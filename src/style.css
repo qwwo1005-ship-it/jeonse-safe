@@ -50,6 +50,7 @@
 /* 메뉴별 고유 색 — 채도 낮은 파스텔 */
 [data-r="home"], body[data-route="home"] { --c: #8f8b84; }
 [data-r="learn"], body[data-route="learn"] { --c: #86a592; }
+[data-r="scams"], body[data-route="scams"] { --c: #c48a86; }
 [data-r="docs"], body[data-route="docs"] { --c: #8a9fb6; }
 [data-r="contract"], body[data-route="contract"] { --c: #b8998f; }
 [data-r="my"], body[data-route="my"] { --c: #a199b7; }
@@ -636,6 +637,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 /* 시안별 메뉴 색 */
 [data-design="a"] [data-r="home"], [data-design="a"] body[data-route="home"] { --c: #c9a7e8; }
 [data-design="a"] [data-r="learn"], [data-design="a"] body[data-route="learn"] { --c: #8fd3b6; }
+[data-design="a"] [data-r="scams"], [data-design="a"] body[data-route="scams"] { --c: #f2a39a; }
 [data-design="a"] [data-r="docs"], [data-design="a"] body[data-route="docs"] { --c: #9ec5f0; }
 [data-design="a"] [data-r="contract"], [data-design="a"] body[data-route="contract"] { --c: #f4a9b8; }
 [data-design="a"] [data-r="my"], [data-design="a"] body[data-route="my"] { --c: #b7a6f2; }
@@ -645,6 +647,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 [data-design="a"] [data-r="glossary"], [data-design="a"] body[data-route="glossary"] { --c: #c6dc8f; }
 [data-design="b"] [data-r="home"], [data-design="b"] body[data-route="home"] { --c: #8fd0c6; }
 [data-design="b"] [data-r="learn"], [data-design="b"] body[data-route="learn"] { --c: #7fd6b9; }
+[data-design="b"] [data-r="scams"], [data-design="b"] body[data-route="scams"] { --c: #f4a99a; }
 [data-design="b"] [data-r="docs"], [data-design="b"] body[data-route="docs"] { --c: #8ec5ef; }
 [data-design="b"] [data-r="contract"], [data-design="b"] body[data-route="contract"] { --c: #f5b3a8; }
 [data-design="b"] [data-r="my"], [data-design="b"] body[data-route="my"] { --c: #b3b8f0; }
@@ -654,6 +657,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 [data-design="b"] [data-r="glossary"], [data-design="b"] body[data-route="glossary"] { --c: #b5dc94; }
 [data-design="c"] [data-r="home"], [data-design="c"] body[data-route="home"] { --c: #ffd6a5; }
 [data-design="c"] [data-r="learn"], [data-design="c"] body[data-route="learn"] { --c: #b9f0ae; }
+[data-design="c"] [data-r="scams"], [data-design="c"] body[data-route="scams"] { --c: #ffb59e; }
 [data-design="c"] [data-r="docs"], [data-design="c"] body[data-route="docs"] { --c: #a6ecf5; }
 [data-design="c"] [data-r="contract"], [data-design="c"] body[data-route="contract"] { --c: #ffb3b3; }
 [data-design="c"] [data-r="my"], [data-design="c"] body[data-route="my"] { --c: #c9bfff; }
@@ -774,6 +778,23 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 main.enter.dir-next .page > *:not([data-io]) { animation-name: from-right; }
 main.enter.dir-prev .page > *:not([data-io]) { animation-name: from-left; }
 main.enter.dir-next .page [data-io] { transition: opacity .5s var(--ease), transform .5s var(--ease); }
+
+/* ---------- 알려진 사기 수법 ---------- */
+.redflags { background: var(--stamp-soft) !important; border-color: transparent !important; }
+.redflags h2 { color: color-mix(in srgb, var(--stamp) 70%, var(--ink)); }
+.rf-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.rf { background: var(--surface); border: 1px solid color-mix(in srgb, var(--stamp) 30%, var(--line)); border-radius: 999px; padding: 6px 12px; font-size: .88rem; font-weight: 600; }
+details.scam { padding: 0; overflow: hidden; }
+details.scam > summary { list-style: none; cursor: pointer; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; position: relative; padding-right: 44px; }
+details.scam > summary::-webkit-details-marker { display: none; }
+details.scam > summary::after { content: ""; position: absolute; right: 20px; top: 24px; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .3s var(--spring); }
+details.scam[open] > summary::after { transform: rotate(-135deg); }
+details.scam > summary h3 { font-size: 1.08rem; }
+details.scam > summary p { color: var(--muted); font-size: .92rem; }
+details.scam > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.scam-body { padding: 0 18px 18px; }
+details.scam[open] .scam-body { animation: rise .35s var(--ease) both; }
+.scam-link svg { width: 15px; height: 15px; color: var(--stamp); }
 
 /* ---------- 플래너: 달력 · 내 일정 ---------- */
 .cal-head { display: flex; align-items: center; gap: 6px; }

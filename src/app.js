@@ -32,7 +32,7 @@ try { const raw = localStorage.getItem(KEY); if (raw) store = Object.assign(blan
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* ignore */ } };
 
 /* ================= state ================= */
-const ROUTES = ['intro', 'terms', 'home', 'learn', 'glossary', 'docs', 'contract', 'my', 'insurance', 'exam', 'news'];
+const ROUTES = ['intro', 'terms', 'home', 'learn', 'scams', 'glossary', 'docs', 'contract', 'my', 'insurance', 'exam', 'news'];
 const S = {
   route: 'home', stageId: null, lessonId: null, gq: '',
   docId: null, docTab: 'guide', docSample: 0,
@@ -96,12 +96,13 @@ const I = {
   exam: '<path d="M4 4h16v16H4z"/><path d="M8 9l2 2 4-4M8 16h8"/>',
   news: '<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M7 9h7M7 13h7"/>',
   glossary: '<path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M9 9h6M9 13h4"/>',
+  scams: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17.2v.1"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
   auto: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>',
 };
 const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
-const NAV = [['home', '홈'], ['learn', '배우기'], ['docs', '서류 읽는 법'], ['contract', '계약서 예시'], ['my', '내 계약 플래너'], ['insurance', '보증보험 비교'], ['exam', '모의고사'], ['news', '최신 제도'], ['glossary', '용어사전']];
+const NAV = [['home', '홈'], ['learn', '배우기'], ['scams', '사기 수법'], ['docs', '서류 읽는 법'], ['contract', '계약서 예시'], ['my', '내 계약 플래너'], ['insurance', '보증보험 비교'], ['exam', '모의고사'], ['news', '최신 제도'], ['glossary', '용어사전']];
 const TABS = [['home', '홈'], ['learn', '배우기'], ['docs', '서류'], ['my', '플래너'], ['exam', '시험']];
 
 /* ================= theme ================= */
@@ -250,7 +251,7 @@ function vHome() {
   <section class="stack"><div class="row" style="justify-content:space-between"><h2>최신 제도</h2><button class="btn ghost" data-act="nav" data-r="news">전체 보기</button></div>
     <div class="grid">${C.policy.items.slice(0, 4).map(p => `<button class="linkcard" data-act="nav" data-r="news">${statusChip(p.status)}<h3>${esc(p.title)}</h3></button>`).join('')}</div></section>
   <section class="stack"><h2>바로 가기</h2><div class="grid">
-    ${[['docs', '서류 읽는 법', '등기부등본·건축물대장·확인설명서 등 10종을 견본으로 읽어봐요.'], ['contract', '계약서 예시', '아파트·빌라·다가구·오피스텔 월세 계약서의 중요한 칸과 위험 찾기.'], ['my', '내 계약 플래너', '날짜를 넣으면 할 일과 체크리스트, 특약 문구가 만들어져요.'], ['insurance', '보증보험 비교', 'HUG·HF·SGI 비교와 126% 룰·보증료 계산기.'], ['exam', '모의고사', `${qs.length}문항 문제은행으로 실전 모의고사와 오답노트.`], ['glossary', '용어사전', '대항력, 확정일자 같은 말을 쉬운 말로.']]
+    ${[['scams', '알려진 사기 수법', `깡통전세·신탁·이중계약부터 신종 수법까지 ${C.scams.items.length}가지와 막는 법.`], ['docs', '서류 읽는 법', '등기부등본·건축물대장·확인설명서 등 10종을 견본으로 읽어봐요.'], ['contract', '계약서 예시', '아파트·빌라·다가구·오피스텔 월세 계약서의 중요한 칸과 위험 찾기.'], ['my', '내 계약 플래너', '날짜를 넣으면 할 일과 체크리스트, 특약 문구가 만들어져요.'], ['insurance', '보증보험 비교', 'HUG·HF·SGI 비교와 126% 룰·보증료 계산기.'], ['exam', '모의고사', `${qs.length}문항 문제은행으로 실전 모의고사와 오답노트.`], ['glossary', '용어사전', '대항력, 확정일자 같은 말을 쉬운 말로.']]
       .map(([r, t, d]) => `<button class="linkcard" data-act="nav" data-r="${r}"><h3>${t}</h3><p>${d}</p></button>`).join('')}</div></section>
   <p class="small muted">${esc(C.meta.disclaimer)}</p></div>`;
 }
@@ -339,6 +340,7 @@ function vLesson(l) {
   ${l.warning ? `<div class="callout red stack" data-io role="note"><div class="row"><span class="chip red">주의</span><b>${esc(l.warning.title)}</b></div><p>${rich(l.warning.text, seen, false)}</p>${l.warning.actions?.length ? `<div><b>지금 할 일</b><ul class="clean ticks">${l.warning.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}</div>` : ''}
   <details class="more" data-io><summary>자세히 알아보기</summary><p class="body">${rich(l.body, seen, false)}</p></details>
   ${(l.keyTerms || []).some(t => termById[t] && !seen.has(t)) ? `<div class="stack"><div class="eyebrow">함께 알면 좋은 용어</div><div class="row">${l.keyTerms.filter(t => termById[t] && !seen.has(t)).map(t => `<button class="term" data-act="term" data-id="${t}">${esc(termById[t].term)}</button>`).join(' · ')}</div></div>` : ''}
+  ${(() => { const sc = C.scams.items.filter(x => (x.lessonIds || []).includes(l.id)); return sc.length ? `<div class="stack"><div class="eyebrow">이 카드와 관련된 사기 수법</div><div class="row">${sc.map(x => `<button class="btn ghost small scam-link" data-act="scamOpen" data-id="${x.id}">${icon('scams')} ${esc(x.name)}</button>`).join('')}</div></div>` : ''; })()}
   ${l.policyUpdateIds?.length ? `<div class="stack"><div class="eyebrow">관련 최신 제도</div>${l.policyUpdateIds.map(id => puById[id] ? `<div class="row">${statusChip(puById[id].status)}<button class="btn ghost" data-act="nav" data-r="news">${esc(puById[id].title)}</button></div>` : '').join('')}</div>` : ''}
   ${l.relatedClauseIds?.length ? `<div class="stack"><div class="eyebrow">관련 특약</div><div class="row">${l.relatedClauseIds.map(id => `<span class="chip plain">${esc(clauseById[id]?.title)}</span>`).join('')}<button class="btn" data-act="clauses">특약 문구 보기</button></div></div>` : ''}
   ${l.contractHotspotIds?.length ? `<div class="row"><button class="btn" data-act="sample" data-id="contract_apt_jeonse_01">계약서 예시에서 확인하기</button></div>` : ''}
@@ -909,12 +911,43 @@ function vResult() {
   <div class="row"><button class="btn primary" data-act="examStart" data-id="wrong" ${Object.keys(store.wrong).length ? '' : 'disabled'}>오답노트 풀기</button><button class="btn" data-act="examHome">시험 목록</button></div></div>`;
 }
 
+// 상태별 보기: 시행 중 / 시행 예정·대기 / 추진 중(미확정)
+const NEWS_F = [['all', '전체', () => true], ['on', '시행 중', p => p.status === 'IN_FORCE'], ['soon', '시행 예정·대기', p => p.status === 'PASSED_PENDING' || p.status === 'PLANNED_SERVICE'], ['plan', '추진 중', p => p.status === 'PROPOSED']];
 function vNews() {
+  const f = NEWS_F.find(x => x[0] === S.newsFilter) || NEWS_F[0];
   return `<div class="page"><div class="head"><div class="eyebrow">최신 제도 · ${esc(C.policy.baseDate)} 기준</div><h1>지금 바뀌고 있는 것들</h1><p>시행 중인지, 아직 추진 중인지 꼭 구분해서 보세요. 추진 중인 제도는 시행 전까지 현행법 기준으로 행동해야 해요.</p></div>
-  ${C.policy.items.map(p => `<div class="card stack"><div class="row">${statusChip(p.status)}${p.checkAgain ? '<span class="chip plain">시행일 재확인 필요</span>' : ''}</div><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
+  <div class="seg" role="group" aria-label="상태별 보기">${NEWS_F.map(([k, t, fn]) => `<button data-act="newsFilter" data-f="${k}" aria-pressed="${f[0] === k}">${t} <span class="num small">${C.policy.items.filter(fn).length}</span></button>`).join('')}</div>
+  ${C.policy.items.filter(f[2]).map(p => `<div class="card stack" data-io><div class="row">${statusChip(p.status)}${p.checkAgain ? '<span class="chip plain">시행일 재확인 필요</span>' : ''}</div><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
     <div><div class="eyebrow">지금 할 일</div><ul class="clean ticks">${p.whatToDoNow.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
     <p class="small muted">출처: ${p.sourceIds.map(id => srcById[id] ? `<a href="${esc(srcById[id].url)}" target="_blank" rel="noopener">${esc(srcById[id].publisher)}</a>` : '').join(' · ')}</p></div>`).join('')}
   <p class="small muted">${esc(C.meta.disclaimer)}</p></div>`;
+}
+
+/* ================= 알려진 사기 수법 ================= */
+const scamTagCls = t => /피해 큼|빠르게|회복|2026/.test(t) ? 'red' : /진화|신종|청년|악용/.test(t) ? 'yellow' : 'plain';
+function scamCard(x) {
+  const srcs = (x.sourceIds || []).map(id => srcById[id]).filter(Boolean);
+  return `<details class="scam card" id="${x.id}" data-io ${S.scamOpen === x.id ? 'open' : ''}>
+    <summary><div class="row">${x.tags.map(t => `<span class="chip ${scamTagCls(t)}">${esc(t)}</span>`).join('')}</div><h3>${esc(x.name)}</h3><p>${esc(x.oneLine)}</p></summary>
+    <div class="scam-body stack">
+      <div><div class="eyebrow">이렇게 속여요</div><ul class="clean flags">${x.how.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>
+      ${x.case ? `<div class="callout small"><b>실제 사례</b><br>${esc(x.case)}</div>` : ''}
+      ${x.signs?.length ? `<div><div class="eyebrow">이런 신호가 보이면 멈추세요</div><ul class="clean">${x.signs.map(s => `<li>· ${esc(s)}</li>`).join('')}</ul></div>` : ''}
+      <div class="callout green"><b>이렇게 막아요</b><ul class="clean ticks">${x.defense.map(d => `<li>${esc(d)}</li>`).join('')}</ul></div>
+      ${x.note ? `<p class="small muted">${esc(x.note)}</p>` : ''}
+      ${(x.lessonIds?.length || x.documentIds?.length) ? `<div class="row">${(x.lessonIds || []).map(id => lessonById[id] ? `<button class="btn ghost small" data-act="lesson" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>` : '').join('')}${(x.documentIds || []).map(id => docById[id] ? `<button class="btn ghost small" data-act="doc" data-id="${id}">${esc(docById[id].name)} 읽는 법</button>` : '').join('')}</div>` : ''}
+      ${srcs.length ? `<p class="small muted">출처: ${srcs.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.publisher)}</a>`).join(' · ')}</p>` : ''}
+    </div></details>`;
+}
+function vScams() {
+  const SC = C.scams, f = S.scamFilter || 'all';
+  const tabs = [['all', '전체'], ...SC.groups.map(g => [g.id, g.id === 'common' ? '대표 수법' : '신종·진화'])];
+  return `<div class="page"><div class="head"><div class="eyebrow">사기 수법 · ${esc(SC.baseDate)} 기준</div><h1>알려진 전세사기 수법</h1><p>${esc(SC.intro)}</p></div>
+  <section class="card stack redflags"><h2>이런 말을 들으면 일단 멈추세요</h2><div class="rf-list">${SC.redFlags.map(t => `<span class="rf">“${esc(t)}”</span>`).join('')}</div></section>
+  <div class="seg" role="group" aria-label="수법 분류">${tabs.map(([k, t]) => `<button data-act="scamFilter" data-f="${k}" aria-pressed="${f === k}">${t} <span class="num small">${k === 'all' ? SC.items.length : SC.items.filter(x => x.group === k).length}</span></button>`).join('')}</div>
+  ${SC.groups.filter(g => f === 'all' || g.id === f).map(g => `<section class="stack"><div><h2>${esc(g.title)}</h2><p class="small muted">${esc(g.desc)}</p></div>${SC.items.filter(x => x.group === g.id).map(scamCard).join('')}</section>`).join('')}
+  <div class="callout"><b>의심되면 혼자 판단하지 마세요</b><br>${esc(SC.help)}<div class="row" style="margin-top:8px"><button class="btn primary glow" data-act="nav" data-r="news">무료 안전계약 컨설팅 등 최신 제도 보기 ${ARR}</button></div></div>
+  <p class="small muted">${esc(C.meta.disclaimer)} 사례는 보도·판결 요약을 바탕으로 했고, 수사·재판 중인 사건은 피해자 측 주장일 수 있어요.</p></div>`;
 }
 
 /* ================= intro (랜딩) — 스크롤이 곧 재생 헤드: 장면(frame)마다 --p(0~1)로 움직임 ================= */
@@ -1044,7 +1077,7 @@ function closeSheet() {
 }
 
 /* ================= render ================= */
-const VIEWS = { intro: vIntro, terms: vTerms, home: vHome, learn: vLearn, glossary: vGlossary, docs: vDocs, contract: vContract, my: vMy, insurance: vInsurance, exam: vExam, news: vNews };
+const VIEWS = { intro: vIntro, terms: vTerms, home: vHome, learn: vLearn, scams: vScams, glossary: vGlossary, docs: vDocs, contract: vContract, my: vMy, insurance: vInsurance, exam: vExam, news: vNews };
 let lastRoute = null, lastKey = null, lastQ = null, lastPage = null;
 // 화면이 '바뀌었을 때'만 등장 애니메이션 — 체크·입력으로 다시 그릴 때는 움직이지 않게
 const viewKey = () => [S.route, S.stageId, S.lessonId, S.docId, S.docTab, S.docSample, S.sampleId, S.cmode, S.trap?.id, S.myTab, store.active, S.session ? 'exam' : '', S.result ? 'result' : ''].join('|');
@@ -1065,7 +1098,7 @@ function render(keepScroll) {
   main.innerHTML = VIEWS[S.route]();
   if (anim && !reduceMotion()) { void main.offsetWidth; main.classList.add(anim); if (anim === 'enter') { countUp(main); if (S.navDir) main.classList.add('dir-' + S.navDir); } }
   S.navDir = null;
-  if (newPage && keepScroll && !S.calFocus && !S.tour && scrollY > 0) {
+  if (newPage && keepScroll && !S.calcFocus && !S.focusId && !S.tour && scrollY > 0) {
     const y0 = scrollY;
     window.scrollTo({ top: 0, behavior: reduceMotion() || y0 > 3000 ? 'auto' : 'smooth' });
     setTimeout(() => { if (scrollY >= y0 - 1) window.scrollTo(0, 0); }, 450); // 부드러운 스크롤을 지원하지 않는 앱 안 브라우저 대비
@@ -1076,6 +1109,7 @@ function render(keepScroll) {
   lastRoute = S.route;
   const smooth = reduceMotion() ? 'auto' : 'smooth';
   if (S.calcFocus) { const el = document.getElementById(S.calcFocus); if (el) { el.scrollIntoView({ block: 'start', behavior: smooth }); el.classList.add('focus-flash'); } S.calcFocus = null; }
+  if (S.focusId) { const el = document.getElementById(S.focusId); if (el) { el.classList.add('in'); el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); el.classList.add('focus-flash'); } S.focusId = null; }
   if (S.tour && S.hsId) { const el = main.querySelector(`[data-id="${S.hsId}"]`); if (el) el.scrollIntoView({ block: 'center', behavior: smooth }); }
   if (S.fx) { const el = main.querySelector(S.fx.sel); (el?.closest('.check') || el)?.classList.add(S.fx.cls); S.fx = null; }
   revealOnScroll(main, anim === 'enter');
@@ -1125,6 +1159,9 @@ const A = {
   term: el => { S.sheet = { type: 'term', id: el.dataset.id }; renderSheet(); },
   cksheet: el => { S.sheet = { type: 'ck', id: el.dataset.id }; renderSheet(); },
   sheetClose: () => closeSheet(),
+  scamFilter: el => { S.scamFilter = el.dataset.f; S.scamOpen = null; render(true); },
+  newsFilter: el => { S.newsFilter = el.dataset.f; render(true); },
+  scamOpen: el => go('scams', { scamOpen: el.dataset.id, scamFilter: 'all', focusId: el.dataset.id }),
   // 달력·내 일정
   calDay: el => { S.calDay = el.dataset.d; S.remForm = null; S.remMsg = ''; render(true); },
   calMove: el => { const [y, m] = S.calMonth.split('-').map(Number); const d = new Date(y, m + +el.dataset.d, 1); S.calMonth = `${d.getFullYear()}-${d.getMonth()}`; render(true); },

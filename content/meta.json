@@ -69,6 +69,17 @@
     { "id": "src_korea_20230202", "title": "전세사기 예방 및 피해지원 방안 — 보증보험 전세가율 100%→90%(2023.5.1 신규 계약부터)", "publisher": "대한민국 정책브리핑 2023.2.2", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148911232" },
     { "id": "src_mt_20260427", "title": "깡통전세 줄이기, 정부 보증비율 90%→70% 축소 추진", "publisher": "머니투데이 2026.4.27", "url": "https://www.mt.co.kr/estate/2026/04/27/2026042619563253880" },
     { "id": "src_bizwatch_20241121", "title": "'공시가 126→112%' 빌라 전세보증 문턱 더 높아지나", "publisher": "비즈워치 2024.11.21", "url": "https://news.bizwatch.co.kr/article/real_estate/2024/11/21/0031" },
+    { "id": "src_korea_20260310", "title": "임차인 대항력 '전입 신고 즉시' 발생…전세사기 방지 대책 발표(2026.3.10)", "publisher": "대한민국 정책브리핑 2026.3", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148960599" },
+    { "id": "src_mbc_daejeon_20260121", "title": "'피해금 40억' 대전서 또 전세사기…\"사기 수법도 진화\"", "publisher": "대전MBC 2026.1.21", "url": "https://v.daum.net/v/20260121213435601" },
+    { "id": "src_hankyung_202606", "title": "전세사기, 이렇게 하면 막을 수 있다(유형별 수법과 예방)", "publisher": "한경부동산밸류업센터 2026.6", "url": "https://landvalueup.hankyung.com/issuecheck-2026-0604-0700" },
+    { "id": "src_ytn_upappraisal", "title": "전세보증사고 5건 가운데 1건은 '감정평가' 이용", "publisher": "YTN 2023.2.12", "url": "https://www.ytn.co.kr/_ln/0102_202302122231533748" },
+    { "id": "src_kapanet_kkangtong", "title": "깡통전세(전세사기) 유형 및 예방법", "publisher": "한국감정평가사협회", "url": "https://consult.kapanet.or.kr/download/%EA%B9%A1%ED%86%B5%EC%A0%84%EC%84%B8%20%EC%9C%A0%ED%98%95%20%EB%B0%8F%20%EC%98%88%EB%B0%A9%EB%B2%95.pdf" },
+    { "id": "src_lfind_fakeloan", "title": "무자본 갭투자자의 허위 전세자금대출 편취 사건(대전지법 홍성지원 2024고단894)", "publisher": "엘파인드 판결 요약", "url": "https://lfind.kr/cases/%EB%8C%80%EC%A0%84%EC%A7%80%EB%B0%A9%EB%B2%95%EC%9B%90%ED%99%8D%EC%84%B1%EC%A7%80%EC%9B%90/2024%EA%B3%A0%EB%8B%A8894" },
+    { "id": "src_safehomes_trust", "title": "전세보증보험도 소용없는 최악의 전세사기 유형과 예방법", "publisher": "안심등기(safehomes.kr)", "url": "https://safehomes.kr/insights/403?post_type=magazine" },
+    { "id": "src_newspim_20260805", "title": "경찰, 집값 띄우기·전세사기 특별단속", "publisher": "뉴스핌 2026.8.5", "url": "https://www.newspim.com/news/view/20260805001140" },
+    { "id": "src_eiec_consult", "title": "국토교통부, 전세사기 예방을 위해 '안전계약 컨설팅 사업' 시행(2026.5.18~)", "publisher": "KDI 경제정보센터(국토교통부 보도) 2026.5.15", "url": "https://eiec.kdi.re.kr/policy//materialView.do?num=281108&pg=&pp=&device=&search_txt=&topic=&type=J&depth1=N0000&depth2=N0100" },
+    { "id": "src_mt_20260820_trust", "title": "전세금 2억 맡기면 집주인 월 73만원…전월세 안심신탁 도입", "publisher": "머니투데이 2026.8.20", "url": "https://www.mt.co.kr/estate/2026/08/20/2026082011085270881" },
+    { "id": "src_korea_leasereport_2025", "title": "6월부터 '주택 임대계약 신고제' 본격 시행", "publisher": "대한민국 정책브리핑 2025.4.28", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148942511" },
     { "id": "src_imaeil_20261009", "title": "전세보증 126% 룰 유지·등록임대 고시, 공시가격 변동과 갱신 시 보증 한도", "publisher": "매일신문 2026.10.9", "url": "https://www.imaeil.com/page/view/2026100916594256154" }
   ]
 }

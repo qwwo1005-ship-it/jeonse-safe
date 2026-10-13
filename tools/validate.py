@@ -21,6 +21,10 @@ for s in L["stages"]:
         chk(l.get("linkIds", []), links, l["id"])
 for x in L["calculators"]: chk(x.get("linkIds", []), links, x["id"])
 srcs = {s["id"] for s in c("meta.json")["sources"]}
+SC = c("scams.json"); groups = {g["id"] for g in SC["groups"]}
+for x in SC["items"]:
+    if x["group"] not in groups: err.append(f"{x['id']}: unknown group {x['group']}")
+    chk(x.get("lessonIds", []), lessons, x["id"]); chk(x.get("documentIds", []), docs, x["id"]); chk(x.get("sourceIds", []), srcs, x["id"] + " source")
 for x in P["items"]:
     chk(x.get("sourceIds", []), srcs, x["id"] + " source")
     if x.get("status") not in ("IN_FORCE", "PASSED_PENDING", "PROPOSED", "PLANNED_SERVICE"): err.append(f"{x['id']}: unknown status {x.get('status')}")
