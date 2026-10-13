@@ -930,6 +930,18 @@ details.scam[open] .scam-body { animation: rise .35s var(--ease) both; }
 .ev.mine::before { border-color: var(--stamp); }
 .mine-chip { color: var(--stamp); background: var(--stamp-soft); border-color: transparent; }
 .rem-form { border: 2px solid var(--accent) !important; }
+.ics-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.ics-opt { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: var(--r); border: 1.5px solid var(--line-strong); background: var(--surface); transition: border-color .2s, background-color .2s, transform .2s var(--ease); }
+.ics-opt:hover { border-color: var(--accent); background: var(--accent-soft); }
+.ics-opt:active { transform: scale(.98); }
+.ics-opt:focus-visible { outline: 2px solid var(--focus); }
+.ics-opt b { font-size: .98rem; }
+.ics-opt b .num { color: var(--accent-ink); }
+.ics-opt span { font-size: .84rem; color: var(--muted); line-height: 1.5; }
+.ev-memo { background: var(--accent-soft); border-radius: 8px; padding: 6px 10px; }
+.ev-memo b { color: var(--accent-ink); margin-right: 4px; }
+.hidden-evs { padding: 0 16px 14px; gap: 6px; }
+.hidden-evs li { gap: 10px; }
 .broker-box { padding: 14px 16px; border-radius: var(--r); background: var(--accent-soft); }
 
 /* ---------- 아이폰 입력 보정 ---------- */

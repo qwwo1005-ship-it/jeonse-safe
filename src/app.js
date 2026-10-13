@@ -478,9 +478,17 @@ function buildEvents(c) {
     ev.push({ id: 'r:notice', date: addDays(base.END, -60), title: '갱신·이사 의사 통지 마감(만료 2개월 전)', note: '기록이 남는 방식으로 통지하세요.' });
     ev.push({ id: 'r:end', date: base.END, title: '계약 만료일 — 보증금 반환·이사', note: '보증금을 받기 전에는 전출하지 마세요. 먼저 나가야 하면 임차권등기명령.' });
   }
+  // 자동 일정을 사용자가 고친 내용(날짜·시간·제목·메모) 반영, 숨긴 일정은 빼기
+  const ov = c.evOverride || {}, out = [];
+  ev.forEach(e => { const o = ov[e.id]; if (!o) return out.push(e); if (o.hidden) return; out.push({ ...e, origDate: e.date, origTitle: e.title, date: pDate(o.date) || e.date, time: o.time || '', title: o.title || e.title, memo: o.memo || '', edited: true }); });
   // 내가 직접 넣은 일정(리마인더)
-  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) ev.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type }); });
-  return ev.sort((a, b) => a.date - b.date || (a.time || '').localeCompare(b.time || ''));
+  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) out.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type }); });
+  return out.sort((a, b) => a.date - b.date || (a.time || '').localeCompare(b.time || ''));
+}
+// 숨긴 자동 일정(다시 보이기 목록용)
+function hiddenEvents(c) {
+  const ov = c.evOverride || {}; const keep = c.evOverride; c.evOverride = {};
+  const all = buildEvents(c).filter(e => !e.custom && ov[e.id]?.hidden); c.evOverride = keep; return all;
 }
 
 /* ---------- 내 일정(리마인더) 프리셋 — 제목은 고쳐 쓸 수 있고, 상세 내용은 본인이 작성 ---------- */
@@ -559,10 +567,16 @@ function vPlan(c) {
     return `<div class="ev${n === 0 ? ' today' : ''}${n < 0 ? ' past' : ''}${done ? ' done' : ''}${e.custom ? ' mine' : ''}">
       <div class="ev-head"><span class="dday${n >= 0 && n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><span class="d">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span>${e.custom ? '<span class="chip mine-chip">내 일정</span>' : ''}<b>${esc(e.title)}</b>${e.ck ? `<span class="small muted num">${cnt}/${items.length}</span>` : ''}</div>
       ${e.note ? `<p class="small ${e.custom ? '' : 'muted'}" style="white-space:pre-line">${esc(e.note)}</p>` : ''}
-      ${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<div class="row"><label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>${e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : ''}</div>`}
+      ${e.memo ? `<p class="small ev-memo" style="white-space:pre-line"><b>내 메모</b> ${esc(e.memo)}</p>` : ''}
+      <div class="row">${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>`}${editBtn(e)}${e.edited ? '<span class="chip plain">고침</span>' : ''}</div>
       ${e.ck && open ? `<div class="card" data-evbody="${e.id}" style="padding:8px;margin-top:6px">${ckById[e.ck].fieldMode ? '<p class="small muted" style="padding:4px 10px">현장 모드: 이 화면을 켜두고 하나씩 체크하세요.</p>' : ''}${items.map(it => `<label class="check${ch[it.id] ? ' done' : ''}"><input type="checkbox" data-act="ckItem" data-id="${it.id}" ${ch[it.id] ? 'checked' : ''}><span><span class="t">${esc(it.text)}</span> ${it.required ? '' : '<span class="chip plain">권장</span>'}
         ${it.helpLessonId ? `<button class="btn ghost small" data-act="lessonSheet" data-id="${it.helpLessonId}">왜?</button>` : ''}${it.contractHotspotId ? `<button class="btn ghost small" data-act="hsSheet" data-id="${it.contractHotspotId}">계약서 칸</button>` : ''}${it.calculatorId ? `<button class="btn ghost small" data-act="calcSheet" data-id="${it.calculatorId}">계산기</button>` : ''}</span></label>`).join('')}</div>` : ''}</div>`;
-  }).join('')}</div>`;
+  }).join('')}</div>${hiddenList(c)}`;
+}
+const editBtn = e => e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : `<button class="btn ghost small" data-act="evEdit" data-id="${e.id}">수정</button>`;
+function hiddenList(c) {
+  const hs = hiddenEvents(c); if (!hs.length) return '';
+  return `<details class="more"><summary>숨긴 일정 ${hs.length}개 다시 보기</summary><ul class="clean hidden-evs">${hs.map(e => `<li class="row"><span class="num small muted">${fmt(e.date)}</span><span>${esc(e.title)}</span><button class="btn ghost small" data-act="evUnhide" data-id="${e.id}">다시 보이기</button></li>`).join('')}</ul></details>`;
 }
 function vRisk(c) {
   const d = diagnose(c);
@@ -645,15 +659,27 @@ function vCal(c) {
     <div class="cal-grid">${'일월화수목금토'.split('').map((w, i) => `<div class="cal-dow${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}">${w}</div>`).join('')}${cells.join('')}</div>
     <div class="row small muted"><span class="cal-key auto"></span>계약 일정 <span class="cal-key mine"></span>내 일정</div></div>
   ${S.remForm ? remForm() : sel ? `<section class="card stack"><div class="row" style="justify-content:space-between"><h3>${fmt(selD)}</h3><button class="btn primary" data-act="remNew" data-d="${sel}">+ 이 날 일정 추가</button></div>
-    ${dayList.length ? `<ul class="clean">${dayList.map(e => `<li class="day-ev${e.custom ? ' mine' : ''}"><div class="row"><b>${e.time ? `<span class="num">${esc(e.time)}</span> ` : ''}${esc(e.title)}</b>${e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : ''}</div>${e.note ? `<p class="small muted" style="white-space:pre-line">${esc(e.note)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">이 날은 아직 일정이 없어요.</p>'}</section>`
+    ${dayList.length ? `<ul class="clean">${dayList.map(e => `<li class="day-ev${e.custom ? ' mine' : ''}"><div class="row"><b>${e.time ? `<span class="num">${esc(e.time)}</span> ` : ''}${esc(e.title)}</b>${editBtn(e)}</div>${e.note ? `<p class="small muted" style="white-space:pre-line">${esc(e.note)}</p>` : ''}${e.memo ? `<p class="small ev-memo" style="white-space:pre-line"><b>내 메모</b> ${esc(e.memo)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">이 날은 아직 일정이 없어요.</p>'}</section>`
     : `<div class="row"><button class="btn primary" data-act="remNew">+ 내 일정 추가</button><span class="small muted">달력에서 날짜를 누르면 그날 일정을 보고 추가할 수 있어요.</span></div>`}
-  <section class="card stack"><h3>폰 캘린더에 넣고 알림 받기</h3><p class="small muted">일정 파일(.ics)을 받아 열면 구글·삼성·아이폰 캘린더에 들어가요. 하루 전과 당일에 알림이 울리도록 함께 설정돼요. 같은 파일을 다시 넣으면 일정이 겹쳐 보일 수 있어요.</p>
-    <div class="row"><button class="btn" data-act="icsExport" data-w="mine">내 일정만 보내기</button><button class="btn" data-act="icsExport" data-w="all">전체 일정 보내기</button></div></section>`;
+  <section class="card stack"><h3>폰 캘린더에 넣고 알림 받기</h3><p class="small muted">일정 파일(.ics)을 받아 열면 구글·삼성·아이폰 캘린더에 들어가요. 하루 전과 당일에 알림이 울려요. 같은 파일을 두 번 넣으면 일정이 겹쳐 보일 수 있어요.</p>
+    <div class="ics-opts">
+      <button class="ics-opt" data-act="icsExport" data-w="mine"><b>내가 넣은 일정만 <span class="num">${evs.filter(e => e.custom).length}개</span></b><span>은행 방문·이사업체 예약처럼 직접 추가한 일정만 보내요.</span></button>
+      <button class="ics-opt" data-act="icsExport" data-w="all"><b>계약 일정 + 내 일정 전체 <span class="num">${evs.length}개</span></b><span>계약 전날·잔금일·대항력 확인·보증보험 마감·등기부 점검·만기 통지 같은 자동 일정까지 모두 보내요.</span></button>
+    </div></section>`;
 }
 // 일정 입력 폼 — 값은 S.remForm에 들고 있어서 종류를 바꿔도 적던 내용이 남음
 function remForm() {
   const f = S.remForm, hint = REMIND[f.type]?.hint || '';
   const opt = Object.entries(REMIND).map(([k, v]) => `<option value="${k}" ${k === f.type ? 'selected' : ''}>${esc(v.label)}</option>`).join('');
+  if (f.auto) return `<section class="card stack rem-form" id="remForm"><h3>자동 일정 고치기</h3>
+    <p class="small muted">계약 날짜로 자동으로 생긴 일정이에요. 이 일정만 따로 옮기거나 이름·메모를 바꿀 수 있어요.${f.origDate ? ` 처음 날짜: <b class="num">${fmt(f.origDate)}</b>` : ''}<br>계약일·잔금일·만기일 자체가 바뀌었다면 '계약 정보'에서 바꾸세요. 관련 일정이 함께 움직여요.</p>
+    <div class="form-grid">
+      <div class="field"><label for="rm-date">날짜</label><input id="rm-date" type="date" value="${esc(f.date)}"></div>
+      <div class="field"><label for="rm-time">시간 (선택)</label><input id="rm-time" type="time" value="${esc(f.time)}"></div>
+    </div>
+    <div class="field"><label for="rm-title">제목</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}"></div>
+    <div class="field"><label for="rm-memo">내 메모</label><textarea id="rm-memo" placeholder="예) 오전 10시 ○○은행 방문, 신분증 챙기기">${esc(f.memo)}</textarea></div>
+    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.edited ? '<button class="btn ghost" data-act="evReset">원래대로</button>' : ''}<button class="btn ghost" data-act="evHide">${f.askHide ? '정말 숨길까요? 한 번 더 누르세요' : '이 일정 숨기기'}</button>${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
   return `<section class="card stack rem-form" id="remForm"><h3>${f.id ? '내 일정 고치기' : '내 일정 추가'}</h3>
     <div class="form-grid">
       <div class="field"><label for="rm-date">날짜</label><input id="rm-date" type="date" value="${esc(f.date)}"></div>
@@ -1291,9 +1317,19 @@ const A = {
   remNew: el => { const date = el.dataset.d || S.calDay || ymd(today()); openCalAt(date); S.remForm = { id: null, date, time: '', type: 'bank', title: REMIND.bank.label, memo: '' }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   remEdit: el => { const c = activeContract(); const r = (c.reminders || []).find(x => x.id === el.dataset.id); if (!r) return; openCalAt(r.date); S.remForm = { ...r }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   remCancel: () => { S.remForm = null; S.remMsg = ''; render(true); },
+  evEdit: el => { const c = activeContract(); const e = buildEvents(c).find(x => x.id === el.dataset.id); if (!e) return; openCalAt(ymd(e.date));
+    S.remForm = { auto: true, evId: e.id, date: ymd(e.date), time: e.time || '', title: e.title, memo: e.memo || '', origDate: e.origDate || e.date, origTitle: e.origTitle || e.title, edited: !!e.edited }; S.remMsg = ''; render(true);
+    document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
+  evReset: () => { const c = activeContract(); delete (c.evOverride || {})[S.remForm.evId]; save(); const d = ymd(S.remForm.origDate); S.remForm = null; openCalAt(d); render(true); toast('원래 일정으로 되돌렸어요'); },
+  evHide: () => { const f = S.remForm; if (!f.askHide) { readRemForm(); f.askHide = true; render(true); return; } const c = activeContract(); (c.evOverride ||= {})[f.evId] = { ...(c.evOverride[f.evId] || {}), hidden: true }; save(); S.remForm = null; render(true); toast('일정을 숨겼어요. 목록 아래에서 다시 볼 수 있어요'); },
+  evUnhide: el => { const c = activeContract(); const o = (c.evOverride || {})[el.dataset.id]; if (o) { delete o.hidden; if (!o.date && !o.title && !o.memo && !o.time) delete c.evOverride[el.dataset.id]; } save(); render(true); toast('일정을 다시 보이게 했어요'); },
   remSave: () => {
     const c = activeContract(); readRemForm(); const f = S.remForm;
     if (!pDate(f.date)) { S.remMsg = '날짜를 골라 주세요.'; render(true); return; }
+    if (f.auto) {
+      (c.evOverride ||= {})[f.evId] = { date: f.date, time: f.time, title: f.title.trim() || f.origTitle, memo: f.memo.trim() };
+      save(); S.remForm = null; S.remMsg = ''; openCalAt(f.date); render(true); toast('일정을 고쳤어요'); return;
+    }
     const title = f.title.trim() || (f.type !== 'custom' ? REMIND[f.type].label : '');
     if (!title) { S.remMsg = '제목을 적어 주세요.'; render(true); return; }
     const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim() };
