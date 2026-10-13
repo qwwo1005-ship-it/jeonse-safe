@@ -960,9 +960,9 @@ function vIntro() {
     <h1 class="in-h"><span class="ln"><span>당신의 보증금,</span></span><span class="ln"><span>지금 안전한가요?</span></span></h1>
     <div class="in-money"><span class="num" data-count="200000000">200,000,000</span><span class="unit">원</span></div>
     <p class="in-sub">평생 모은 돈이 들어가는 계약이에요.<br>하루의 틈, 서류 한 장이 결과를 바꿔요.</p>
-    <div class="in-hero-cta"><button class="btn in-go" data-act="introStart">바로 시작하기</button><span>또는 아래로 내려 5장면 보기</span></div>
+    <div class="in-hero-cta"><button class="btn in-go" data-act="introStart">바로 시작하기</button><button class="in-tour" data-act="introJump" data-to="2">5장면 둘러보기 <span aria-hidden="true">↓</span></button></div>
     <div class="in-stamp" data-at="0.3" aria-hidden="true">확인<br>필요</div>
-    <div class="in-cue" aria-hidden="true"><span>스크롤</span><i></i></div>
+    <button class="in-cue" data-act="introJump" data-to="2" aria-label="다음 장면으로 내려가기"><span class="mouse" aria-hidden="true"><i></i></span><span>아래로 내려보세요</span><span class="chev" aria-hidden="true"><i></i><i></i></span></button>
   </div></section>
 
   <section class="fr fr2" data-fr="2"><div class="fr-stick">
@@ -1014,6 +1014,7 @@ function vIntro() {
     <p class="in-disc">${esc(C.meta.disclaimer)}</p>
   </section>
   <div class="in-progress" aria-hidden="true"><i id="inProg"></i></div>
+  <nav class="in-dots" aria-label="장면 이동">${['시작', '숫자', '하루의 틈', '깡통전세', '막는 법'].map((t, i) => `<button data-act="introJump" data-to="${i + 1}" aria-label="${i + 1}장면 ${t}"${i === 0 ? ' aria-current="step"' : ''}><span>${t}</span></button>`).join('')}</nav>
   </div>`;
 }
 function introFx() {
@@ -1031,6 +1032,8 @@ function introFx() {
     sec.querySelectorAll('[data-scrub]').forEach(el => { const t = Math.min(1, Math.max(0, (p - +el.dataset.a) / (+el.dataset.b - +el.dataset.a))); el.textContent = Math.round(+el.dataset.scrub * (1 - Math.pow(1 - t, 3))).toLocaleString('ko-KR'); });
   });
   const f = document.getElementById('inFrame'); if (f) f.textContent = `${String(cur).padStart(2, '0')} / 05`;
+  document.querySelectorAll('.in-dots button').forEach(b => b.toggleAttribute('aria-current', +b.dataset.to === cur));
+  document.querySelector('.in-dots')?.classList.toggle('done', !!document.querySelector('.in-cta') && document.querySelector('.in-cta').getBoundingClientRect().top < innerHeight * 0.6);
   const max = document.documentElement.scrollHeight - innerHeight, pg = document.getElementById('inProg');
   if (pg) pg.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
 }
@@ -1186,6 +1189,13 @@ const A = {
   shareBroker: () => { const c = activeContract(); const text = brokerText(c); if (navigator.share) navigator.share({ title: '특약사항 요청', text }).catch(() => {}); else copyText(text); },
   paperMode: el => { S.paperMode = el.dataset.m; render(true); },
   introStart: () => go(termsOk ? 'home' : 'terms'),
+  // 인트로 장면 이동: 그 장면이 시작되는 위치로 부드럽게 (지원 안 하는 브라우저는 바로 이동)
+  introJump: el => {
+    const sec = document.querySelector(`[data-fr="${el.dataset.to}"]`); if (!sec) return;
+    const top = el.dataset.to === '1' ? 0 : Math.round(sec.offsetTop + (sec.offsetHeight - innerHeight) * 0.2), y0 = scrollY;
+    window.scrollTo({ top, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    setTimeout(() => { if (Math.abs(scrollY - y0) < 2) window.scrollTo(0, top); }, 450);
+  },
   termsAgree: () => {
     const d = new Date(), at = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
     try { localStorage.setItem(TERMS_KEY, JSON.stringify({ v: C.meta.terms.version, at })); } catch (e) { /* 저장이 막혀도 이번 방문 동안은 진행 */ }
