@@ -26,7 +26,7 @@ samples.forEach(s => s.hotspots.forEach(h => { if (!allHotspots[h.id]) allHotspo
 
 /* ================= storage ================= */
 const KEY = 'jeonse-guard-v1';
-const blank = () => ({ v: 1, read: {}, contracts: [], active: null, checks: {}, clauseSel: {}, wrong: {}, results: [], hl: {} });
+const blank = () => ({ v: 1, read: {}, contracts: [], active: null, checks: {}, clauseSel: {}, wrong: {}, results: [], hl: {}, trash: [] });
 let store = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) store = Object.assign(blank(), JSON.parse(raw)); } catch (e) { /* storage unavailable */ }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* ignore */ } };
@@ -73,11 +73,15 @@ const verdictColor = { red: 'red', yellow: 'yellow', green: 'green' };
 const statusChip = st => { const t = C.meta.statusTags[st]; return t ? `<span class="chip ${esc(t.color)}">${esc(t.label)}</span>` : ''; };
 const priChip = p => p === 'critical' ? '<span class="chip red">필수</span>' : '<span class="chip yellow">상황별</span>';
 let toastTimer;
-function toast(msg) {
+let toastUndoFn = null;
+function toast(msg, undo) {
   let el = document.getElementById('toast');
   if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
-  el.textContent = msg; requestAnimationFrame(() => el.classList.add('show'));
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  toastUndoFn = undo || null;
+  el.innerHTML = esc(msg) + (undo ? ' <button class="toast-undo" data-act="toastUndo">되돌리기</button>' : '');
+  el.classList.toggle('has-undo', !!undo);
+  requestAnimationFrame(() => el.classList.add('show'));
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.classList.remove('show', 'has-undo'); toastUndoFn = null; }, undo ? 7000 : 2200);
 }
 function copyText(text, fallbackSel) {
   const done = () => toast('복사했어요');
@@ -480,9 +484,9 @@ function buildEvents(c) {
   }
   // 자동 일정을 사용자가 고친 내용(날짜·시간·제목·메모) 반영, 숨긴 일정은 빼기
   const ov = c.evOverride || {}, out = [];
-  ev.forEach(e => { const o = ov[e.id]; if (!o) return out.push(e); if (o.hidden) return; out.push({ ...e, origDate: e.date, origTitle: e.title, date: pDate(o.date) || e.date, time: o.time || '', title: o.title || e.title, memo: o.memo || '', color: o.color || '', edited: true }); });
+  ev.forEach(e => { const o = ov[e.id]; if (!o) return out.push(e); if (o.hidden) return; out.push({ ...e, origDate: e.date, origTitle: e.title, date: pDate(o.date) || e.date, time: o.time || '', title: o.title || e.title, memo: o.memo || '', color: o.color || '', alerts: o.alerts, edited: true }); });
   // 내가 직접 넣은 일정(리마인더)
-  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) out.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type, color: r.color || '' }); });
+  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) out.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type, color: r.color || '', alerts: r.alerts }); });
   return out.sort((a, b) => a.date - b.date || (a.time || '').localeCompare(b.time || ''));
 }
 // 숨긴 자동 일정(다시 보이기 목록용)
@@ -508,6 +512,12 @@ const REMIND = {
   counsel: { label: '법률·피해 상담 (132 등)', hint: '예) 대한법률구조공단 132, 전세피해지원센터' },
   custom: { label: '직접 입력', hint: '무엇을 할지 자유롭게 적어 주세요' },
 };
+// 알림 시간 (폰 캘린더 파일에 들어감). 기본: 하루 전 + 당일
+const ALERTS = [['d0', '당일 오전 9시'], ['h1', '1시간 전'], ['d1', '하루 전'], ['d3', '3일 전'], ['w1', '일주일 전']];
+const ALERT_DEFAULT = ['d1', 'd0'];
+const alertsOf = e => Array.isArray(e.alerts) ? e.alerts : ALERT_DEFAULT;
+const alertText = a => a.length ? ALERTS.filter(([k]) => a.includes(k)).map(([, t]) => t).join(' · ') : '알림 없음';
+const alertPicker = (sel, timed) => `<div class="field"><span class="field-label">알림 <span class="muted">(폰 캘린더에 넣을 때 적용)</span></span><div class="al-pick">${ALERTS.map(([k, tx]) => `<button class="al-chip" data-act="remAlert" data-a="${k}" aria-pressed="${sel.includes(k)}"${k === 'h1' && !timed ? ' title="시간을 넣지 않으면 당일 오전 8시에 알려요"' : ''}>${tx}</button>`).join('')}<button class="al-chip none" data-act="remAlert" data-a="none" aria-pressed="${!sel.length}">알림 없음</button></div></div>`;
 // 일정 색깔 마커 (파스텔)
 const MARKS = [['pink', '#f4a9b8', '분홍'], ['orange', '#f6b48f', '주황'], ['yellow', '#f3d27f', '노랑'], ['green', '#8fd3b6', '초록'], ['teal', '#7fcfd6', '청록'], ['sky', '#9ec5f0', '하늘'], ['purple', '#b7a6f2', '보라'], ['gray', '#c4bfc9', '회색']];
 const MARK_HEX = Object.fromEntries(MARKS.map(([k, h]) => [k, h]));
@@ -543,7 +553,7 @@ function vMy() {
   const head = `<div class="head"><div class="eyebrow">내 계약 플래너</div><h1>날짜만 넣으면 할 일이 정리돼요</h1><p>계약일·잔금일·만기일을 넣으면 그날 할 일, 체크리스트, 특약 문구, 위험 진단이 만들어져요. 이 기기 브라우저에만 저장돼요.</p></div>`;
   if (!c) return `<div class="page">${head}<section class="plan-spot plan-start"><div class="plan-spot-head"><span class="chip plan-chip">핵심 기능</span><h2>내 계약을 만들면 이렇게 도와드려요</h2></div>${planFeatGrid()}
     <div class="row"><button class="btn primary glow" data-act="cNew">내 계약 만들기 ${ARR}</button><button class="btn" data-act="cExample">예시 계약으로 둘러보기</button></div>
-    <p class="small muted">입력한 내용은 이 기기 브라우저에만 저장돼요. '저장·PDF'에서 파일로 옮길 수 있어요.</p></section>
+    <p class="small muted">입력한 내용은 이 기기 브라우저에만 저장돼요. '저장·PDF'에서 파일로 옮길 수 있어요.</p></section>${trashList(null)}
     <div class="card stack"><h2>특약 문구만 보고 싶다면</h2><p class="muted">계약을 만들지 않아도 특약 라이브러리 전체를 볼 수 있어요.</p><div><button class="btn" data-act="myTab" data-t="library">특약 라이브러리 열기</button></div></div>${S.myTab === 'library' ? vLibrary() : ''}</div>`;
   const tabs = [['plan', '일정·체크리스트'], ['cal', '달력·내 일정'], ['risk', '위험 진단'], ['clauses', '특약 만들기'], ['info', '계약 정보'], ['backup', '저장·PDF']];
   const tab = tabs.some(t => t[0] === S.myTab) ? S.myTab : 'plan';
@@ -557,7 +567,8 @@ function vMy() {
   return `<div class="page">${head}
   <div class="row"><div class="field" style="min-width:min(100%,280px)"><label for="csel">계약 선택</label><select id="csel" data-bind="active">${store.contracts.map(x => `<option value="${x.id}" ${x.id === c.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
     <button class="btn" data-act="cNew" style="align-self:end">+ 새 계약</button>
-    ${S.confirmDel ? `<span class="row" style="align-self:end"><span class="small">'${esc(c.name)}'을(를) 지울까요?</span><button class="btn primary" data-act="cDelYes">지우기</button><button class="btn" data-act="cDelNo">취소</button></span>` : `<button class="btn ghost" data-act="cDel" style="align-self:end">이 계약 지우기</button>`}</div>
+    <button class="btn ghost danger" data-act="delAsk" data-kind="contract" data-id="${c.id}" style="align-self:end">이 계약 삭제</button></div>
+  ${trashList(null)}
   ${c.example ? '<div class="callout yellow small">예시 데이터예요. \'계약 정보\'에서 내 계약으로 바꿔 쓰거나 새 계약을 만드세요.</div>' : ''}
   <div class="seg" role="group" aria-label="플래너 메뉴">${tabs.map(([k, t]) => `<button data-act="myTab" data-t="${k}" aria-pressed="${tab === k}">${t}</button>`).join('')}</div>${body}</div>`;
 }
@@ -577,12 +588,44 @@ function vPlan(c) {
       <div class="row">${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>`}${editBtn(e)}${e.edited ? '<span class="chip plain">고침</span>' : ''}</div>
       ${e.ck && open ? `<div class="card" data-evbody="${e.id}" style="padding:8px;margin-top:6px">${ckById[e.ck].fieldMode ? '<p class="small muted" style="padding:4px 10px">현장 모드: 이 화면을 켜두고 하나씩 체크하세요.</p>' : ''}${items.map(it => `<label class="check${ch[it.id] ? ' done' : ''}"><input type="checkbox" data-act="ckItem" data-id="${it.id}" ${ch[it.id] ? 'checked' : ''}><span><span class="t">${esc(it.text)}</span> ${it.required ? '' : '<span class="chip plain">권장</span>'}
         ${it.helpLessonId ? `<button class="btn ghost small" data-act="lessonSheet" data-id="${it.helpLessonId}">왜?</button>` : ''}${it.contractHotspotId ? `<button class="btn ghost small" data-act="hsSheet" data-id="${it.contractHotspotId}">계약서 칸</button>` : ''}${it.calculatorId ? `<button class="btn ghost small" data-act="calcSheet" data-id="${it.calculatorId}">계산기</button>` : ''}</span></label>`).join('')}</div>` : ''}</div>`;
-  }).join('')}</div>${hiddenList(c)}`;
+  }).join('')}</div>${hiddenList(c)}${trashList(c.id)}`;
 }
-const editBtn = e => e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : `<button class="btn ghost small" data-act="evEdit" data-id="${e.id}">수정</button>`;
+const editBtn = e => (e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button><button class="btn ghost small danger" data-act="delAsk" data-kind="rem" data-id="${e.custom}">삭제</button>` : `<button class="btn ghost small" data-act="evEdit" data-id="${e.id}">수정</button><button class="btn ghost small danger" data-act="delAsk" data-kind="ev" data-id="${e.id}">삭제</button>`) + (Array.isArray(e.alerts) ? `<span class="small muted al-note">알림 ${esc(alertText(e.alerts))}</span>` : '');
+function doDelete(kind, id) {
+  const c = activeContract();
+  if (kind === 'rem') {
+    const item = (c.reminders || []).find(x => x.id === id); if (!item) return;
+    c.reminders = c.reminders.filter(x => x.id !== id); const rec = { kind: 'rem', cid: c.id, item, at: Date.now() };
+    (store.trash ||= []).push(rec); S.remForm = null; save(); render(true);
+    toast('일정을 삭제했어요', () => restoreTrash(rec));
+  } else if (kind === 'ev') {
+    (c.evOverride ||= {})[id] = { ...(c.evOverride[id] || {}), hidden: true }; S.remForm = null; save(); render(true);
+    toast('자동 일정을 삭제했어요', () => { delete c.evOverride[id].hidden; save(); render(true); });
+  } else if (kind === 'contract') {
+    const k = store.contracts.find(x => x.id === id); if (!k) return;
+    const rec = { kind: 'contract', item: k, checks: store.checks[id], clauseSel: store.clauseSel[id], at: Date.now() };
+    (store.trash ||= []).push(rec); store.contracts = store.contracts.filter(x => x.id !== id); delete store.checks[id]; delete store.clauseSel[id];
+    store.active = store.contracts[0]?.id || null; save(); render(true);
+    toast('계약을 삭제했어요', () => restoreTrash(rec));
+  }
+}
+function restoreTrash(rec) {
+  store.trash = (store.trash || []).filter(x => x !== rec && x.at !== rec.at);
+  if (rec.kind === 'rem') { const c = store.contracts.find(x => x.id === rec.cid); if (!c) { toast('이 일정의 계약이 없어서 되살릴 수 없어요'); save(); return; } (c.reminders ||= []).push(rec.item); }
+  if (rec.kind === 'contract') { if (!store.contracts.some(x => x.id === rec.item.id)) store.contracts.push(rec.item); if (rec.checks) store.checks[rec.item.id] = rec.checks; if (rec.clauseSel) store.clauseSel[rec.item.id] = rec.clauseSel; store.active = rec.item.id; }
+  save(); render(true); toast('되살렸어요');
+}
+// 휴지통: 지운 내 일정·계약을 30일 동안 보관
+const TRASH_DAYS = 30;
+function trashPrune() { const lim = Date.now() - TRASH_DAYS * 864e5; store.trash = (store.trash || []).filter(x => x.at > lim).slice(-50); }
+function trashList(cid) {
+  trashPrune(); const items = store.trash.filter(x => cid ? x.kind === 'rem' && x.cid === cid : x.kind === 'contract');
+  if (!items.length) return '';
+  return `<details class="more"><summary>최근 삭제한 ${cid ? '내 일정' : '계약'} ${items.length}개 (${TRASH_DAYS}일 보관)</summary><ul class="clean hidden-evs">${items.slice().reverse().map(x => `<li class="row"><span class="num small muted">${new Date(x.at).toLocaleDateString('ko-KR')} 삭제</span><span>${esc(x.kind === 'rem' ? `${x.item.date} ${x.item.title}` : x.item.name)}</span><button class="btn ghost small" data-act="trashRestore" data-at="${x.at}">되살리기</button></li>`).join('')}</ul></details>`;
+}
 function hiddenList(c) {
   const hs = hiddenEvents(c); if (!hs.length) return '';
-  return `<details class="more"><summary>숨긴 일정 ${hs.length}개 다시 보기</summary><ul class="clean hidden-evs">${hs.map(e => `<li class="row"><span class="num small muted">${fmt(e.date)}</span><span>${esc(e.title)}</span><button class="btn ghost small" data-act="evUnhide" data-id="${e.id}">다시 보이기</button></li>`).join('')}</ul></details>`;
+  return `<details class="more"><summary>삭제한 자동 일정 ${hs.length}개 되살리기</summary><ul class="clean hidden-evs">${hs.map(e => `<li class="row"><span class="num small muted">${fmt(e.date)}</span><span>${esc(e.title)}</span><button class="btn ghost small" data-act="evUnhide" data-id="${e.id}">되살리기</button></li>`).join('')}</ul></details>`;
 }
 function vRisk(c) {
   const d = diagnose(c);
@@ -685,8 +728,9 @@ function remForm() {
     </div>
     <div class="field"><label for="rm-title">제목</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}"></div>
     <div class="field"><label for="rm-memo">내 메모</label><textarea id="rm-memo" placeholder="예) 오전 10시 ○○은행 방문, 신분증 챙기기">${esc(f.memo)}</textarea></div>
+    ${alertPicker(f.alerts || ALERT_DEFAULT, !!f.time)}
     ${colorPicker(f.color || '')}
-    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.edited ? '<button class="btn ghost" data-act="evReset">원래대로</button>' : ''}<button class="btn ghost" data-act="evHide">${f.askHide ? '정말 숨길까요? 한 번 더 누르세요' : '이 일정 숨기기'}</button>${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
+    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.edited ? '<button class="btn ghost" data-act="evReset">원래대로</button>' : ''}<button class="btn ghost danger" data-act="delAsk" data-kind="ev" data-id="${f.evId}">이 일정 삭제</button>${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
   return `<section class="card stack rem-form" id="remForm"><h3>${f.id ? '내 일정 고치기' : '내 일정 추가'}</h3>
     <div class="form-grid">
       <div class="field"><label for="rm-date">날짜</label><input id="rm-date" type="date" value="${esc(f.date)}"></div>
@@ -695,8 +739,9 @@ function remForm() {
     </div>
     <div class="field"><label for="rm-title">제목 ${f.type === 'custom' ? '(직접 입력)' : '(고쳐 써도 돼요)'}</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}" placeholder="${f.type === 'custom' ? '예) 보증금 이체 한도 늘리기' : ''}"></div>
     <div class="field"><label for="rm-memo">상세 내용</label><textarea id="rm-memo" placeholder="${esc(hint)}">${esc(f.memo)}</textarea></div>
+    ${alertPicker(f.alerts || ALERT_DEFAULT, !!f.time)}
     ${colorPicker(f.color || '')}
-    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.id ? `<button class="btn ghost" data-act="remDel">${f.askDel ? '정말 지울까요? 한 번 더 누르세요' : '이 일정 지우기'}</button>` : ''}${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
+    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.id ? `<button class="btn ghost danger" data-act="delAsk" data-kind="rem" data-id="${f.id}">이 일정 삭제</button>` : ''}${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
 }
 const readRemForm = () => { const v = id => document.getElementById(id)?.value ?? ''; Object.assign(S.remForm, { date: v('rm-date'), time: v('rm-time'), title: v('rm-title'), memo: v('rm-memo') }); };
 const openCalAt = date => { S.myTab = 'cal'; S.calDay = date; const d = pDate(date); if (d) S.calMonth = `${d.getFullYear()}-${d.getMonth()}`; };
@@ -719,8 +764,11 @@ function icsFor(c, which) {
     else { const n = ymd(addDays(e.date, 1)).replace(/-/g, ''); lines.push(`DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${n}`); }
     lines.push(`SUMMARY:${esc2('[전세] ' + e.title)}`);
     if (e.note) lines.push(`DESCRIPTION:${esc2(e.note)}`);
-    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(e.title)}`, e.time ? 'TRIGGER:-P1D' : 'TRIGGER:-PT15H', 'END:VALARM');
-    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(e.title)}`, e.time ? 'TRIGGER:-PT1H' : 'TRIGGER:PT9H', 'END:VALARM');
+    const start = new Date(e.date); if (e.time) { const [h, m] = e.time.split(':'); start.setHours(+h, +m, 0, 0); } else start.setHours(0, 0, 0, 0);
+    const at9 = n => { const x = new Date(start); x.setDate(x.getDate() - n); x.setHours(9, 0, 0, 0); return x; };
+    const sameTime = n => { const x = new Date(start); x.setDate(x.getDate() - n); return x; };
+    const when = { d0: () => at9(0), h1: () => e.time ? new Date(start - 3600e3) : (() => { const x = new Date(start); x.setHours(8, 0, 0, 0); return x; })(), d1: () => e.time ? sameTime(1) : at9(1), d3: () => e.time ? sameTime(3) : at9(3), w1: () => e.time ? sameTime(7) : at9(7) };
+    alertsOf(e).forEach(k => { if (!when[k]) return; const min = Math.round((when[k]() - start) / 60000); lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(e.title)}`, `TRIGGER:${min < 0 ? '-' : ''}PT${Math.abs(min)}M`, 'END:VALARM'); });
     lines.push('END:VEVENT');
   });
   lines.push('END:VCALENDAR');
@@ -1036,6 +1084,14 @@ const SHEET = {
   scam: s => peekScam(C.scams.items.find(x => x.id === s.id)),
   policy: s => policyBody(puById[s.id]),
   calc: s => peekCalc(calcById[s.id]),
+  confirm: s => {
+    const what = { rem: '이 일정을', ev: '이 자동 일정을', contract: `'${esc(activeContract()?.name || '이 계약')}' 계약을` }[s.kind];
+    const lost = s.kind === 'contract' ? '이 계약의 일정·체크·특약 문구가 모두 목록에서 사라져요.' : '목록과 달력에서 사라져요.';
+    const keep = s.kind === 'ev' ? "'삭제한 자동 일정 되살리기'에서 다시 살릴 수 있어요." : `실수로 지워도 '최근 삭제한 항목'에서 ${TRASH_DAYS}일 안에 되살릴 수 있어요.`;
+    return s.step === 1
+      ? `<div class="confirm-box"><div class="confirm-ic">!</div><h2>${what} 삭제할까요?</h2><p class="muted">${lost}</p><div class="row"><button class="btn danger-fill" data-act="delStep2">삭제</button><button class="btn" data-act="sheetClose">취소</button></div></div>`
+      : `<div class="confirm-box"><div class="confirm-ic strong">!</div><h2>정말 삭제할까요?</h2><p>한 번 더 확인할게요. ${lost}</p><p class="small muted">${keep}</p><div class="row"><button class="btn danger-fill" data-act="delYes">네, 삭제할게요</button><button class="btn" data-act="sheetClose">아니요, 그대로 둘게요</button></div></div>`;
+  },
 };
 // 팝업 안에서 또 열면 이전 팝업을 기억해 '← 이전'으로 돌아갈 수 있게
 function openSheet(next, el) {
@@ -1327,25 +1383,29 @@ const A = {
   remCancel: () => { S.remForm = null; S.remMsg = ''; render(true); },
   remColor: el => { readRemForm(); S.remForm.color = el.dataset.c; render(true); },
   evEdit: el => { const c = activeContract(); const e = buildEvents(c).find(x => x.id === el.dataset.id); if (!e) return; openCalAt(ymd(e.date));
-    S.remForm = { auto: true, evId: e.id, date: ymd(e.date), time: e.time || '', title: e.title, memo: e.memo || '', color: e.color || '', origDate: e.origDate || e.date, origTitle: e.origTitle || e.title, edited: !!e.edited }; S.remMsg = ''; render(true);
+    S.remForm = { auto: true, evId: e.id, date: ymd(e.date), time: e.time || '', title: e.title, memo: e.memo || '', color: e.color || '', alerts: alertsOf(e), origDate: e.origDate || e.date, origTitle: e.origTitle || e.title, edited: !!e.edited }; S.remMsg = ''; render(true);
     document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   evReset: () => { const c = activeContract(); delete (c.evOverride || {})[S.remForm.evId]; save(); const d = ymd(S.remForm.origDate); S.remForm = null; openCalAt(d); render(true); toast('원래 일정으로 되돌렸어요'); },
-  evHide: () => { const f = S.remForm; if (!f.askHide) { readRemForm(); f.askHide = true; render(true); return; } const c = activeContract(); (c.evOverride ||= {})[f.evId] = { ...(c.evOverride[f.evId] || {}), hidden: true }; save(); S.remForm = null; render(true); toast('일정을 숨겼어요. 목록 아래에서 다시 볼 수 있어요'); },
+  remAlert: el => { readRemForm(); const f = S.remForm; const a = el.dataset.a; f.alerts = a === 'none' ? [] : (f.alerts || ALERT_DEFAULT).includes(a) ? (f.alerts || ALERT_DEFAULT).filter(x => x !== a) : [...(f.alerts || ALERT_DEFAULT), a]; render(true); },
   evUnhide: el => { const c = activeContract(); const o = (c.evOverride || {})[el.dataset.id]; if (o) { delete o.hidden; if (!o.date && !o.title && !o.memo && !o.time) delete c.evOverride[el.dataset.id]; } save(); render(true); toast('일정을 다시 보이게 했어요'); },
   remSave: () => {
     const c = activeContract(); readRemForm(); const f = S.remForm;
     if (!pDate(f.date)) { S.remMsg = '날짜를 골라 주세요.'; render(true); return; }
     if (f.auto) {
-      (c.evOverride ||= {})[f.evId] = { date: f.date, time: f.time, title: f.title.trim() || f.origTitle, memo: f.memo.trim(), color: f.color || '' };
+      (c.evOverride ||= {})[f.evId] = { date: f.date, time: f.time, title: f.title.trim() || f.origTitle, memo: f.memo.trim(), color: f.color || '', alerts: f.alerts || ALERT_DEFAULT };
       save(); S.remForm = null; S.remMsg = ''; openCalAt(f.date); render(true); toast('일정을 고쳤어요'); return;
     }
     const title = f.title.trim() || (f.type !== 'custom' ? REMIND[f.type].label : '');
     if (!title) { S.remMsg = '제목을 적어 주세요.'; render(true); return; }
-    const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim(), color: f.color || '' };
+    const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim(), color: f.color || '', alerts: f.alerts || ALERT_DEFAULT };
     const list = (c.reminders ||= []); const i = list.findIndex(x => x.id === r.id); if (i >= 0) list[i] = r; else list.push(r);
     save(); S.remForm = null; S.remMsg = ''; openCalAt(r.date); render(true); toast(i >= 0 ? '일정을 고쳤어요' : '일정을 추가했어요');
   },
-  remDel: () => { const f = S.remForm; if (!f.askDel) { readRemForm(); f.askDel = true; render(true); return; } const c = activeContract(); c.reminders = (c.reminders || []).filter(x => x.id !== f.id); delete (store.checks[c.id] || {})['ev:u:' + f.id]; save(); S.remForm = null; render(true); toast('일정을 지웠어요'); },
+  delAsk: el => { if (S.remForm) readRemForm(); openSheet({ type: 'confirm', step: 1, kind: el.dataset.kind, id: el.dataset.id }); },
+  delStep2: () => { S.sheet = { ...S.sheet, step: 2 }; renderSheet(); },
+  delYes: () => { const s = S.sheet; closeSheet(); doDelete(s.kind, s.id); },
+  toastUndo: () => { const fn = toastUndoFn; toastUndoFn = null; document.getElementById('toast')?.classList.remove('show'); fn?.(); },
+  trashRestore: el => { const at = +el.dataset.at; const x = (store.trash || []).find(y => y.at === at); if (x) restoreTrash(x); },
   icsExport: el => { const c = activeContract(); const { text, n } = icsFor(c, el.dataset.w); if (!n) { toast(el.dataset.w === 'mine' ? '내 일정이 아직 없어요' : '일정이 없어요'); return; } download(`전세지킴이_일정_${safeName(c.name)}.ics`, text, 'text/calendar;charset=utf-8'); toast(`일정 ${n}개를 파일로 받았어요. 열어서 캘린더에 추가하세요`); },
   // 저장·불러오기·PDF
   saveFile: () => { const data = JSON.stringify({ app: 'jeonse-jikimi', v: 1, savedAt: new Date().toISOString(), contracts: store.contracts, checks: store.checks, clauseSel: store.clauseSel }, null, 1); download(`전세지킴이_내계약_${fileDate()}.json`, data, 'application/json'); toast('파일로 저장했어요'); },
@@ -1401,9 +1461,6 @@ const A = {
   myTab: el => { S.myTab = el.dataset.t; S.confirmDel = false; S.remForm = null; S.remMsg = ''; render(true); },
   cNew: () => { const c = newContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'info'; S.confirmDel = false; render(true); },
   cExample: () => { const c = exampleContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'plan'; render(true); },
-  cDel: () => { S.confirmDel = true; render(true); },
-  cDelNo: () => { S.confirmDel = false; render(true); },
-  cDelYes: () => { const c = activeContract(); store.contracts = store.contracts.filter(x => x.id !== c.id); delete store.checks[c.id]; delete store.clauseSel[c.id]; store.active = store.contracts[0]?.id || null; save(); S.confirmDel = false; render(true); toast('지웠어요'); },
   evToggle: el => { const c = activeContract(); const e = buildEvents(c).find(x => x.id === el.dataset.id); const n = ddays(e.date); const cur = S.openEv[e.id] ?? (n >= 0 && n <= 7 && !!e.ck); S.openEv[e.id] = !cur; if (!cur) S.fx = { sel: `[data-evbody="${e.id}"]`, cls: 'reveal' }; render(true); },
   copyOut: () => { const t = document.getElementById('clOut'); copyText(t.value, '#clOut'); },
   copyBk: () => { const t = document.getElementById('bkOut'); copyText(t.value, '#bkOut'); },

@@ -930,6 +930,27 @@ details.scam[open] .scam-body { animation: rise .35s var(--ease) both; }
 .ev.mine::before { border-color: var(--stamp); }
 .mine-chip { color: var(--stamp); background: var(--stamp-soft); border-color: transparent; }
 .rem-form { border: 2px solid var(--accent) !important; }
+/* 알림 시간 고르기 */
+.al-pick { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+.al-chip { all: unset; cursor: pointer; padding: 7px 12px; border-radius: 999px; border: 1.5px solid var(--line-strong); font-size: .86rem; font-weight: 600; color: var(--muted); background: var(--surface); transition: background-color .2s, border-color .2s, color .2s; }
+.al-chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+.al-chip[aria-pressed="true"]::before { content: "✓ "; }
+.al-chip.none[aria-pressed="true"] { border-color: var(--line-strong); background: var(--surface-2); color: var(--ink); }
+.al-chip:focus-visible { outline: 2px solid var(--focus); }
+.al-note { margin-left: 4px; }
+/* 삭제: 위험 버튼, 두 번 확인 창, 되돌리기 */
+.btn.danger, .btn.ghost.danger { color: var(--stamp); }
+.btn.ghost.danger:hover { background: var(--stamp-soft); }
+.btn.danger-fill { background: var(--stamp) !important; border-color: var(--stamp) !important; color: #fff !important; }
+.confirm-box { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 6px 4px 4px; }
+.confirm-box .row { justify-content: center; margin-top: 6px; }
+.confirm-ic { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; font-weight: 800; color: var(--warn); background: var(--warn-soft); animation: pop .4s var(--spring); }
+.confirm-ic.strong { color: #fff; background: var(--stamp); }
+.toast.has-undo { display: flex; align-items: center; gap: 12px; }
+.toast.has-undo { pointer-events: auto; }
+.toast-undo { all: unset; cursor: pointer; font-weight: 800; color: #ffd27a; padding: 4px 6px; border-radius: 6px; }
+.toast-undo:focus-visible { outline: 2px solid #ffd27a; }
+
 /* 일정 색깔 마커 */
 .field-label { font-size: .8rem; font-weight: 700; color: var(--muted); }
 .mk-pick { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px 0; }
