@@ -1,0 +1,9 @@
+# 빌드 결과물은 CI(GitHub Actions)가 만듦 — 로컬에서는 python3 tools/build.py
+dist/
+_site/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
+.claude/

@@ -1,0 +1,118 @@
+{
+  "baseDate": "2026-10-13",
+  "checklists": [
+    {
+      "id": "ck_visit",
+      "title": "집 보러 가는 날",
+      "eventType": "VISIT",
+      "stageId": "stage_02",
+      "items": [
+        { "id": "ck_visit_01", "text": "실제 주소·동호수가 등기부·건축물대장과 일치하는지 확인", "required": true, "helpLessonId": "ls_03_01", "allowPhoto": true },
+        { "id": "ck_visit_02", "text": "우편함·현관 고지서로 다른 세대 거주·체납 흔적 확인", "required": false, "allowPhoto": true },
+        { "id": "ck_visit_03", "text": "누수·곰팡이·결로·수압·보일러 상태 확인(사진·영상)", "required": true, "allowPhoto": true },
+        { "id": "ck_visit_04", "text": "옥탑·베란다 확장·방 쪼개기 등 불법 증축 흔적 확인", "required": true, "helpLessonId": "ls_03_02", "allowPhoto": true },
+        { "id": "ck_visit_05", "text": "중개사무소 등록증과 실제 응대자가 공인중개사인지 확인", "required": true, "helpLessonId": "ls_02_03" },
+        { "id": "ck_visit_06", "text": "보증금·시세 메모 → 전세가율 계산", "required": true, "calculatorId": "calc_jeonse_ratio" }
+      ]
+    },
+    {
+      "id": "ck_before_contract",
+      "title": "계약 전날",
+      "eventType": "CONTRACT",
+      "offsetDays": -1,
+      "stageId": "stage_03",
+      "items": [
+        { "id": "ck_bc_01", "text": "등기부등본 발급 — 갑구(신탁·압류·가압류·경매) 확인", "required": true, "helpLessonId": "ls_03_01" },
+        { "id": "ck_bc_02", "text": "등기부 을구 — 근저당 채권최고액 합계 확인", "required": true, "helpLessonId": "ls_03_01" },
+        { "id": "ck_bc_03", "text": "건축물대장 — 위반건축물·용도(주택 여부) 확인", "required": true, "helpLessonId": "ls_03_02" },
+        { "id": "ck_bc_04", "text": "공시가격 확인 후 126% 룰 계산(빌라·다세대)", "required": true, "calculatorId": "calc_hug_126" },
+        { "id": "ck_bc_09", "text": "보증기관(HUG·HF·SGI)·은행에 이 주소로 보증보험 가입 가능 여부를 직접 확인하고 '가능' 답변 받기", "required": true, "helpLessonId": "ls_02_02" },
+        { "id": "ck_bc_05", "text": "안심전세앱 위험진단 결과 확인", "required": false, "helpLessonId": "ls_03_04" },
+        { "id": "ck_bc_06", "text": "특약 생성기로 특약 준비 → 중개사에게 미리 전송", "required": true, "helpLessonId": "ls_04_03" },
+        { "id": "ck_bc_07", "text": "신탁등기가 있으면 신탁원부 발급·수탁자 동의 여부 확인", "required": false, "condition": "isTrust" },
+        { "id": "ck_bc_08", "text": "다가구면 선순위 임차보증금 합계 자료 요청", "required": false, "condition": "isMultiFamily" }
+      ]
+    },
+    {
+      "id": "ck_contract_day",
+      "title": "계약 당일",
+      "eventType": "CONTRACT",
+      "offsetDays": 0,
+      "stageId": "stage_04",
+      "fieldMode": true,
+      "items": [
+        { "id": "ck_cd_01", "text": "계약 직전 등기부등본 재발급(오늘 날짜)", "required": true },
+        { "id": "ck_cd_02", "text": "임대인 신분증 진위 확인 + 등기부 소유자와 동일인", "required": true, "helpLessonId": "ls_04_01" },
+        { "id": "ck_cd_03", "text": "(대리인) 위임장·본인발급 인감증명서 확인 + 소유자 직접 통화", "required": false, "condition": "isAgent" },
+        { "id": "ck_cd_04", "text": "납세증명서(국세·지방세) 제시 받음", "required": true, "contractHotspotId": "hs_tax" },
+        { "id": "ck_cd_05", "text": "선순위 확정일자 부여현황 제시 받음", "required": true, "contractHotspotId": "hs_senior_fixed_date" },
+        { "id": "ck_cd_06", "text": "건축물대장·신탁원부(해당 시) 제시 받음", "required": true },
+        { "id": "ck_cd_07", "text": "계약서 주소·동호수·면적이 등기부와 일치", "required": true, "contractHotspotId": "hs_address" },
+        { "id": "ck_cd_08", "text": "특약사항이 빠짐없이 기재되었는지 확인", "required": true, "contractHotspotId": "hs_special_terms" },
+        { "id": "ck_cd_09", "text": "중개사 서명·날인 + 중개대상물 확인·설명서 수령", "required": true, "contractHotspotId": "hs_broker" },
+        { "id": "ck_cd_10", "text": "계약금은 등기부상 소유자 명의 계좌로 송금", "required": true, "contractHotspotId": "hs_deposit_account" },
+        { "id": "ck_cd_11", "text": "계약서·영수증·확인설명서 사진을 앱에 저장", "required": true, "allowPhoto": true }
+      ]
+    },
+    {
+      "id": "ck_after_contract",
+      "title": "계약 후 ~ 잔금 전",
+      "eventType": "CONTRACT",
+      "offsetDays": 1,
+      "stageId": "stage_05",
+      "items": [
+        { "id": "ck_ac_01", "text": "확정일자 받기(또는 임대차 신고로 자동 부여)", "required": true, "helpLessonId": "ls_05_01" },
+        { "id": "ck_ac_02", "text": "주택임대차 신고(계약일로부터 30일 이내, 대상 시)", "required": true, "dueOffsetDays": 30 },
+        { "id": "ck_ac_03", "text": "임대인 미납 국세 열람(세무서, 보증금 1천만 원 초과 시 동의 불필요)", "required": false },
+        { "id": "ck_ac_04", "text": "전세대출 신청·서류 제출, 실행일=잔금일 확인", "required": false, "condition": "usesLoan" },
+        { "id": "ck_ac_05", "text": "이사 업체 예약", "required": false }
+      ]
+    },
+    {
+      "id": "ck_moving_day",
+      "title": "잔금·이사 당일",
+      "eventType": "BALANCE",
+      "offsetDays": 0,
+      "stageId": "stage_06",
+      "fieldMode": true,
+      "items": [
+        { "id": "ck_md_01", "text": "잔금 송금 직전 등기부등본 재확인(새 근저당·가압류 없음)", "required": true, "helpLessonId": "ls_06_01" },
+        { "id": "ck_md_02", "text": "선순위 근저당 말소 조건이 있다면 상환·말소 접수 확인", "required": false, "condition": "hasPayoffCondition" },
+        { "id": "ck_md_03", "text": "잔금은 소유자 계좌로 송금, 영수증 수령", "required": true },
+        { "id": "ck_md_04", "text": "전입신고 완료(정부24 또는 주민센터)", "required": true, "helpLessonId": "ls_06_02" },
+        { "id": "ck_md_05", "text": "확정일자 완료 확인", "required": true },
+        { "id": "ck_md_06", "text": "주민등록등본으로 전입 주소(동·호수) 확인", "required": true },
+        { "id": "ck_md_07", "text": "빈집 상태 사진·영상 촬영", "required": true, "allowPhoto": true },
+        { "id": "ck_md_08", "text": "공과금 검침값 사진·관리비 정산", "required": false, "allowPhoto": true },
+        { "id": "ck_md_09", "text": "도어락 비밀번호 변경", "required": false }
+      ]
+    },
+    {
+      "id": "ck_after_move",
+      "title": "이사 후 1주~1개월",
+      "eventType": "BALANCE",
+      "offsetDays": 7,
+      "stageId": "stage_07",
+      "items": [
+        { "id": "ck_am_01", "text": "잔금 다음 날 등기부 재확인(대항력 발생 후)", "required": true, "dueOffsetDays": -6 },
+        { "id": "ck_am_02", "text": "전세보증보험 신청", "required": true, "helpLessonId": "ls_07_01" },
+        { "id": "ck_am_03", "text": "지자체 보증료 지원사업 확인·신청", "required": false },
+        { "id": "ck_am_04", "text": "계약서 원본·확정일자·보증서 보관(앱 백업)", "required": true, "allowPhoto": true },
+        { "id": "ck_am_05", "text": "6개월 등기부 확인 알림 켜기", "required": true }
+      ]
+    },
+    {
+      "id": "ck_before_end",
+      "title": "만기 6개월 전",
+      "eventType": "END",
+      "offsetDays": -180,
+      "stageId": "stage_08",
+      "items": [
+        { "id": "ck_be_01", "text": "갱신할지 이사할지 결정", "required": true },
+        { "id": "ck_be_02", "text": "임대인에게 의사 통지(만료 2개월 전까지, 기록 남기기)", "required": true, "helpLessonId": "ls_08_01" },
+        { "id": "ck_be_03", "text": "보증보험 만기·이행청구 절차 확인", "required": false },
+        { "id": "ck_be_04", "text": "반환 지연 우려 시 임차권등기명령 준비", "required": false, "helpLessonId": "ls_08_02" }
+      ]
+    }
+  ]
+}

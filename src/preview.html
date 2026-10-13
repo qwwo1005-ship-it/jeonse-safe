@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 비교</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root { --bg: #f6f4f8; --ink: #2f2b36; --muted: #7a7482; --line: #e6e1ec; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Pretendard Variable", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: rgba(246, 244, 248, .9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  h1 { font-size: 1.05rem; margin: 0 8px 0 0; }
+  .pages { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pages button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 7px 14px; font: inherit; font-size: .88rem; cursor: pointer; }
+  .pages button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .note { color: var(--muted); font-size: .82rem; margin-left: auto; }
+  main { display: flex; gap: 28px; justify-content: safe center; padding: 26px 20px 40px; overflow-x: auto; }
+  figure { margin: 0; display: flex; flex-direction: column; gap: 10px; align-items: center; flex: none; }
+  figcaption { text-align: center; }
+  figcaption b { display: block; font-size: 1.02rem; }
+  figcaption span { color: var(--muted); font-size: .84rem; }
+  .phone { width: 390px; height: 780px; border-radius: 36px; padding: 10px; background: #1f1d24; box-shadow: 0 20px 50px rgba(40, 30, 60, .18); }
+  .phone iframe { width: 100%; height: 100%; border: 0; border-radius: 28px; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>전세지킴이 디자인 시안 비교</h1>
+  <div class="pages" id="pages"></div>
+  <span class="note">각 화면 안에서 스크롤·클릭도 돼요</span>
+</header>
+<main>
+  <figure><figcaption><b>확정안 · A 솜사탕</b><span>핑크·라일락 · 둥근 카드 · 주아</span></figcaption><div class="phone"><iframe data-d="a" title="A 솜사탕"></iframe></div></figure>
+  <figure><figcaption><b>B 민트 글라스</b><span>민트·하늘 · 반투명 유리 · 고운돋움</span></figcaption><div class="phone"><iframe data-d="b" title="B 민트 글라스"></iframe></div></figure>
+  <figure><figcaption><b>C 피치 스티커</b><span>복숭아·버터 · 굵은 테두리 · 도현</span></figcaption><div class="phone"><iframe data-d="c" title="C 피치 스티커"></iframe></div></figure>
+</main>
+<script>
+  const PAGES = [['', '인트로'], ['terms', '약관'], ['home', '홈'], ['learn', '배우기'], ['docs', '서류'], ['my', '플래너'], ['insurance', '보증보험'], ['exam', '모의고사']];
+  const frames = [...document.querySelectorAll('iframe')];
+  const show = h => {
+    // 약관 화면은 동의 전 모습으로 보이도록 preview 표시를 빼고 연다
+    frames.forEach(f => { f.src = `standalone.html?design=${f.dataset.d}${h === 'terms' ? '&review' : '&preview'}#${h}`; });
+    document.querySelectorAll('#pages button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.h === h)));
+  };
+  document.getElementById('pages').innerHTML = PAGES.map(([h, t]) => `<button data-h="${h}">${t}</button>`).join('');
+  document.getElementById('pages').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(b.dataset.h); });
+  show('');
+</script>
+</body>
+</html>

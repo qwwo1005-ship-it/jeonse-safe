@@ -1,0 +1,3029 @@
+{
+ "baseDate": "2026-10-13",
+ "notice": "아래 계약서는 교육용 가상 예시입니다. 인물·주소·계좌·등록번호는 모두 허구이며, 조문은 법무부 주택임대차표준계약서의 구성을 따라 '요지'로 쉽게 풀어 쓴 것입니다. 실제 계약 시에는 법무부 최신 양식 원문을 사용하세요(조문 번호는 양식 버전에 따라 다를 수 있음).",
+ "forms": [
+  {
+   "id": "form_moj_standard",
+   "name": "법무부 주택임대차표준계약서",
+   "publisher": "법무부(국토교통부·서울시 등과 공동 마련)",
+   "recommended": true,
+   "pros": [
+    "미납 국세·지방세, 선순위 확정일자 현황 확인란이 기본으로 들어 있음",
+    "계약 종류(신규/합의 재계약/갱신요구권 행사) 구분란",
+    "입주 전 수리, 관리비, 중요확인사항(별지) 포함"
+   ],
+   "url": "https://www.moj.go.kr"
+  },
+  {
+   "id": "form_broker_association",
+   "name": "공인중개사협회 등 중개업계 양식(예: 아파트 전세 계약서)",
+   "publisher": "중개업계·부동산 거래 프로그램",
+   "recommended": false,
+   "typicalStructure": [
+    "1. 부동산의 표시(소재지·토지·건물·임대할 부분)",
+    "2. 계약내용: 보증금·계약금·중도금·잔금",
+    "존속기간 / 용도변경 및 전대 / 계약의 해지 / 계약의 종료 / 계약의 해제 / 채무불이행과 손해배상 / 중개보수 / 확인설명서 교부",
+    "특약사항",
+    "당사자·중개사 서명란"
+   ],
+   "watchOut": [
+    "미납 국세·선순위 확정일자 확인란이 없는 경우가 있어 특약으로 보완해야 함",
+    "양식마다 조항 순서·문구가 다르므로 임차인 보호 조항이 빠지지 않았는지 대조"
+   ],
+   "note": "현장에서 가장 많이 쓰이는 양식이지만 표준계약서 사용을 요청할 수 있습니다."
+  }
+ ],
+ "samples": [
+  {
+   "id": "contract_apt_jeonse_01",
+   "title": "아파트 전세 계약서 예시 (표준계약서 기준)",
+   "formId": "form_moj_standard",
+   "houseType": "APARTMENT",
+   "leaseType": "JEONSE",
+   "context": {
+    "marketPrice": 500000000,
+    "officialPrice": 360000000,
+    "registry": {
+     "issuedAt": "2026-11-02T09:40",
+     "titleSection": "경기도 수원시 영통구 샘플로 123, 샘플마을아파트 제101동 제12층 제1203호, 전용 84.97㎡",
+     "gapgu": [
+      {
+       "rank": 1,
+       "purpose": "소유권이전",
+       "date": "2019-05-20",
+       "cause": "매매",
+       "holder": "김안심"
+      }
+     ],
+     "eulgu": [
+      {
+       "rank": 1,
+       "purpose": "근저당권설정",
+       "date": "2019-05-20",
+       "maxAmount": 60000000,
+       "holder": "가상은행"
+      }
+     ]
+    },
+    "buildingLedger": {
+     "use": "공동주택(아파트)",
+     "violation": false
+    },
+    "calc": {
+     "jeonseRatioWithDebt": 76.0,
+     "explain": "(보증금 3억 2천만 + 채권최고액 6천만) ÷ 시세 5억 = 76% → 주의 구간. HUG 아파트 기준(시세 × 90% = 4억 5천만) 이내라 보증 가입 가능성은 있음."
+    }
+   },
+   "pages": [
+    {
+     "pageNo": 1,
+     "sections": [
+      {
+       "id": "sec_header",
+       "title": "계약 유형과 당사자",
+       "fields": [
+        {
+         "key": "leaseKind",
+         "label": "임대차 종류",
+         "value": "☑ 전세  ☐ 보증금 있는 월세  ☐ 월세",
+         "hotspotId": "hs_lease_kind"
+        },
+        {
+         "key": "parties",
+         "label": "당사자",
+         "value": "임대인 김안심 과 임차인 이지킴 은 아래와 같이 임대차 계약을 체결한다.",
+         "hotspotId": "hs_parties"
+        }
+       ]
+      },
+      {
+       "id": "sec_property",
+       "title": "[임차주택의 표시]",
+       "fields": [
+        {
+         "key": "address",
+         "label": "소재지(도로명주소)",
+         "value": "경기도 수원시 영통구 샘플로 123",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "land",
+         "label": "토지",
+         "value": "지목: 대 / 대지권 면적: 45.12㎡"
+        },
+        {
+         "key": "building",
+         "label": "건물",
+         "value": "구조·용도: 철근콘크리트조 공동주택(아파트) / 면적: 84.97㎡",
+         "hotspotId": "hs_building_use"
+        },
+        {
+         "key": "leasedPart",
+         "label": "임차할 부분",
+         "value": "샘플마을아파트 제101동 제12층 제1203호 전부 / 84.97㎡",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "contractType",
+         "label": "계약의 종류",
+         "value": "☑ 신규 계약  ☐ 합의에 의한 재계약  ☐ 계약갱신요구권 행사에 의한 갱신계약",
+         "hotspotId": "hs_contract_type"
+        }
+       ]
+      },
+      {
+       "id": "sec_disclosure",
+       "title": "미납 국세·지방세 / 선순위 확정일자 현황 / 확정일자 부여란",
+       "fields": [
+        {
+         "key": "taxArrears",
+         "label": "미납 국세·지방세",
+         "value": "☑ 없음 (임대인 서명: 김안심 ㊞)  ☐ 있음",
+         "hotspotId": "hs_tax"
+        },
+        {
+         "key": "seniorFixedDate",
+         "label": "선순위 확정일자 현황",
+         "value": "☑ 해당 없음 (임대인 서명: 김안심 ㊞)  ☐ 해당 있음",
+         "hotspotId": "hs_senior_fixed_date"
+        },
+        {
+         "key": "fixedDateBox",
+         "label": "확정일자 부여란",
+         "value": "(주민센터 확정일자 도장 자리 — 임대차 신고 시 자동 부여)",
+         "hotspotId": "hs_fixed_date_box"
+        }
+       ]
+      },
+      {
+       "id": "sec_money",
+       "title": "제1조 보증금과 차임 및 관리비",
+       "fields": [
+        {
+         "key": "deposit",
+         "label": "보증금",
+         "value": "금 삼억이천만원정 (₩320,000,000)",
+         "hotspotId": "hs_deposit"
+        },
+        {
+         "key": "downPayment",
+         "label": "계약금",
+         "value": "금 삼천이백만원정(₩32,000,000)은 계약 시 지불하고 영수함. 영수자: 김안심 ㊞",
+         "hotspotId": "hs_down_payment"
+        },
+        {
+         "key": "middlePayment",
+         "label": "중도금",
+         "value": "없음",
+         "hotspotId": "hs_middle_payment"
+        },
+        {
+         "key": "balance",
+         "label": "잔금",
+         "value": "금 이억팔천팔백만원정(₩288,000,000)은 2026년 12월 15일에 지불한다.",
+         "hotspotId": "hs_balance"
+        },
+        {
+         "key": "rent",
+         "label": "차임(월세)",
+         "value": "없음"
+        },
+        {
+         "key": "maintenanceFee",
+         "label": "관리비",
+         "value": "아파트 관리사무소 부과 실비(관리비 고지서 기준)",
+         "hotspotId": "hs_maintenance"
+        },
+        {
+         "key": "account",
+         "label": "임대인 계좌",
+         "value": "가상은행 000-0000-0000 (예금주: 김안심)",
+         "hotspotId": "hs_deposit_account"
+        }
+       ]
+      },
+      {
+       "id": "sec_period",
+       "title": "제2조 임대차기간",
+       "fields": [
+        {
+         "key": "period",
+         "label": "임대차기간",
+         "value": "임대인은 임차주택을 2026년 12월 15일까지 임차인에게 인도하고, 임대차기간은 인도일로부터 2028년 12월 14일까지로 한다.",
+         "hotspotId": "hs_period"
+        }
+       ]
+      },
+      {
+       "id": "sec_repair",
+       "title": "제3조 입주 전 수리",
+       "fields": [
+        {
+         "key": "repair",
+         "label": "수리 필요 시설",
+         "value": "☑ 있음 — 수리할 내용: 욕실 실리콘 재시공, 보일러 점검 / 수리 완료 시기: 잔금 지급 기일인 2026년 12월 15일까지 / 미수리 시: ☑ 수리비를 잔금에서 공제",
+         "hotspotId": "hs_repair"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 2,
+     "sections": [
+      {
+       "id": "sec_articles",
+       "title": "제4조 ~ 제13조 (조문 요지)",
+       "fields": [
+        {
+         "key": "art4",
+         "label": "제4조 임차주택의 사용·관리·수선",
+         "value": "임차인은 임대인 동의 없이 구조 변경·전대를 할 수 없다. 임대인은 계약기간 중 주택을 사용·수익에 필요한 상태로 유지하고, 임대인 부담 수선과 임차인 부담 수선을 구분해 적는다.",
+         "hotspotId": "hs_art_repair"
+        },
+        {
+         "key": "art5",
+         "label": "제5조 계약의 해제",
+         "value": "중도금(중도금이 없으면 잔금) 지급 전까지 임대인은 계약금의 배액을 상환하고, 임차인은 계약금을 포기하고 계약을 해제할 수 있다.",
+         "hotspotId": "hs_art_cancel"
+        },
+        {
+         "key": "art6",
+         "label": "제6조 채무불이행과 손해배상",
+         "value": "당사자 일방이 채무를 이행하지 않으면 상대방은 상당한 기간을 정해 이행을 최고한 후 계약을 해제하고 손해배상을 청구할 수 있다."
+        },
+        {
+         "key": "art7",
+         "label": "제7조 계약의 해지",
+         "value": "임차인의 귀책 없이 주택 일부가 멸실되어 목적을 달성할 수 없으면 임차인은 해지할 수 있다. 임차인이 차임을 2기 이상 연체하는 등의 경우 임대인은 해지할 수 있다."
+        },
+        {
+         "key": "art8",
+         "label": "제8조 갱신요구와 거절",
+         "value": "임차인은 기간 만료 6개월 전부터 2개월 전까지 계약 갱신을 요구할 수 있고, 임대인은 정당한 사유 없이 거절하지 못한다(1회, 2년, 증액 5% 이내).",
+         "hotspotId": "hs_art_renewal"
+        },
+        {
+         "key": "art9",
+         "label": "제9조 계약의 종료",
+         "value": "계약이 종료되면 임차인은 주택을 원상회복해 반환하고, 임대인은 보증금을 반환한다. 두 의무는 동시에 이행한다.",
+         "hotspotId": "hs_art_end"
+        },
+        {
+         "key": "art10",
+         "label": "제10조 비용의 정산",
+         "value": "공과금·관리비 정산, 임차인이 낸 장기수선충당금은 계약 종료 시 돌려받을 수 있다.",
+         "hotspotId": "hs_art_ltrf"
+        },
+        {
+         "key": "art11",
+         "label": "제11조 분쟁의 해결",
+         "value": "분쟁은 주택임대차분쟁조정위원회 조정을 신청하는 등 상호 협의로 해결한다."
+        },
+        {
+         "key": "art12",
+         "label": "제12조 중개보수 등",
+         "value": "중개보수는 법정 요율 한도에서 정하고, 중개사 고의·과실 없이 계약이 무효·취소·해제되어도 중개보수는 지급한다."
+        },
+        {
+         "key": "art13",
+         "label": "제13조 중개대상물 확인·설명서 교부",
+         "value": "개업공인중개사는 확인·설명서를 작성하고 공제증서 사본을 첨부해 계약 체결 시 양 당사자에게 교부한다.",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      },
+      {
+       "id": "sec_special",
+       "title": "[특약사항]",
+       "fields": [
+        {
+         "key": "sp1",
+         "label": "특약 1",
+         "value": "임대인은 잔금 지급일 다음 날까지 본 주택에 저당권 등 어떠한 담보권도 설정하지 않으며 소유권 이전 등 권리변동을 일으키지 않는다. 위반 시 임차인은 계약을 해제할 수 있고, 임대인은 보증금 전액을 즉시 반환하며 계약금 상당액을 배상한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_no_mortgage_until_next_day"
+        },
+        {
+         "key": "sp2",
+         "label": "특약 2",
+         "value": "임대인은 계약일 현재 등기사항전부증명서상 권리상태(을구 순위번호 1번 근저당권 채권최고액 금 6,000만 원)를 잔금일까지 유지하며, 계약기간 중 임차인 동의 없이 추가 담보권을 설정하지 않는다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_keep_rights"
+        },
+        {
+         "key": "sp3",
+         "label": "특약 3",
+         "value": "본 계약은 임차인의 전세보증금반환보증 가입을 전제로 하며, 임대인의 사유로 가입이 거절될 경우 계약은 무효로 하고 임대인은 수령 금원 전액을 즉시 반환한다. 임대인은 보증 가입 및 전세자금대출에 필요한 절차에 협조한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_insurance_void"
+        },
+        {
+         "key": "sp4",
+         "label": "특약 4",
+         "value": "임대인은 국세·지방세 체납 사실이 없음을 확인하며, 잔금 지급일 이전에 체납이나 이로 인한 압류·가압류가 확인되면 임차인은 계약을 해제할 수 있고 임대인은 수령 금원 전액을 반환한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_tax_none"
+        },
+        {
+         "key": "sp5",
+         "label": "특약 5",
+         "value": "임대인은 계약기간 중 주택을 매도하거나 임대인 지위가 변경될 경우 사전에 임차인에게 통지하며, 계약 만료일에 신규 임차인 입주 여부와 관계없이 보증금을 반환한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_sale_notice"
+        },
+        {
+         "key": "sp6",
+         "label": "특약 6",
+         "value": "임차인은 잔금 지급일에 전입신고 및 확정일자를 받을 수 있으며 임대인은 이를 제한하지 않는다. 통상 사용에 따른 자연 마모는 원상복구 대상에서 제외한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_moving_in_free"
+        }
+       ]
+      },
+      {
+       "id": "sec_sign",
+       "title": "서명·날인",
+       "fields": [
+        {
+         "key": "contractDate",
+         "label": "계약일",
+         "value": "2026년 11월 2일",
+         "hotspotId": "hs_contract_date"
+        },
+        {
+         "key": "lessor",
+         "label": "임대인",
+         "value": "주소: (등기부상 주소와 동일) / 성명: 김안심 ㊞ / 연락처: 010-0000-0000",
+         "hotspotId": "hs_parties"
+        },
+        {
+         "key": "lessee",
+         "label": "임차인",
+         "value": "주소: (현 거주지) / 성명: 이지킴 ㊞ / 연락처: 010-0000-0000"
+        },
+        {
+         "key": "broker",
+         "label": "개업공인중개사",
+         "value": "사무소: 바른공인중개사사무소 / 등록번호: 가상-0000-00000 / 대표: 정바른 ㊞",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 3,
+     "sections": [
+      {
+       "id": "sec_annex",
+       "title": "[별지] 법의 보호를 받기 위한 중요확인사항 (요지)",
+       "fields": [
+        {
+         "key": "annex1",
+         "label": "계약 체결 시",
+         "value": "등기부로 소유자·권리관계 확인, 임대인 신분 확인, 미납 국세·선순위 확정일자 현황 확인",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex2",
+         "label": "계약 체결 후",
+         "value": "주택 인도·전입신고로 대항력, 확정일자로 우선변제권 확보, 임대차 신고",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex3",
+         "label": "계약기간 중",
+         "value": "갱신요구권, 차임 증액 제한, 묵시적 갱신 시 해지 통지",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex4",
+         "label": "계약 종료 시",
+         "value": "보증금 반환 전 이사해야 하면 임차권등기명령 활용, 장기수선충당금 반환 청구",
+         "hotspotId": "hs_annex"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "hotspots": [
+    {
+     "id": "hs_lease_kind",
+     "level": "info",
+     "title": "전세·월세 구분",
+     "explain": "전세는 보증금만, 보증금 있는 월세는 보증금+월세입니다. 체크가 실제 조건과 맞는지 보세요.",
+     "check": [
+      "계약 조건과 체크 항목 일치"
+     ]
+    },
+    {
+     "id": "hs_parties",
+     "level": "critical",
+     "title": "임대인이 진짜 집주인인가",
+     "explain": "임대인 이름·주소가 등기부 갑구의 현재 소유자와 같아야 합니다. 예시에서는 등기부 소유자 '김안심'과 일치합니다.",
+     "check": [
+      "신분증 진위 확인(정부24·ARS 1382)",
+      "등기부 소유자와 동일인",
+      "공동소유면 전원 서명 또는 위임"
+     ],
+     "redFlags": [
+      "소유자와 다른 사람이 계약서에 임대인으로 서명",
+      "신분증 사진이 흐리거나 원본 제시 거부"
+     ],
+     "lessonIds": [
+      "ls_04_01"
+     ],
+     "quizIds": [
+      "q_cs_01"
+     ]
+    },
+    {
+     "id": "hs_address",
+     "level": "critical",
+     "title": "주소·동·층·호수 정확히",
+     "explain": "계약서·등기부·건축물대장·전입신고 주소가 한 글자라도 다르면 대항력을 다툴 수 있습니다. 아파트는 동·층·호수를 모두 적으세요.",
+     "check": [
+      "등기부 표제부 주소와 일치",
+      "동·층·호수 정확",
+      "전입신고 시 같은 주소 입력"
+     ],
+     "redFlags": [
+      "호수 누락·오기",
+      "등기부와 다른 지번"
+     ],
+     "lessonIds": [
+      "ls_06_02"
+     ],
+     "quizIds": [
+      "q_cs_02"
+     ]
+    },
+    {
+     "id": "hs_building_use",
+     "level": "important",
+     "title": "건물 용도",
+     "explain": "건축물대장상 용도가 주택(공동주택·단독주택)인지 확인하세요. 근린생활시설이면 대출·보증이 막힐 수 있습니다.",
+     "check": [
+      "건축물대장 용도 = 주택",
+      "위반건축물 표시 없음"
+     ],
+     "lessonIds": [
+      "ls_03_02"
+     ]
+    },
+    {
+     "id": "hs_contract_type",
+     "level": "important",
+     "title": "계약의 종류",
+     "explain": "신규 계약인지, 갱신요구권을 쓴 갱신계약인지 구분합니다. 갱신요구권을 썼다면 그 사실이 기록으로 남아 다음에 다시 쓸 수 없다는 점도 확인돼요.",
+     "check": [
+      "신규/합의 재계약/갱신요구권 갱신 중 정확히 체크"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_tax",
+     "level": "critical",
+     "title": "미납 국세·지방세",
+     "explain": "체납 세금은 경매 때 보증금보다 먼저 배당될 수 있어요. '없음'에 체크하고 임대인이 서명했는지, 실제 납세증명서를 봤는지 확인하세요.",
+     "check": [
+      "납세증명서(국세·지방세) 실물 확인",
+      "'없음' 체크 + 임대인 서명"
+     ],
+     "redFlags": [
+      "납세증명서 제시 거부",
+      "'있음'인데 금액 설명이 없음"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "quizIds": [
+      "q_cs_03"
+     ]
+    },
+    {
+     "id": "hs_senior_fixed_date",
+     "level": "critical",
+     "title": "선순위 확정일자 현황",
+     "explain": "나보다 먼저 들어온 세입자의 보증금입니다. 아파트 한 세대 전체 계약이면 보통 '해당 없음'이지만, 다가구·다세대 일부 임차라면 반드시 금액을 확인하세요.",
+     "check": [
+      "확정일자 부여현황 서류 확인",
+      "다가구는 선순위 보증금 합계 기재"
+     ],
+     "redFlags": [
+      "다가구인데 '해당 없음'으로만 처리"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ]
+    },
+    {
+     "id": "hs_fixed_date_box",
+     "level": "important",
+     "title": "확정일자 부여란",
+     "explain": "여기에 확정일자 도장이 찍히면 우선변제권의 요건 하나가 갖춰져요. 임대차 신고를 하면 자동 부여됩니다.",
+     "check": [
+      "계약 직후 확정일자 받기",
+      "신고필증의 확정일자 번호 확인"
+     ],
+     "lessonIds": [
+      "ls_05_01"
+     ]
+    },
+    {
+     "id": "hs_deposit",
+     "level": "critical",
+     "title": "보증금 — 숫자와 한글 모두",
+     "explain": "한글 금액과 숫자 금액이 같아야 합니다. 보증금 + 선순위채권이 시세 대비 몇 %인지 계산해보세요. 예시는 76%(주의 구간).",
+     "check": [
+      "한글·숫자 금액 일치",
+      "전세가율 계산",
+      "보증보험 가입 가능 금액 이내"
+     ],
+     "calculatorId": "calc_jeonse_ratio",
+     "quizIds": [
+      "q_cs_04"
+     ]
+    },
+    {
+     "id": "hs_down_payment",
+     "level": "important",
+     "title": "계약금",
+     "explain": "보통 보증금의 10%입니다. 계약금을 넣은 뒤 마음이 바뀌면 임차인은 계약금을 포기, 임대인은 두 배를 돌려줘야 해제할 수 있어요(제5조).",
+     "check": [
+      "영수자 서명",
+      "송금 기록 보관"
+     ],
+     "lessonIds": [
+      "ls_04_02"
+     ]
+    },
+    {
+     "id": "hs_middle_payment",
+     "level": "info",
+     "title": "중도금",
+     "explain": "중도금이 있으면 그 지급 이후에는 계약금 포기·배액상환으로 해제하기 어려워요. 전세는 중도금 없이 하는 경우가 많습니다.",
+     "check": [
+      "중도금 유무·날짜 확인"
+     ]
+    },
+    {
+     "id": "hs_balance",
+     "level": "critical",
+     "title": "잔금일 = 이사·전입신고일",
+     "explain": "잔금일에 이사·전입신고·확정일자를 함께 처리해야 해요. 잔금 송금 직전 등기부를 다시 확인하세요.",
+     "check": [
+      "잔금일과 입주일 동일",
+      "대출 실행일 = 잔금일",
+      "잔금 직전 등기부 재확인"
+     ],
+     "lessonIds": [
+      "ls_06_01",
+      "ls_06_02"
+     ],
+     "checklistId": "ck_moving_day"
+    },
+    {
+     "id": "hs_maintenance",
+     "level": "info",
+     "title": "관리비",
+     "explain": "아파트는 관리사무소 고지서 기준 실비인 경우가 많아요. 빌라·오피스텔 정액 관리비는 항목을 적어두세요.",
+     "check": [
+      "정액이면 포함 항목 명시"
+     ],
+     "clauseId": "cl_maintenance_fee"
+    },
+    {
+     "id": "hs_deposit_account",
+     "level": "critical",
+     "title": "송금 계좌 예금주",
+     "explain": "계약금·잔금은 반드시 등기부상 소유자 본인 명의 계좌로. 중개사·가족·대리인 계좌로 보내라고 하면 멈추세요.",
+     "check": [
+      "예금주 = 등기부 소유자",
+      "송금 메모에 '주소+계약금' 기재"
+     ],
+     "redFlags": [
+      "예금주가 소유자와 다름",
+      "현금 지급 요구"
+     ],
+     "quizIds": [
+      "q_cs_05"
+     ]
+    },
+    {
+     "id": "hs_period",
+     "level": "important",
+     "title": "임대차기간",
+     "explain": "주택임대차보호법상 2년 미만으로 정해도 임차인은 2년을 주장할 수 있어요. 만기일을 앱 플래너에 등록하면 6개월 전부터 알려줍니다.",
+     "check": [
+      "시작일 = 잔금·인도일",
+      "만기일 플래너 등록"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_repair",
+     "level": "important",
+     "title": "입주 전 수리",
+     "explain": "수리할 내용·완료 시기·미이행 시 처리(잔금 공제 등)를 구체적으로 적어야 분쟁이 줄어요.",
+     "check": [
+      "수리 항목 구체적 기재",
+      "미이행 시 처리 방법 체크"
+     ],
+     "clauseId": "cl_repair_before"
+    },
+    {
+     "id": "hs_art_repair",
+     "level": "info",
+     "title": "수선 의무",
+     "explain": "보일러·배관 같은 큰 수선은 원칙적으로 임대인 부담, 전구·소모품 같은 소규모 수선은 임차인 부담으로 나누는 경우가 많아요. 표준계약서는 부담 범위를 적도록 되어 있어요."
+    },
+    {
+     "id": "hs_art_cancel",
+     "level": "important",
+     "title": "계약 해제(계약금 포기·배액상환)",
+     "explain": "중도금(없으면 잔금) 전까지는 임차인은 계약금을 포기하고, 임대인은 계약금의 두 배를 주고 계약을 해제할 수 있어요. 특약의 '무효·해제' 조항은 이와 별개로 임대인 사유 시 계약금 전액 반환을 받기 위한 장치예요.",
+     "quizIds": [
+      "q_cs_06"
+     ]
+    },
+    {
+     "id": "hs_art_renewal",
+     "level": "important",
+     "title": "갱신요구권",
+     "explain": "만료 6개월~2개월 전 갱신 요구, 1회 2년, 증액 5% 이내.",
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_art_end",
+     "level": "critical",
+     "title": "계약 종료 — 동시이행",
+     "explain": "집을 비워주는 것과 보증금 반환은 동시에 이뤄져야 해요. 돈을 받기 전에 전출하면 대항력을 잃을 수 있으니 임차권등기명령을 활용하세요.",
+     "lessonIds": [
+      "ls_08_02"
+     ]
+    },
+    {
+     "id": "hs_art_ltrf",
+     "level": "info",
+     "title": "장기수선충당금",
+     "explain": "아파트 관리비에 포함된 장기수선충당금은 원래 소유자 부담이라, 임차인이 냈다면 퇴거 시 돌려받을 수 있어요."
+    },
+    {
+     "id": "hs_special_terms",
+     "level": "critical",
+     "title": "특약사항 — 이 계약서의 심장",
+     "explain": "예시 계약서에는 담보 설정 금지, 권리상태 유지, 보증보험 가입 불가 시 무효, 체납 시 해제, 매도 통지, 전입신고 보장 특약이 들어 있어요. 내 상황에 맞는 특약은 '특약 생성기'에서 추가하세요.",
+     "check": [
+      "담보 설정 금지(잔금 다음 날까지)",
+      "보증보험 불가 시 무효",
+      "근저당 금액 명시",
+      "체납 시 해제"
+     ],
+     "redFlags": [
+      "특약란이 비어 있음",
+      "'현 시설 상태로 임대' 한 줄만 있음"
+     ],
+     "lessonIds": [
+      "ls_04_03"
+     ],
+     "quizIds": [
+      "q_cs_07"
+     ]
+    },
+    {
+     "id": "hs_contract_date",
+     "level": "info",
+     "title": "계약일",
+     "explain": "계약일로부터 30일 이내 임대차 신고(대상 시). 계약일 당일 아침이 아니라 '서명 직전' 등기부를 확인하세요.",
+     "check": [
+      "임대차 신고 기한 플래너 등록"
+     ]
+    },
+    {
+     "id": "hs_broker",
+     "level": "important",
+     "title": "중개사 날인·확인설명서",
+     "explain": "개업공인중개사의 서명·날인과 등록번호, 중개대상물 확인·설명서, 공제증서 사본을 받으세요. 중개사 날인이 없는 계약서는 보증보험이 거절될 수 있어요.",
+     "check": [
+      "등록번호 조회",
+      "확인·설명서 수령",
+      "공제증서 사본 수령"
+     ],
+     "quizIds": [
+      "q_cs_08"
+     ]
+    },
+    {
+     "id": "hs_annex",
+     "level": "info",
+     "title": "별지 중요확인사항",
+     "explain": "표준계약서 뒤에 붙은 '법의 보호를 받기 위한 체크리스트'예요. 앱의 단계별 체크리스트와 같은 흐름입니다."
+    }
+   ],
+   "viewerTour": [
+    "hs_parties",
+    "hs_address",
+    "hs_tax",
+    "hs_senior_fixed_date",
+    "hs_deposit",
+    "hs_deposit_account",
+    "hs_balance",
+    "hs_special_terms",
+    "hs_broker",
+    "hs_art_end"
+   ],
+   "label": "아파트 전세",
+   "summary": "보증금 3억 2천만 원 · 시세 5억 · 근저당 6천만 원 — 특약이 잘 갖춰진 기본 예시",
+   "verdict": {
+    "level": "yellow",
+    "title": "기본은 갖췄지만 전세가율 76%는 주의 구간",
+    "points": [
+     "특약 6개로 담보 설정·보증 거절·체납 위험을 막아둠",
+     "보증금+근저당이 시세의 76% — 보증보험 가입은 필수"
+    ]
+   }
+  },
+  {
+   "id": "contract_villa_jeonse_01",
+   "title": "빌라(다세대) 전세 계약서 예시 — 위험 사례",
+   "formId": "form_moj_standard",
+   "houseType": "VILLA",
+   "leaseType": "JEONSE",
+   "context": {
+    "marketPrice": 260000000,
+    "marketPriceNote": "중개사가 말한 시세(실거래 기록 없음)",
+    "officialPrice": 160000000,
+    "seniorDebt": 36000000,
+    "documentIds": [
+     "doc_registry",
+     "doc_building"
+    ],
+    "calc": {
+     "hug126Limit": 201600000,
+     "explain": "공시가격 1억 6천만 × 126% = 2억 160만 원 < 보증금 2억 1천만 + 근저당 3,600만 = 2억 4,600만 원 → HUG 보증 불가. 중개사가 말한 시세 2억 6천만 원 기준이면 95% — 깡통전세."
+    }
+   },
+   "pages": [
+    {
+     "pageNo": 1,
+     "sections": [
+      {
+       "id": "sec_header",
+       "title": "계약 유형과 당사자",
+       "fields": [
+        {
+         "key": "leaseKind",
+         "label": "임대차 종류",
+         "value": "☑ 전세  ☐ 보증금 있는 월세  ☐ 월세",
+         "hotspotId": "hs_lease_kind"
+        },
+        {
+         "key": "parties",
+         "label": "당사자",
+         "value": "임대인 박빠른 과 임차인 이지킴 은 아래와 같이 임대차 계약을 체결한다.",
+         "hotspotId": "hs_parties"
+        }
+       ]
+      },
+      {
+       "id": "sec_property",
+       "title": "[임차주택의 표시]",
+       "fields": [
+        {
+         "key": "address",
+         "label": "소재지(도로명주소)",
+         "value": "경기도 가상시 샘플구 연습로 45",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "land",
+         "label": "토지",
+         "value": "지목: 대 / 대지권 면적: 18.30㎡"
+        },
+        {
+         "key": "building",
+         "label": "건물",
+         "value": "구조·용도: 철근콘크리트구조 공동주택(다세대주택) / 면적: 39.80㎡",
+         "hotspotId": "hs_building_use"
+        },
+        {
+         "key": "leasedPart",
+         "label": "임차할 부분",
+         "value": "연습빌라 제3층 제302호 전부 / 39.80㎡",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "contractType",
+         "label": "계약의 종류",
+         "value": "☑ 신규 계약  ☐ 합의에 의한 재계약  ☐ 계약갱신요구권 행사에 의한 갱신계약",
+         "hotspotId": "hs_contract_type"
+        }
+       ]
+      },
+      {
+       "id": "sec_disclosure",
+       "title": "미납 국세·지방세 / 선순위 확정일자 현황 / 확정일자 부여란",
+       "fields": [
+        {
+         "key": "taxArrears",
+         "label": "미납 국세·지방세",
+         "value": "☑ 없음 (임대인 서명: 박빠른 ㊞)  ☐ 있음",
+         "hotspotId": "hs_tax"
+        },
+        {
+         "key": "seniorFixedDate",
+         "label": "선순위 확정일자 현황",
+         "value": "☑ 해당 없음 (임대인 서명: 박빠른 ㊞)  ☐ 해당 있음",
+         "hotspotId": "hs_senior_fixed_date"
+        },
+        {
+         "key": "fixedDateBox",
+         "label": "확정일자 부여란",
+         "value": "(주민센터 확정일자 도장 자리 — 임대차 신고 시 자동 부여)",
+         "hotspotId": "hs_fixed_date_box"
+        }
+       ]
+      },
+      {
+       "id": "sec_money",
+       "title": "제1조 보증금과 차임 및 관리비",
+       "fields": [
+        {
+         "key": "deposit",
+         "label": "보증금",
+         "value": "금 이억일천만원정 (₩210,000,000)",
+         "hotspotId": "hs_deposit"
+        },
+        {
+         "key": "downPayment",
+         "label": "계약금",
+         "value": "금 이천일백만원정(₩21,000,000)은 계약 시 지불하고 영수함. 영수자: 박빠른 ㊞",
+         "hotspotId": "hs_down_payment"
+        },
+        {
+         "key": "middlePayment",
+         "label": "중도금",
+         "value": "없음",
+         "hotspotId": "hs_middle_payment"
+        },
+        {
+         "key": "balance",
+         "label": "잔금",
+         "value": "금 일억팔천구백만원정(₩189,000,000)은 2026년 12월 20일에 지불한다.",
+         "hotspotId": "hs_balance"
+        },
+        {
+         "key": "rent",
+         "label": "차임(월세)",
+         "value": "없음"
+        },
+        {
+         "key": "maintenanceFee",
+         "label": "관리비",
+         "value": "정액 월 70,000원 (공용 전기·계단 청소·공용 수도 포함, 세대 전기·가스·수도는 임차인 부담)",
+         "hotspotId": "hs_maintenance"
+        },
+        {
+         "key": "account",
+         "label": "임대인 계좌",
+         "value": "가상은행 222-2222-2222 (예금주: 박빠른)",
+         "hotspotId": "hs_deposit_account"
+        }
+       ]
+      },
+      {
+       "id": "sec_period",
+       "title": "제2조 임대차기간",
+       "fields": [
+        {
+         "key": "period",
+         "label": "임대차기간",
+         "value": "임대인은 임차주택을 2026년 12월 20일까지 임차인에게 인도하고, 임대차기간은 인도일로부터 2028년 12월 19일까지로 한다.",
+         "hotspotId": "hs_period"
+        }
+       ]
+      },
+      {
+       "id": "sec_repair",
+       "title": "제3조 입주 전 수리",
+       "fields": [
+        {
+         "key": "repair",
+         "label": "수리 필요 시설",
+         "value": "☐ 있음  ☑ 없음",
+         "hotspotId": "hs_repair"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 2,
+     "sections": [
+      {
+       "id": "sec_articles",
+       "title": "제4조 ~ 제13조 (조문 요지)",
+       "fields": [
+        {
+         "key": "art4",
+         "label": "제4조 임차주택의 사용·관리·수선",
+         "value": "임차인은 임대인 동의 없이 구조 변경·전대를 할 수 없다. 임대인은 계약기간 중 주택을 사용·수익에 필요한 상태로 유지하고, 임대인 부담 수선과 임차인 부담 수선을 구분해 적는다.",
+         "hotspotId": "hs_art_repair"
+        },
+        {
+         "key": "art5",
+         "label": "제5조 계약의 해제",
+         "value": "중도금(중도금이 없으면 잔금) 지급 전까지 임대인은 계약금의 배액을 상환하고, 임차인은 계약금을 포기하고 계약을 해제할 수 있다.",
+         "hotspotId": "hs_art_cancel"
+        },
+        {
+         "key": "art6",
+         "label": "제6조 채무불이행과 손해배상",
+         "value": "당사자 일방이 채무를 이행하지 않으면 상대방은 상당한 기간을 정해 이행을 최고한 후 계약을 해제하고 손해배상을 청구할 수 있다."
+        },
+        {
+         "key": "art7",
+         "label": "제7조 계약의 해지",
+         "value": "임차인의 귀책 없이 주택 일부가 멸실되어 목적을 달성할 수 없으면 임차인은 해지할 수 있다. 임차인이 차임을 2기 이상 연체하는 등의 경우 임대인은 해지할 수 있다."
+        },
+        {
+         "key": "art8",
+         "label": "제8조 갱신요구와 거절",
+         "value": "임차인은 기간 만료 6개월 전부터 2개월 전까지 계약 갱신을 요구할 수 있고, 임대인은 정당한 사유 없이 거절하지 못한다(1회, 2년, 증액 5% 이내).",
+         "hotspotId": "hs_art_renewal"
+        },
+        {
+         "key": "art9",
+         "label": "제9조 계약의 종료",
+         "value": "계약이 종료되면 임차인은 주택을 원상회복해 반환하고, 임대인은 보증금을 반환한다. 두 의무는 동시에 이행한다.",
+         "hotspotId": "hs_art_end"
+        },
+        {
+         "key": "art10",
+         "label": "제10조 비용의 정산",
+         "value": "공과금·관리비 정산, 임차인이 낸 장기수선충당금은 계약 종료 시 돌려받을 수 있다.",
+         "hotspotId": "hs_art_ltrf"
+        },
+        {
+         "key": "art11",
+         "label": "제11조 분쟁의 해결",
+         "value": "분쟁은 주택임대차분쟁조정위원회 조정을 신청하는 등 상호 협의로 해결한다."
+        },
+        {
+         "key": "art12",
+         "label": "제12조 중개보수 등",
+         "value": "중개보수는 법정 요율 한도에서 정하고, 중개사 고의·과실 없이 계약이 무효·취소·해제되어도 중개보수는 지급한다."
+        },
+        {
+         "key": "art13",
+         "label": "제13조 중개대상물 확인·설명서 교부",
+         "value": "개업공인중개사는 확인·설명서를 작성하고 공제증서 사본을 첨부해 계약 체결 시 양 당사자에게 교부한다.",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      },
+      {
+       "id": "sec_special",
+       "title": "[특약사항]",
+       "fields": [
+        {
+         "key": "sp1",
+         "label": "특약 1",
+         "value": "임대인은 잔금 지급일 다음 날까지 본 주택에 저당권 등 어떠한 담보권도 설정하지 않으며 소유권 이전 등 권리변동을 일으키지 않는다. 위반 시 임차인은 계약을 해제할 수 있고, 임대인은 보증금 전액을 즉시 반환하며 계약금 상당액을 배상한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_no_mortgage_until_next_day"
+        },
+        {
+         "key": "sp2",
+         "label": "특약 2",
+         "value": "본 계약은 임차인의 전세보증금반환보증 가입을 전제로 하며, 부채비율 초과·위반건축물 등 임대인 또는 주택의 사유로 가입이 거절될 경우 계약은 무효로 하고 임대인은 수령 금원 전액을 즉시 반환한다.",
+         "hotspotId": "hs_villa_void",
+         "clauseId": "cl_insurance_void"
+        },
+        {
+         "key": "sp3",
+         "label": "특약 3",
+         "value": "임대인 또는 본 주택의 사유로 임차인의 전세자금대출이 불가할 경우 본 계약은 무효로 하며, 임대인은 수령한 계약금을 즉시 전액 반환한다.",
+         "hotspotId": "hs_villa_void",
+         "clauseId": "cl_loan_void"
+        },
+        {
+         "key": "sp4",
+         "label": "특약 4",
+         "value": "임대인은 계약일 현재 권리상태(을구 1번 근저당권 채권최고액 금 3,600만 원)를 잔금일까지 유지하며 추가 담보권을 설정하지 않는다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_keep_rights"
+        },
+        {
+         "key": "sp5",
+         "label": "특약 5",
+         "value": "임대인은 국세·지방세 체납 사실이 없음을 확인하며, 잔금 지급일 이전에 체납 또는 압류·가압류가 확인되면 임차인은 계약을 해제할 수 있다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_tax_none"
+        }
+       ]
+      },
+      {
+       "id": "sec_sign",
+       "title": "서명·날인",
+       "fields": [
+        {
+         "key": "contractDate",
+         "label": "계약일",
+         "value": "2026년 11월 2일",
+         "hotspotId": "hs_contract_date"
+        },
+        {
+         "key": "lessor",
+         "label": "임대인",
+         "value": "주소: (등기부상 주소와 동일) / 성명: 박빠른 ㊞ / 연락처: 010-0000-0000",
+         "hotspotId": "hs_parties"
+        },
+        {
+         "key": "lessee",
+         "label": "임차인",
+         "value": "주소: (현 거주지) / 성명: 이지킴 ㊞ / 연락처: 010-0000-0000"
+        },
+        {
+         "key": "broker",
+         "label": "개업공인중개사",
+         "value": "사무소: 연습공인중개사사무소 / 등록번호: 가상-0000-11111 / 대표: 문빠름 ㊞",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 3,
+     "sections": [
+      {
+       "id": "sec_annex",
+       "title": "[별지] 법의 보호를 받기 위한 중요확인사항 (요지)",
+       "fields": [
+        {
+         "key": "annex1",
+         "label": "계약 체결 시",
+         "value": "등기부로 소유자·권리관계 확인, 임대인 신분 확인, 미납 국세·선순위 확정일자 현황 확인",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex2",
+         "label": "계약 체결 후",
+         "value": "주택 인도·전입신고로 대항력, 확정일자로 우선변제권 확보, 임대차 신고",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex3",
+         "label": "계약기간 중",
+         "value": "갱신요구권, 차임 증액 제한, 묵시적 갱신 시 해지 통지",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex4",
+         "label": "계약 종료 시",
+         "value": "보증금 반환 전 이사해야 하면 임차권등기명령 활용, 장기수선충당금 반환 청구",
+         "hotspotId": "hs_annex"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "hotspots": [
+    {
+     "id": "hs_lease_kind",
+     "level": "info",
+     "title": "전세·월세 구분",
+     "explain": "전세는 보증금만, 보증금 있는 월세는 보증금+월세입니다. 체크가 실제 조건과 맞는지 보세요.",
+     "check": [
+      "계약 조건과 체크 항목 일치"
+     ]
+    },
+    {
+     "id": "hs_parties",
+     "level": "critical",
+     "title": "임대인이 진짜 집주인인가",
+     "explain": "등기부 갑구 마지막 소유자 '박빠른'과 같아요. 다만 2024년 3월에 산 직후 같은 날 근저당이 잡혀 있어 갭투자 패턴이에요.",
+     "check": [
+      "신분증 진위 확인(정부24·ARS 1382)",
+      "등기부 소유자와 동일인",
+      "공동소유면 전원 서명 또는 위임"
+     ],
+     "redFlags": [
+      "소유자와 다른 사람이 계약서에 임대인으로 서명",
+      "신분증 사진이 흐리거나 원본 제시 거부"
+     ],
+     "lessonIds": [
+      "ls_04_01"
+     ],
+     "quizIds": [
+      "q_cs_01"
+     ],
+     "documentId": "doc_registry"
+    },
+    {
+     "id": "hs_address",
+     "level": "critical",
+     "title": "주소·동·층·호수 정확히",
+     "explain": "계약서·등기부·건축물대장·전입신고 주소가 한 글자라도 다르면 대항력을 다툴 수 있습니다. 아파트는 동·층·호수를 모두 적으세요.",
+     "check": [
+      "등기부 표제부 주소와 일치",
+      "동·층·호수 정확",
+      "전입신고 시 같은 주소 입력"
+     ],
+     "redFlags": [
+      "호수 누락·오기",
+      "등기부와 다른 지번"
+     ],
+     "lessonIds": [
+      "ls_06_02"
+     ],
+     "quizIds": [
+      "q_cs_02"
+     ]
+    },
+    {
+     "id": "hs_building_use",
+     "level": "critical",
+     "title": "건물 용도",
+     "explain": "다세대주택(주택)은 맞지만 건축물대장에 '위반건축물'(옥상 무단 증축) 표시가 있어요. 계약서 칸에는 이 정보가 드러나지 않으니 건축물대장을 꼭 따로 보세요.",
+     "check": [
+      "건축물대장 용도 = 주택",
+      "위반건축물 표시 없음"
+     ],
+     "lessonIds": [
+      "ls_03_02"
+     ],
+     "documentId": "doc_building"
+    },
+    {
+     "id": "hs_contract_type",
+     "level": "important",
+     "title": "계약의 종류",
+     "explain": "신규 계약인지, 갱신요구권을 쓴 갱신계약인지 구분합니다. 갱신요구권을 썼다면 그 사실이 기록으로 남아 다음에 다시 쓸 수 없다는 점도 확인돼요.",
+     "check": [
+      "신규/합의 재계약/갱신요구권 갱신 중 정확히 체크"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_tax",
+     "level": "critical",
+     "title": "미납 국세·지방세",
+     "explain": "체납 세금은 경매 때 보증금보다 먼저 배당될 수 있어요. '없음'에 체크하고 임대인이 서명했는지, 실제 납세증명서를 봤는지 확인하세요.",
+     "check": [
+      "납세증명서(국세·지방세) 실물 확인",
+      "'없음' 체크 + 임대인 서명"
+     ],
+     "redFlags": [
+      "납세증명서 제시 거부",
+      "'있음'인데 금액 설명이 없음"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "quizIds": [
+      "q_cs_03"
+     ]
+    },
+    {
+     "id": "hs_senior_fixed_date",
+     "level": "critical",
+     "title": "선순위 확정일자 현황",
+     "explain": "나보다 먼저 들어온 세입자의 보증금입니다. 아파트 한 세대 전체 계약이면 보통 '해당 없음'이지만, 다가구·다세대 일부 임차라면 반드시 금액을 확인하세요.",
+     "check": [
+      "확정일자 부여현황 서류 확인",
+      "다가구는 선순위 보증금 합계 기재"
+     ],
+     "redFlags": [
+      "다가구인데 '해당 없음'으로만 처리"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ]
+    },
+    {
+     "id": "hs_fixed_date_box",
+     "level": "important",
+     "title": "확정일자 부여란",
+     "explain": "여기에 확정일자 도장이 찍히면 우선변제권의 요건 하나가 갖춰져요. 임대차 신고를 하면 자동 부여됩니다.",
+     "check": [
+      "계약 직후 확정일자 받기",
+      "신고필증의 확정일자 번호 확인"
+     ],
+     "lessonIds": [
+      "ls_05_01"
+     ]
+    },
+    {
+     "id": "hs_deposit",
+     "level": "critical",
+     "title": "보증금 — 숫자와 한글 모두",
+     "explain": "보증금 2억 1천만 원 + 근저당 3,600만 원 = 2억 4,600만 원. 공시가격 1억 6천만 원 × 126% = 2억 160만 원을 넘어 HUG 보증이 안 돼요.",
+     "check": [
+      "한글·숫자 금액 일치",
+      "전세가율 계산",
+      "보증보험 가입 가능 금액 이내"
+     ],
+     "calculatorId": "calc_hug_126",
+     "quizIds": [
+      "q_cs_04"
+     ]
+    },
+    {
+     "id": "hs_down_payment",
+     "level": "important",
+     "title": "계약금",
+     "explain": "보통 보증금의 10%입니다. 계약금을 넣은 뒤 마음이 바뀌면 임차인은 계약금을 포기, 임대인은 두 배를 돌려줘야 해제할 수 있어요(제5조).",
+     "check": [
+      "영수자 서명",
+      "송금 기록 보관"
+     ],
+     "lessonIds": [
+      "ls_04_02"
+     ]
+    },
+    {
+     "id": "hs_middle_payment",
+     "level": "info",
+     "title": "중도금",
+     "explain": "중도금이 있으면 그 지급 이후에는 계약금 포기·배액상환으로 해제하기 어려워요. 전세는 중도금 없이 하는 경우가 많습니다.",
+     "check": [
+      "중도금 유무·날짜 확인"
+     ]
+    },
+    {
+     "id": "hs_balance",
+     "level": "critical",
+     "title": "잔금일 = 이사·전입신고일",
+     "explain": "잔금일에 이사·전입신고·확정일자를 함께 처리해야 해요. 잔금 송금 직전 등기부를 다시 확인하세요.",
+     "check": [
+      "잔금일과 입주일 동일",
+      "대출 실행일 = 잔금일",
+      "잔금 직전 등기부 재확인"
+     ],
+     "lessonIds": [
+      "ls_06_01",
+      "ls_06_02"
+     ],
+     "checklistId": "ck_moving_day"
+    },
+    {
+     "id": "hs_maintenance",
+     "level": "info",
+     "title": "관리비",
+     "explain": "빌라 정액 관리비는 포함 항목을 적어야 해요. 이 예시는 항목이 적혀 있어 괜찮아요.",
+     "check": [
+      "정액이면 포함 항목 명시"
+     ],
+     "clauseId": "cl_maintenance_fee"
+    },
+    {
+     "id": "hs_deposit_account",
+     "level": "critical",
+     "title": "송금 계좌 예금주",
+     "explain": "계약금·잔금은 반드시 등기부상 소유자 본인 명의 계좌로. 중개사·가족·대리인 계좌로 보내라고 하면 멈추세요.",
+     "check": [
+      "예금주 = 등기부 소유자",
+      "송금 메모에 '주소+계약금' 기재"
+     ],
+     "redFlags": [
+      "예금주가 소유자와 다름",
+      "현금 지급 요구"
+     ],
+     "quizIds": [
+      "q_cs_05"
+     ]
+    },
+    {
+     "id": "hs_period",
+     "level": "important",
+     "title": "임대차기간",
+     "explain": "주택임대차보호법상 2년 미만으로 정해도 임차인은 2년을 주장할 수 있어요. 만기일을 앱 플래너에 등록하면 6개월 전부터 알려줍니다.",
+     "check": [
+      "시작일 = 잔금·인도일",
+      "만기일 플래너 등록"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_repair",
+     "level": "important",
+     "title": "입주 전 수리",
+     "explain": "수리할 내용·완료 시기·미이행 시 처리(잔금 공제 등)를 구체적으로 적어야 분쟁이 줄어요.",
+     "check": [
+      "수리 항목 구체적 기재",
+      "미이행 시 처리 방법 체크"
+     ],
+     "clauseId": "cl_repair_before"
+    },
+    {
+     "id": "hs_art_repair",
+     "level": "info",
+     "title": "수선 의무",
+     "explain": "보일러·배관 같은 큰 수선은 원칙적으로 임대인 부담, 전구·소모품 같은 소규모 수선은 임차인 부담으로 나누는 경우가 많아요. 표준계약서는 부담 범위를 적도록 되어 있어요."
+    },
+    {
+     "id": "hs_art_cancel",
+     "level": "important",
+     "title": "계약 해제(계약금 포기·배액상환)",
+     "explain": "중도금(없으면 잔금) 전까지는 임차인은 계약금을 포기하고, 임대인은 계약금의 두 배를 주고 계약을 해제할 수 있어요. 특약의 '무효·해제' 조항은 이와 별개로 임대인 사유 시 계약금 전액 반환을 받기 위한 장치예요.",
+     "quizIds": [
+      "q_cs_06"
+     ]
+    },
+    {
+     "id": "hs_art_renewal",
+     "level": "important",
+     "title": "갱신요구권",
+     "explain": "만료 6개월~2개월 전 갱신 요구, 1회 2년, 증액 5% 이내.",
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_art_end",
+     "level": "critical",
+     "title": "계약 종료 — 동시이행",
+     "explain": "집을 비워주는 것과 보증금 반환은 동시에 이뤄져야 해요. 돈을 받기 전에 전출하면 대항력을 잃을 수 있으니 임차권등기명령을 활용하세요.",
+     "lessonIds": [
+      "ls_08_02"
+     ]
+    },
+    {
+     "id": "hs_art_ltrf",
+     "level": "info",
+     "title": "장기수선충당금",
+     "explain": "아파트 관리비에 포함된 장기수선충당금은 원래 소유자 부담이라, 임차인이 냈다면 퇴거 시 돌려받을 수 있어요."
+    },
+    {
+     "id": "hs_special_terms",
+     "level": "critical",
+     "title": "특약사항 — 이 계약서의 심장",
+     "explain": "예시 계약서에는 담보 설정 금지, 권리상태 유지, 보증보험 가입 불가 시 무효, 체납 시 해제, 매도 통지, 전입신고 보장 특약이 들어 있어요. 내 상황에 맞는 특약은 '특약 생성기'에서 추가하세요.",
+     "check": [
+      "담보 설정 금지(잔금 다음 날까지)",
+      "보증보험 불가 시 무효",
+      "근저당 금액 명시",
+      "체납 시 해제"
+     ],
+     "redFlags": [
+      "특약란이 비어 있음",
+      "'현 시설 상태로 임대' 한 줄만 있음"
+     ],
+     "lessonIds": [
+      "ls_04_03"
+     ],
+     "quizIds": [
+      "q_cs_07"
+     ]
+    },
+    {
+     "id": "hs_contract_date",
+     "level": "info",
+     "title": "계약일",
+     "explain": "계약일로부터 30일 이내 임대차 신고(대상 시). 계약일 당일 아침이 아니라 '서명 직전' 등기부를 확인하세요.",
+     "check": [
+      "임대차 신고 기한 플래너 등록"
+     ]
+    },
+    {
+     "id": "hs_broker",
+     "level": "important",
+     "title": "중개사 날인·확인설명서",
+     "explain": "개업공인중개사의 서명·날인과 등록번호, 중개대상물 확인·설명서, 공제증서 사본을 받으세요. 중개사 날인이 없는 계약서는 보증보험이 거절될 수 있어요.",
+     "check": [
+      "등록번호 조회",
+      "확인·설명서 수령",
+      "공제증서 사본 수령"
+     ],
+     "quizIds": [
+      "q_cs_08"
+     ]
+    },
+    {
+     "id": "hs_annex",
+     "level": "info",
+     "title": "별지 중요확인사항",
+     "explain": "표준계약서 뒤에 붙은 '법의 보호를 받기 위한 체크리스트'예요. 앱의 단계별 체크리스트와 같은 흐름입니다."
+    },
+    {
+     "id": "hs_villa_void",
+     "level": "critical",
+     "title": "이 계약을 살리는 특약",
+     "explain": "이 집은 보증보험이 거절될 가능성이 매우 커요. '보증 거절·대출 불가 시 무효, 계약금 반환' 특약이 있으면 계약금 2,100만 원을 돌려받고 빠져나올 수 있어요. 특약이 없었다면 계약금을 잃거나 위험한 계약을 그대로 이어가야 해요.",
+     "check": [
+      "보증 가입 가능 여부를 계약 전에 먼저 확인",
+      "특약에 '임대인 또는 주택의 사유' 명시"
+     ],
+     "lessonIds": [
+      "ls_04_03"
+     ]
+    }
+   ],
+   "viewerTour": [
+    "hs_parties",
+    "hs_building_use",
+    "hs_deposit",
+    "hs_villa_void",
+    "hs_deposit_account",
+    "hs_balance",
+    "hs_special_terms",
+    "hs_broker"
+   ],
+   "label": "빌라 전세",
+   "summary": "보증금 2억 1천만 원 · 공시가격 1억 6천만 원 · 근저당 3,600만 원 — 특약 덕분에 빠져나올 수 있는 사례",
+   "verdict": {
+    "level": "red",
+    "title": "특약은 좋지만 집 자체가 위험해요",
+    "points": [
+     "공시가격 126% 초과 → 보증보험 불가",
+     "위반건축물 표시 → 보증·대출 거절 사유",
+     "매수 직후 근저당 + 전세 = 갭투자 패턴",
+     "'보증 거절 시 무효' 특약 덕분에 계약금은 지킬 수 있음"
+    ]
+   }
+  },
+  {
+   "id": "contract_multi_jeonse_01",
+   "title": "다가구주택 전세 계약서 예시 — 선순위 보증금 확인",
+   "formId": "form_moj_standard",
+   "houseType": "MULTI_FAMILY",
+   "leaseType": "JEONSE",
+   "context": {
+    "marketPrice": 900000000,
+    "officialPrice": null,
+    "seniorDebt": 300000000,
+    "seniorDeposits": 630000000,
+    "documentIds": [
+     "doc_building",
+     "doc_movein",
+     "doc_fixeddate"
+    ],
+    "calc": {
+     "explain": "근저당 3억 + 선순위 보증금 6억 3천만 + 내 보증금 1억 2천만 = 10억 5천만 원 > 시세 9억 원 → 117%. 경매 시 내 보증금은 거의 회수 불가."
+    }
+   },
+   "pages": [
+    {
+     "pageNo": 1,
+     "sections": [
+      {
+       "id": "sec_header",
+       "title": "계약 유형과 당사자",
+       "fields": [
+        {
+         "key": "leaseKind",
+         "label": "임대차 종류",
+         "value": "☑ 전세  ☐ 보증금 있는 월세  ☐ 월세",
+         "hotspotId": "hs_lease_kind"
+        },
+        {
+         "key": "parties",
+         "label": "당사자",
+         "value": "임대인 한건물 과 임차인 이지킴 은 아래와 같이 임대차 계약을 체결한다.",
+         "hotspotId": "hs_parties"
+        }
+       ]
+      },
+      {
+       "id": "sec_property",
+       "title": "[임차주택의 표시]",
+       "fields": [
+        {
+         "key": "address",
+         "label": "소재지(도로명주소)",
+         "value": "경기도 가상시 샘플구 연습로 77",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "land",
+         "label": "토지",
+         "value": "지목: 대 / 면적: 198.0㎡"
+        },
+        {
+         "key": "building",
+         "label": "건물",
+         "value": "구조·용도: 철근콘크리트구조 단독주택(다가구주택), 제2종근린생활시설 / 연면적: 353.10㎡",
+         "hotspotId": "hs_building_use"
+        },
+        {
+         "key": "leasedPart",
+         "label": "임차할 부분",
+         "value": "4층 중 일부(현관 표시 403호) / 약 24㎡",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "contractType",
+         "label": "계약의 종류",
+         "value": "☑ 신규 계약  ☐ 합의에 의한 재계약  ☐ 계약갱신요구권 행사에 의한 갱신계약",
+         "hotspotId": "hs_contract_type"
+        }
+       ]
+      },
+      {
+       "id": "sec_disclosure",
+       "title": "미납 국세·지방세 / 선순위 확정일자 현황 / 확정일자 부여란",
+       "fields": [
+        {
+         "key": "taxArrears",
+         "label": "미납 국세·지방세",
+         "value": "☑ 없음 (임대인 서명: 한건물 ㊞)  ☐ 있음",
+         "hotspotId": "hs_tax"
+        },
+        {
+         "key": "seniorFixedDate",
+         "label": "선순위 확정일자 현황",
+         "value": "☐ 해당 없음  ☑ 해당 있음 — 선순위 확정일자 6건, 보증금 합계 금 630,000,000원 (확정일자 부여현황 별첨)",
+         "hotspotId": "hs_senior_fixed_date"
+        },
+        {
+         "key": "fixedDateBox",
+         "label": "확정일자 부여란",
+         "value": "(주민센터 확정일자 도장 자리 — 임대차 신고 시 자동 부여)",
+         "hotspotId": "hs_fixed_date_box"
+        }
+       ]
+      },
+      {
+       "id": "sec_money",
+       "title": "제1조 보증금과 차임 및 관리비",
+       "fields": [
+        {
+         "key": "deposit",
+         "label": "보증금",
+         "value": "금 일억이천만원정 (₩120,000,000)",
+         "hotspotId": "hs_deposit"
+        },
+        {
+         "key": "downPayment",
+         "label": "계약금",
+         "value": "금 일천이백만원정(₩12,000,000)은 계약 시 지불하고 영수함. 영수자: 한건물 ㊞",
+         "hotspotId": "hs_down_payment"
+        },
+        {
+         "key": "middlePayment",
+         "label": "중도금",
+         "value": "없음",
+         "hotspotId": "hs_middle_payment"
+        },
+        {
+         "key": "balance",
+         "label": "잔금",
+         "value": "금 일억팔백만원정(₩108,000,000)은 2026년 12월 1일에 지불한다.",
+         "hotspotId": "hs_balance"
+        },
+        {
+         "key": "rent",
+         "label": "차임(월세)",
+         "value": "없음"
+        },
+        {
+         "key": "maintenanceFee",
+         "label": "관리비",
+         "value": "정액 월 50,000원 (공용 전기·인터넷·청소 포함)",
+         "hotspotId": "hs_maintenance"
+        },
+        {
+         "key": "account",
+         "label": "임대인 계좌",
+         "value": "가상은행 333-3333-3333 (예금주: 한건물)",
+         "hotspotId": "hs_deposit_account"
+        }
+       ]
+      },
+      {
+       "id": "sec_period",
+       "title": "제2조 임대차기간",
+       "fields": [
+        {
+         "key": "period",
+         "label": "임대차기간",
+         "value": "임대인은 임차주택을 2026년 12월 1일까지 임차인에게 인도하고, 임대차기간은 인도일로부터 2028년 11월 30일까지로 한다.",
+         "hotspotId": "hs_period"
+        }
+       ]
+      },
+      {
+       "id": "sec_repair",
+       "title": "제3조 입주 전 수리",
+       "fields": [
+        {
+         "key": "repair",
+         "label": "수리 필요 시설",
+         "value": "☐ 있음  ☑ 없음",
+         "hotspotId": "hs_repair"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 2,
+     "sections": [
+      {
+       "id": "sec_articles",
+       "title": "제4조 ~ 제13조 (조문 요지)",
+       "fields": [
+        {
+         "key": "art4",
+         "label": "제4조 임차주택의 사용·관리·수선",
+         "value": "임차인은 임대인 동의 없이 구조 변경·전대를 할 수 없다. 임대인은 계약기간 중 주택을 사용·수익에 필요한 상태로 유지하고, 임대인 부담 수선과 임차인 부담 수선을 구분해 적는다.",
+         "hotspotId": "hs_art_repair"
+        },
+        {
+         "key": "art5",
+         "label": "제5조 계약의 해제",
+         "value": "중도금(중도금이 없으면 잔금) 지급 전까지 임대인은 계약금의 배액을 상환하고, 임차인은 계약금을 포기하고 계약을 해제할 수 있다.",
+         "hotspotId": "hs_art_cancel"
+        },
+        {
+         "key": "art6",
+         "label": "제6조 채무불이행과 손해배상",
+         "value": "당사자 일방이 채무를 이행하지 않으면 상대방은 상당한 기간을 정해 이행을 최고한 후 계약을 해제하고 손해배상을 청구할 수 있다."
+        },
+        {
+         "key": "art7",
+         "label": "제7조 계약의 해지",
+         "value": "임차인의 귀책 없이 주택 일부가 멸실되어 목적을 달성할 수 없으면 임차인은 해지할 수 있다. 임차인이 차임을 2기 이상 연체하는 등의 경우 임대인은 해지할 수 있다."
+        },
+        {
+         "key": "art8",
+         "label": "제8조 갱신요구와 거절",
+         "value": "임차인은 기간 만료 6개월 전부터 2개월 전까지 계약 갱신을 요구할 수 있고, 임대인은 정당한 사유 없이 거절하지 못한다(1회, 2년, 증액 5% 이내).",
+         "hotspotId": "hs_art_renewal"
+        },
+        {
+         "key": "art9",
+         "label": "제9조 계약의 종료",
+         "value": "계약이 종료되면 임차인은 주택을 원상회복해 반환하고, 임대인은 보증금을 반환한다. 두 의무는 동시에 이행한다.",
+         "hotspotId": "hs_art_end"
+        },
+        {
+         "key": "art10",
+         "label": "제10조 비용의 정산",
+         "value": "공과금·관리비 정산, 임차인이 낸 장기수선충당금은 계약 종료 시 돌려받을 수 있다.",
+         "hotspotId": "hs_art_ltrf"
+        },
+        {
+         "key": "art11",
+         "label": "제11조 분쟁의 해결",
+         "value": "분쟁은 주택임대차분쟁조정위원회 조정을 신청하는 등 상호 협의로 해결한다."
+        },
+        {
+         "key": "art12",
+         "label": "제12조 중개보수 등",
+         "value": "중개보수는 법정 요율 한도에서 정하고, 중개사 고의·과실 없이 계약이 무효·취소·해제되어도 중개보수는 지급한다."
+        },
+        {
+         "key": "art13",
+         "label": "제13조 중개대상물 확인·설명서 교부",
+         "value": "개업공인중개사는 확인·설명서를 작성하고 공제증서 사본을 첨부해 계약 체결 시 양 당사자에게 교부한다.",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      },
+      {
+       "id": "sec_special",
+       "title": "[특약사항]",
+       "fields": [
+        {
+         "key": "sp1",
+         "label": "특약 1",
+         "value": "임대인은 계약일 현재 본 건물의 선순위 임차보증금 총액이 금 630,000,000원(6건)임을 고지하며, 사실과 다를 경우 임차인은 계약을 해제할 수 있고 임대인은 수령 금원 전액 반환 및 계약금 상당액을 배상한다.",
+         "hotspotId": "hs_multi_disclose",
+         "clauseId": "cl_multi_family_disclosure"
+        },
+        {
+         "key": "sp2",
+         "label": "특약 2",
+         "value": "임대인은 잔금 지급일 다음 날까지 본 건물에 담보권을 설정하지 않으며 권리변동을 일으키지 않는다. 위반 시 임차인은 계약을 해제할 수 있다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_no_mortgage_until_next_day"
+        },
+        {
+         "key": "sp3",
+         "label": "특약 3",
+         "value": "본 계약은 임차인의 전세보증금반환보증 가입을 전제로 하며, 임대인 또는 주택의 사유로 가입이 거절될 경우 계약은 무효로 하고 임대인은 수령 금원 전액을 즉시 반환한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_insurance_void"
+        },
+        {
+         "key": "sp4",
+         "label": "특약 4",
+         "value": "임대인은 국세·지방세 체납 사실이 없음을 확인하며, 잔금 지급일 이전에 체납 또는 압류가 확인되면 임차인은 계약을 해제할 수 있다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_tax_none"
+        }
+       ]
+      },
+      {
+       "id": "sec_sign",
+       "title": "서명·날인",
+       "fields": [
+        {
+         "key": "contractDate",
+         "label": "계약일",
+         "value": "2026년 11월 2일",
+         "hotspotId": "hs_contract_date"
+        },
+        {
+         "key": "lessor",
+         "label": "임대인",
+         "value": "주소: (등기부상 주소와 동일) / 성명: 한건물 ㊞ / 연락처: 010-0000-0000",
+         "hotspotId": "hs_parties"
+        },
+        {
+         "key": "lessee",
+         "label": "임차인",
+         "value": "주소: (현 거주지) / 성명: 이지킴 ㊞ / 연락처: 010-0000-0000"
+        },
+        {
+         "key": "broker",
+         "label": "개업공인중개사",
+         "value": "사무소: 연습공인중개사사무소 / 등록번호: 가상-0000-11111 / 대표: 문빠름 ㊞",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 3,
+     "sections": [
+      {
+       "id": "sec_annex",
+       "title": "[별지] 법의 보호를 받기 위한 중요확인사항 (요지)",
+       "fields": [
+        {
+         "key": "annex1",
+         "label": "계약 체결 시",
+         "value": "등기부로 소유자·권리관계 확인, 임대인 신분 확인, 미납 국세·선순위 확정일자 현황 확인",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex2",
+         "label": "계약 체결 후",
+         "value": "주택 인도·전입신고로 대항력, 확정일자로 우선변제권 확보, 임대차 신고",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex3",
+         "label": "계약기간 중",
+         "value": "갱신요구권, 차임 증액 제한, 묵시적 갱신 시 해지 통지",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex4",
+         "label": "계약 종료 시",
+         "value": "보증금 반환 전 이사해야 하면 임차권등기명령 활용, 장기수선충당금 반환 청구",
+         "hotspotId": "hs_annex"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "hotspots": [
+    {
+     "id": "hs_lease_kind",
+     "level": "info",
+     "title": "전세·월세 구분",
+     "explain": "전세는 보증금만, 보증금 있는 월세는 보증금+월세입니다. 체크가 실제 조건과 맞는지 보세요.",
+     "check": [
+      "계약 조건과 체크 항목 일치"
+     ]
+    },
+    {
+     "id": "hs_parties",
+     "level": "critical",
+     "title": "임대인이 진짜 집주인인가",
+     "explain": "임대인 이름·주소가 등기부 갑구의 현재 소유자와 같아야 합니다. 예시에서는 등기부 소유자 '김안심'과 일치합니다.",
+     "check": [
+      "신분증 진위 확인(정부24·ARS 1382)",
+      "등기부 소유자와 동일인",
+      "공동소유면 전원 서명 또는 위임"
+     ],
+     "redFlags": [
+      "소유자와 다른 사람이 계약서에 임대인으로 서명",
+      "신분증 사진이 흐리거나 원본 제시 거부"
+     ],
+     "lessonIds": [
+      "ls_04_01"
+     ],
+     "quizIds": [
+      "q_cs_01"
+     ]
+    },
+    {
+     "id": "hs_address",
+     "level": "critical",
+     "title": "주소·동·층·호수 정확히",
+     "explain": "다가구는 건물 전체가 등기 하나라 등기부에 호수가 없어요. 전입신고는 지번(도로명)까지가 기본이고, 호수를 적는다면 현관 표시와 일치시키세요. 대장상 호수가 없는 '쪼개진 방'은 위험해요.",
+     "check": [
+      "등기부 표제부 주소와 일치",
+      "동·층·호수 정확",
+      "전입신고 시 같은 주소 입력"
+     ],
+     "redFlags": [
+      "호수 누락·오기",
+      "등기부와 다른 지번"
+     ],
+     "lessonIds": [
+      "ls_06_02"
+     ],
+     "quizIds": [
+      "q_cs_02"
+     ],
+     "documentId": "doc_building"
+    },
+    {
+     "id": "hs_building_use",
+     "level": "critical",
+     "title": "건물 용도",
+     "explain": "건축물대장상 4층은 1가구로 허가됐는데 현장 호수는 3개예요. 방 쪼개기가 의심돼요.",
+     "check": [
+      "건축물대장 용도 = 주택",
+      "위반건축물 표시 없음"
+     ],
+     "lessonIds": [
+      "ls_03_02"
+     ],
+     "documentId": "doc_building"
+    },
+    {
+     "id": "hs_contract_type",
+     "level": "important",
+     "title": "계약의 종류",
+     "explain": "신규 계약인지, 갱신요구권을 쓴 갱신계약인지 구분합니다. 갱신요구권을 썼다면 그 사실이 기록으로 남아 다음에 다시 쓸 수 없다는 점도 확인돼요.",
+     "check": [
+      "신규/합의 재계약/갱신요구권 갱신 중 정확히 체크"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_tax",
+     "level": "critical",
+     "title": "미납 국세·지방세",
+     "explain": "체납 세금은 경매 때 보증금보다 먼저 배당될 수 있어요. '없음'에 체크하고 임대인이 서명했는지, 실제 납세증명서를 봤는지 확인하세요.",
+     "check": [
+      "납세증명서(국세·지방세) 실물 확인",
+      "'없음' 체크 + 임대인 서명"
+     ],
+     "redFlags": [
+      "납세증명서 제시 거부",
+      "'있음'인데 금액 설명이 없음"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "quizIds": [
+      "q_cs_03"
+     ]
+    },
+    {
+     "id": "hs_senior_fixed_date",
+     "level": "critical",
+     "title": "선순위 확정일자 현황",
+     "explain": "다가구 계약의 핵심 칸이에요. 이 예시는 선순위 6건, 합계 6억 3천만 원이라고 적혀 있어요. 근저당 3억 원까지 더하면 이미 시세 9억 원을 넘어요.",
+     "check": [
+      "확정일자 부여현황 서류 확인",
+      "다가구는 선순위 보증금 합계 기재"
+     ],
+     "redFlags": [
+      "다가구인데 '해당 없음'으로만 처리"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "documentId": "doc_fixeddate"
+    },
+    {
+     "id": "hs_fixed_date_box",
+     "level": "important",
+     "title": "확정일자 부여란",
+     "explain": "여기에 확정일자 도장이 찍히면 우선변제권의 요건 하나가 갖춰져요. 임대차 신고를 하면 자동 부여됩니다.",
+     "check": [
+      "계약 직후 확정일자 받기",
+      "신고필증의 확정일자 번호 확인"
+     ],
+     "lessonIds": [
+      "ls_05_01"
+     ]
+    },
+    {
+     "id": "hs_deposit",
+     "level": "critical",
+     "title": "보증금 — 숫자와 한글 모두",
+     "explain": "내 보증금 1억 2천만 원은 선순위 6억 3천만 원 + 근저당 3억 원 뒤에 서요. 합계 10억 5천만 원으로 시세 9억 원의 117%예요.",
+     "check": [
+      "한글·숫자 금액 일치",
+      "전세가율 계산",
+      "보증보험 가입 가능 금액 이내"
+     ],
+     "calculatorId": "calc_jeonse_ratio",
+     "quizIds": [
+      "q_cs_04"
+     ]
+    },
+    {
+     "id": "hs_down_payment",
+     "level": "important",
+     "title": "계약금",
+     "explain": "보통 보증금의 10%입니다. 계약금을 넣은 뒤 마음이 바뀌면 임차인은 계약금을 포기, 임대인은 두 배를 돌려줘야 해제할 수 있어요(제5조).",
+     "check": [
+      "영수자 서명",
+      "송금 기록 보관"
+     ],
+     "lessonIds": [
+      "ls_04_02"
+     ]
+    },
+    {
+     "id": "hs_middle_payment",
+     "level": "info",
+     "title": "중도금",
+     "explain": "중도금이 있으면 그 지급 이후에는 계약금 포기·배액상환으로 해제하기 어려워요. 전세는 중도금 없이 하는 경우가 많습니다.",
+     "check": [
+      "중도금 유무·날짜 확인"
+     ]
+    },
+    {
+     "id": "hs_balance",
+     "level": "critical",
+     "title": "잔금일 = 이사·전입신고일",
+     "explain": "잔금일에 이사·전입신고·확정일자를 함께 처리해야 해요. 잔금 송금 직전 등기부를 다시 확인하세요.",
+     "check": [
+      "잔금일과 입주일 동일",
+      "대출 실행일 = 잔금일",
+      "잔금 직전 등기부 재확인"
+     ],
+     "lessonIds": [
+      "ls_06_01",
+      "ls_06_02"
+     ],
+     "checklistId": "ck_moving_day"
+    },
+    {
+     "id": "hs_maintenance",
+     "level": "info",
+     "title": "관리비",
+     "explain": "아파트는 관리사무소 고지서 기준 실비인 경우가 많아요. 빌라·오피스텔 정액 관리비는 항목을 적어두세요.",
+     "check": [
+      "정액이면 포함 항목 명시"
+     ],
+     "clauseId": "cl_maintenance_fee"
+    },
+    {
+     "id": "hs_deposit_account",
+     "level": "critical",
+     "title": "송금 계좌 예금주",
+     "explain": "계약금·잔금은 반드시 등기부상 소유자 본인 명의 계좌로. 중개사·가족·대리인 계좌로 보내라고 하면 멈추세요.",
+     "check": [
+      "예금주 = 등기부 소유자",
+      "송금 메모에 '주소+계약금' 기재"
+     ],
+     "redFlags": [
+      "예금주가 소유자와 다름",
+      "현금 지급 요구"
+     ],
+     "quizIds": [
+      "q_cs_05"
+     ]
+    },
+    {
+     "id": "hs_period",
+     "level": "important",
+     "title": "임대차기간",
+     "explain": "주택임대차보호법상 2년 미만으로 정해도 임차인은 2년을 주장할 수 있어요. 만기일을 앱 플래너에 등록하면 6개월 전부터 알려줍니다.",
+     "check": [
+      "시작일 = 잔금·인도일",
+      "만기일 플래너 등록"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_repair",
+     "level": "important",
+     "title": "입주 전 수리",
+     "explain": "수리할 내용·완료 시기·미이행 시 처리(잔금 공제 등)를 구체적으로 적어야 분쟁이 줄어요.",
+     "check": [
+      "수리 항목 구체적 기재",
+      "미이행 시 처리 방법 체크"
+     ],
+     "clauseId": "cl_repair_before"
+    },
+    {
+     "id": "hs_art_repair",
+     "level": "info",
+     "title": "수선 의무",
+     "explain": "보일러·배관 같은 큰 수선은 원칙적으로 임대인 부담, 전구·소모품 같은 소규모 수선은 임차인 부담으로 나누는 경우가 많아요. 표준계약서는 부담 범위를 적도록 되어 있어요."
+    },
+    {
+     "id": "hs_art_cancel",
+     "level": "important",
+     "title": "계약 해제(계약금 포기·배액상환)",
+     "explain": "중도금(없으면 잔금) 전까지는 임차인은 계약금을 포기하고, 임대인은 계약금의 두 배를 주고 계약을 해제할 수 있어요. 특약의 '무효·해제' 조항은 이와 별개로 임대인 사유 시 계약금 전액 반환을 받기 위한 장치예요.",
+     "quizIds": [
+      "q_cs_06"
+     ]
+    },
+    {
+     "id": "hs_art_renewal",
+     "level": "important",
+     "title": "갱신요구권",
+     "explain": "만료 6개월~2개월 전 갱신 요구, 1회 2년, 증액 5% 이내.",
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_art_end",
+     "level": "critical",
+     "title": "계약 종료 — 동시이행",
+     "explain": "집을 비워주는 것과 보증금 반환은 동시에 이뤄져야 해요. 돈을 받기 전에 전출하면 대항력을 잃을 수 있으니 임차권등기명령을 활용하세요.",
+     "lessonIds": [
+      "ls_08_02"
+     ]
+    },
+    {
+     "id": "hs_art_ltrf",
+     "level": "info",
+     "title": "장기수선충당금",
+     "explain": "아파트 관리비에 포함된 장기수선충당금은 원래 소유자 부담이라, 임차인이 냈다면 퇴거 시 돌려받을 수 있어요."
+    },
+    {
+     "id": "hs_special_terms",
+     "level": "critical",
+     "title": "특약사항 — 이 계약서의 심장",
+     "explain": "예시 계약서에는 담보 설정 금지, 권리상태 유지, 보증보험 가입 불가 시 무효, 체납 시 해제, 매도 통지, 전입신고 보장 특약이 들어 있어요. 내 상황에 맞는 특약은 '특약 생성기'에서 추가하세요.",
+     "check": [
+      "담보 설정 금지(잔금 다음 날까지)",
+      "보증보험 불가 시 무효",
+      "근저당 금액 명시",
+      "체납 시 해제"
+     ],
+     "redFlags": [
+      "특약란이 비어 있음",
+      "'현 시설 상태로 임대' 한 줄만 있음"
+     ],
+     "lessonIds": [
+      "ls_04_03"
+     ],
+     "quizIds": [
+      "q_cs_07"
+     ]
+    },
+    {
+     "id": "hs_contract_date",
+     "level": "info",
+     "title": "계약일",
+     "explain": "계약일로부터 30일 이내 임대차 신고(대상 시). 계약일 당일 아침이 아니라 '서명 직전' 등기부를 확인하세요.",
+     "check": [
+      "임대차 신고 기한 플래너 등록"
+     ]
+    },
+    {
+     "id": "hs_broker",
+     "level": "important",
+     "title": "중개사 날인·확인설명서",
+     "explain": "개업공인중개사의 서명·날인과 등록번호, 중개대상물 확인·설명서, 공제증서 사본을 받으세요. 중개사 날인이 없는 계약서는 보증보험이 거절될 수 있어요.",
+     "check": [
+      "등록번호 조회",
+      "확인·설명서 수령",
+      "공제증서 사본 수령"
+     ],
+     "quizIds": [
+      "q_cs_08"
+     ]
+    },
+    {
+     "id": "hs_annex",
+     "level": "info",
+     "title": "별지 중요확인사항",
+     "explain": "표준계약서 뒤에 붙은 '법의 보호를 받기 위한 체크리스트'예요. 앱의 단계별 체크리스트와 같은 흐름입니다."
+    },
+    {
+     "id": "hs_multi_disclose",
+     "level": "critical",
+     "title": "선순위 보증금 고지 특약",
+     "explain": "임대인이 말한 선순위 보증금이 사실과 다르면 해제할 수 있도록 금액을 숫자로 박아두는 특약이에요. 그러나 금액이 사실이어도 이 집은 이미 위험해요. 특약은 '거짓말'을 막을 뿐 '위험한 숫자'를 바꾸지 못해요.",
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "documentId": "doc_fixeddate"
+    }
+   ],
+   "viewerTour": [
+    "hs_building_use",
+    "hs_address",
+    "hs_senior_fixed_date",
+    "hs_deposit",
+    "hs_multi_disclose",
+    "hs_deposit_account",
+    "hs_special_terms"
+   ],
+   "label": "다가구 전세",
+   "summary": "보증금 1억 2천만 원 · 선순위 보증금 6억 3천만 원 · 근저당 3억 원 — 등기부에 안 보이는 빚이 핵심",
+   "verdict": {
+    "level": "red",
+    "title": "등기부보다 무서운 '보이지 않는 빚'",
+    "points": [
+     "선순위 보증금 6억 3천만 원 + 근저당 3억 원 = 시세 초과",
+     "허가 가구수보다 많은 호수(쪼개기 의심)",
+     "보증보험 가입 가능성 매우 낮음 → 계약하지 않는 것이 안전"
+    ]
+   }
+  },
+  {
+   "id": "contract_officetel_monthly_01",
+   "title": "오피스텔 보증금 있는 월세 계약서 예시",
+   "formId": "form_moj_standard",
+   "houseType": "OFFICETEL",
+   "leaseType": "MONTHLY",
+   "context": {
+    "marketPrice": 230000000,
+    "officialPrice": 150000000,
+    "seniorDebt": 90000000,
+    "documentIds": [
+     "doc_building",
+     "doc_explain"
+    ],
+    "calc": {
+     "explain": "보증금 5천만 원 + 근저당 9천만 원 = 1억 4천만 원(시세 대비 61%). 과밀억제권역 소액임차인 기준(1억 4,500만 원 이하)에 해당해 최우선변제 최대 4,800만 원 대상(선순위 담보 설정일 기준 확인 필요)."
+    }
+   },
+   "pages": [
+    {
+     "pageNo": 1,
+     "sections": [
+      {
+       "id": "sec_header",
+       "title": "계약 유형과 당사자",
+       "fields": [
+        {
+         "key": "leaseKind",
+         "label": "임대차 종류",
+         "value": "☐ 전세  ☑ 보증금 있는 월세  ☐ 월세",
+         "hotspotId": "hs_lease_kind"
+        },
+        {
+         "key": "parties",
+         "label": "당사자",
+         "value": "임대인 오피스 와 임차인 이지킴 은 아래와 같이 임대차 계약을 체결한다.",
+         "hotspotId": "hs_parties"
+        }
+       ]
+      },
+      {
+       "id": "sec_property",
+       "title": "[임차주택의 표시]",
+       "fields": [
+        {
+         "key": "address",
+         "label": "소재지(도로명주소)",
+         "value": "경기도 수원시 영통구 연습대로 300",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "land",
+         "label": "토지",
+         "value": "지목: 대 / 대지권 면적: 6.80㎡"
+        },
+        {
+         "key": "building",
+         "label": "건물",
+         "value": "구조·용도: 철근콘크리트구조 업무시설(오피스텔) / 전용면적: 29.40㎡",
+         "hotspotId": "hs_building_use"
+        },
+        {
+         "key": "leasedPart",
+         "label": "임차할 부분",
+         "value": "샘플타워 제15층 제1512호 전부 / 29.40㎡",
+         "hotspotId": "hs_address"
+        },
+        {
+         "key": "contractType",
+         "label": "계약의 종류",
+         "value": "☑ 신규 계약  ☐ 합의에 의한 재계약  ☐ 계약갱신요구권 행사에 의한 갱신계약",
+         "hotspotId": "hs_contract_type"
+        }
+       ]
+      },
+      {
+       "id": "sec_disclosure",
+       "title": "미납 국세·지방세 / 선순위 확정일자 현황 / 확정일자 부여란",
+       "fields": [
+        {
+         "key": "taxArrears",
+         "label": "미납 국세·지방세",
+         "value": "☑ 없음 (임대인 서명: 오피스 ㊞)  ☐ 있음",
+         "hotspotId": "hs_tax"
+        },
+        {
+         "key": "seniorFixedDate",
+         "label": "선순위 확정일자 현황",
+         "value": "☑ 해당 없음 (임대인 서명: 오피스 ㊞)  ☐ 해당 있음",
+         "hotspotId": "hs_senior_fixed_date"
+        },
+        {
+         "key": "fixedDateBox",
+         "label": "확정일자 부여란",
+         "value": "(주민센터 확정일자 도장 자리 — 임대차 신고 시 자동 부여)",
+         "hotspotId": "hs_fixed_date_box"
+        }
+       ]
+      },
+      {
+       "id": "sec_money",
+       "title": "제1조 보증금과 차임 및 관리비",
+       "fields": [
+        {
+         "key": "deposit",
+         "label": "보증금",
+         "value": "금 오천만원정 (₩50,000,000)",
+         "hotspotId": "hs_deposit"
+        },
+        {
+         "key": "downPayment",
+         "label": "계약금",
+         "value": "금 오백만원정(₩5,000,000)은 계약 시 지불하고 영수함. 영수자: 오피스 ㊞",
+         "hotspotId": "hs_down_payment"
+        },
+        {
+         "key": "middlePayment",
+         "label": "중도금",
+         "value": "없음",
+         "hotspotId": "hs_middle_payment"
+        },
+        {
+         "key": "balance",
+         "label": "잔금",
+         "value": "금 사천오백만원정(₩45,000,000)은 2026년 11월 30일에 지불한다.",
+         "hotspotId": "hs_balance"
+        },
+        {
+         "key": "rent",
+         "label": "차임(월세)",
+         "value": "월 금 칠십만원정(₩700,000)은 매월 30일에 지불한다(후불). 입금계좌: 가상은행 444-4444-4444 (예금주: 오피스)",
+         "hotspotId": "hs_off_rent"
+        },
+        {
+         "key": "maintenanceFee",
+         "label": "관리비",
+         "value": "정액 월 150,000원 — 포함: 일반관리비 60,000 / 공용전기 20,000 / 청소·경비 35,000 / 승강기 15,000 / 인터넷·TV 20,000. 세대 전기·가스·수도는 사용량에 따라 임차인 부담",
+         "hotspotId": "hs_maintenance"
+        },
+        {
+         "key": "account",
+         "label": "임대인 계좌",
+         "value": "가상은행 444-4444-4444 (예금주: 오피스)",
+         "hotspotId": "hs_deposit_account"
+        }
+       ]
+      },
+      {
+       "id": "sec_period",
+       "title": "제2조 임대차기간",
+       "fields": [
+        {
+         "key": "period",
+         "label": "임대차기간",
+         "value": "임대인은 임차주택을 2026년 11월 30일까지 임차인에게 인도하고, 임대차기간은 인도일로부터 2027년 11월 29일까지(1년)로 한다.",
+         "hotspotId": "hs_period"
+        }
+       ]
+      },
+      {
+       "id": "sec_repair",
+       "title": "제3조 입주 전 수리",
+       "fields": [
+        {
+         "key": "repair",
+         "label": "수리 필요 시설",
+         "value": "☐ 있음  ☑ 없음",
+         "hotspotId": "hs_repair"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 2,
+     "sections": [
+      {
+       "id": "sec_articles",
+       "title": "제4조 ~ 제13조 (조문 요지)",
+       "fields": [
+        {
+         "key": "art4",
+         "label": "제4조 임차주택의 사용·관리·수선",
+         "value": "임차인은 임대인 동의 없이 구조 변경·전대를 할 수 없다. 임대인은 계약기간 중 주택을 사용·수익에 필요한 상태로 유지하고, 임대인 부담 수선과 임차인 부담 수선을 구분해 적는다.",
+         "hotspotId": "hs_art_repair"
+        },
+        {
+         "key": "art5",
+         "label": "제5조 계약의 해제",
+         "value": "중도금(중도금이 없으면 잔금) 지급 전까지 임대인은 계약금의 배액을 상환하고, 임차인은 계약금을 포기하고 계약을 해제할 수 있다.",
+         "hotspotId": "hs_art_cancel"
+        },
+        {
+         "key": "art6",
+         "label": "제6조 채무불이행과 손해배상",
+         "value": "당사자 일방이 채무를 이행하지 않으면 상대방은 상당한 기간을 정해 이행을 최고한 후 계약을 해제하고 손해배상을 청구할 수 있다."
+        },
+        {
+         "key": "art7",
+         "label": "제7조 계약의 해지",
+         "value": "임차인의 귀책 없이 주택 일부가 멸실되어 목적을 달성할 수 없으면 임차인은 해지할 수 있다. 임차인이 차임을 2기 이상 연체하는 등의 경우 임대인은 해지할 수 있다."
+        },
+        {
+         "key": "art8",
+         "label": "제8조 갱신요구와 거절",
+         "value": "임차인은 기간 만료 6개월 전부터 2개월 전까지 계약 갱신을 요구할 수 있고, 임대인은 정당한 사유 없이 거절하지 못한다(1회, 2년, 증액 5% 이내).",
+         "hotspotId": "hs_art_renewal"
+        },
+        {
+         "key": "art9",
+         "label": "제9조 계약의 종료",
+         "value": "계약이 종료되면 임차인은 주택을 원상회복해 반환하고, 임대인은 보증금을 반환한다. 두 의무는 동시에 이행한다.",
+         "hotspotId": "hs_art_end"
+        },
+        {
+         "key": "art10",
+         "label": "제10조 비용의 정산",
+         "value": "공과금·관리비 정산, 임차인이 낸 장기수선충당금은 계약 종료 시 돌려받을 수 있다.",
+         "hotspotId": "hs_art_ltrf"
+        },
+        {
+         "key": "art11",
+         "label": "제11조 분쟁의 해결",
+         "value": "분쟁은 주택임대차분쟁조정위원회 조정을 신청하는 등 상호 협의로 해결한다."
+        },
+        {
+         "key": "art12",
+         "label": "제12조 중개보수 등",
+         "value": "중개보수는 법정 요율 한도에서 정하고, 중개사 고의·과실 없이 계약이 무효·취소·해제되어도 중개보수는 지급한다."
+        },
+        {
+         "key": "art13",
+         "label": "제13조 중개대상물 확인·설명서 교부",
+         "value": "개업공인중개사는 확인·설명서를 작성하고 공제증서 사본을 첨부해 계약 체결 시 양 당사자에게 교부한다.",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      },
+      {
+       "id": "sec_special",
+       "title": "[특약사항]",
+       "fields": [
+        {
+         "key": "sp1",
+         "label": "특약 1",
+         "value": "임차인은 잔금 지급일에 전입신고 및 확정일자를 받을 수 있으며, 임대인은 이를 제한하거나 방해하지 않는다. 임대인의 주택임대사업자·부가가치세 사정은 임차인의 전입신고를 제한하는 사유가 되지 않는다.",
+         "hotspotId": "hs_off_movein",
+         "clauseId": "cl_moving_in_free"
+        },
+        {
+         "key": "sp2",
+         "label": "특약 2",
+         "value": "임대인은 잔금 지급일 다음 날까지 본 호실에 담보권을 설정하지 않으며 권리변동을 일으키지 않는다. 위반 시 임차인은 계약을 해제할 수 있다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_no_mortgage_until_next_day"
+        },
+        {
+         "key": "sp3",
+         "label": "특약 3",
+         "value": "관리비는 월 정액 150,000원으로 하며 포함 항목은 위 제1조에 적은 바와 같다. 임대인은 계약기간 중 관리비 정액을 일방적으로 인상하지 않는다.",
+         "hotspotId": "hs_off_fee",
+         "clauseId": "cl_maintenance_fee"
+        },
+        {
+         "key": "sp4",
+         "label": "특약 4",
+         "value": "통상적인 사용에 따른 자연 마모는 원상복구 대상에서 제외하며, 원상복구 범위는 입주 시 양 당사자가 확인한 사진을 기준으로 한다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_restore_scope"
+        },
+        {
+         "key": "sp5",
+         "label": "특약 5",
+         "value": "임대인은 국세·지방세 체납 사실이 없음을 확인하며, 잔금 지급일 이전에 체납 또는 압류가 확인되면 임차인은 계약을 해제할 수 있다.",
+         "hotspotId": "hs_special_terms",
+         "clauseId": "cl_tax_none"
+        }
+       ]
+      },
+      {
+       "id": "sec_sign",
+       "title": "서명·날인",
+       "fields": [
+        {
+         "key": "contractDate",
+         "label": "계약일",
+         "value": "2026년 11월 9일",
+         "hotspotId": "hs_contract_date"
+        },
+        {
+         "key": "lessor",
+         "label": "임대인",
+         "value": "주소: (등기부상 주소와 동일) / 성명: 오피스 ㊞ / 연락처: 010-0000-0000",
+         "hotspotId": "hs_parties"
+        },
+        {
+         "key": "lessee",
+         "label": "임차인",
+         "value": "주소: (현 거주지) / 성명: 이지킴 ㊞ / 연락처: 010-0000-0000"
+        },
+        {
+         "key": "broker",
+         "label": "개업공인중개사",
+         "value": "사무소: 바른공인중개사사무소 / 등록번호: 가상-0000-00000 / 대표: 정바른 ㊞",
+         "hotspotId": "hs_broker"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "pageNo": 3,
+     "sections": [
+      {
+       "id": "sec_annex",
+       "title": "[별지] 법의 보호를 받기 위한 중요확인사항 (요지)",
+       "fields": [
+        {
+         "key": "annex1",
+         "label": "계약 체결 시",
+         "value": "등기부로 소유자·권리관계 확인, 임대인 신분 확인, 미납 국세·선순위 확정일자 현황 확인",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex2",
+         "label": "계약 체결 후",
+         "value": "주택 인도·전입신고로 대항력, 확정일자로 우선변제권 확보, 임대차 신고",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex3",
+         "label": "계약기간 중",
+         "value": "갱신요구권, 차임 증액 제한, 묵시적 갱신 시 해지 통지",
+         "hotspotId": "hs_annex"
+        },
+        {
+         "key": "annex4",
+         "label": "계약 종료 시",
+         "value": "보증금 반환 전 이사해야 하면 임차권등기명령 활용, 장기수선충당금 반환 청구",
+         "hotspotId": "hs_annex"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "hotspots": [
+    {
+     "id": "hs_lease_kind",
+     "level": "info",
+     "title": "전세·월세 구분",
+     "explain": "'보증금 있는 월세'에 체크돼 있어요. 월세 계약도 보증금이 있으면 대항력·확정일자·최우선변제가 똑같이 중요해요.",
+     "check": [
+      "계약 조건과 체크 항목 일치"
+     ]
+    },
+    {
+     "id": "hs_parties",
+     "level": "critical",
+     "title": "임대인이 진짜 집주인인가",
+     "explain": "임대인 이름·주소가 등기부 갑구의 현재 소유자와 같아야 합니다. 예시에서는 등기부 소유자 '김안심'과 일치합니다.",
+     "check": [
+      "신분증 진위 확인(정부24·ARS 1382)",
+      "등기부 소유자와 동일인",
+      "공동소유면 전원 서명 또는 위임"
+     ],
+     "redFlags": [
+      "소유자와 다른 사람이 계약서에 임대인으로 서명",
+      "신분증 사진이 흐리거나 원본 제시 거부"
+     ],
+     "lessonIds": [
+      "ls_04_01"
+     ],
+     "quizIds": [
+      "q_cs_01"
+     ]
+    },
+    {
+     "id": "hs_address",
+     "level": "critical",
+     "title": "주소·동·층·호수 정확히",
+     "explain": "계약서·등기부·건축물대장·전입신고 주소가 한 글자라도 다르면 대항력을 다툴 수 있습니다. 아파트는 동·층·호수를 모두 적으세요.",
+     "check": [
+      "등기부 표제부 주소와 일치",
+      "동·층·호수 정확",
+      "전입신고 시 같은 주소 입력"
+     ],
+     "redFlags": [
+      "호수 누락·오기",
+      "등기부와 다른 지번"
+     ],
+     "lessonIds": [
+      "ls_06_02"
+     ],
+     "quizIds": [
+      "q_cs_02"
+     ]
+    },
+    {
+     "id": "hs_building_use",
+     "level": "critical",
+     "title": "업무시설(오피스텔)",
+     "explain": "오피스텔은 건축물대장상 '업무시설'이에요. 실제로 주거로 쓰고 전입신고를 하면 주택임대차보호법 보호를 받을 수 있어요. 전입신고를 못 하게 하는 계약은 피하세요.",
+     "check": [
+      "건축물대장 용도 = 주택",
+      "위반건축물 표시 없음"
+     ],
+     "lessonIds": [
+      "ls_03_02"
+     ],
+     "documentId": "doc_building"
+    },
+    {
+     "id": "hs_contract_type",
+     "level": "important",
+     "title": "계약의 종류",
+     "explain": "신규 계약인지, 갱신요구권을 쓴 갱신계약인지 구분합니다. 갱신요구권을 썼다면 그 사실이 기록으로 남아 다음에 다시 쓸 수 없다는 점도 확인돼요.",
+     "check": [
+      "신규/합의 재계약/갱신요구권 갱신 중 정확히 체크"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_tax",
+     "level": "critical",
+     "title": "미납 국세·지방세",
+     "explain": "체납 세금은 경매 때 보증금보다 먼저 배당될 수 있어요. '없음'에 체크하고 임대인이 서명했는지, 실제 납세증명서를 봤는지 확인하세요.",
+     "check": [
+      "납세증명서(국세·지방세) 실물 확인",
+      "'없음' 체크 + 임대인 서명"
+     ],
+     "redFlags": [
+      "납세증명서 제시 거부",
+      "'있음'인데 금액 설명이 없음"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ],
+     "quizIds": [
+      "q_cs_03"
+     ]
+    },
+    {
+     "id": "hs_senior_fixed_date",
+     "level": "critical",
+     "title": "선순위 확정일자 현황",
+     "explain": "나보다 먼저 들어온 세입자의 보증금입니다. 아파트 한 세대 전체 계약이면 보통 '해당 없음'이지만, 다가구·다세대 일부 임차라면 반드시 금액을 확인하세요.",
+     "check": [
+      "확정일자 부여현황 서류 확인",
+      "다가구는 선순위 보증금 합계 기재"
+     ],
+     "redFlags": [
+      "다가구인데 '해당 없음'으로만 처리"
+     ],
+     "lessonIds": [
+      "ls_03_03"
+     ]
+    },
+    {
+     "id": "hs_fixed_date_box",
+     "level": "important",
+     "title": "확정일자 부여란",
+     "explain": "여기에 확정일자 도장이 찍히면 우선변제권의 요건 하나가 갖춰져요. 임대차 신고를 하면 자동 부여됩니다.",
+     "check": [
+      "계약 직후 확정일자 받기",
+      "신고필증의 확정일자 번호 확인"
+     ],
+     "lessonIds": [
+      "ls_05_01"
+     ]
+    },
+    {
+     "id": "hs_deposit",
+     "level": "critical",
+     "title": "보증금 — 숫자와 한글 모두",
+     "explain": "보증금 5천만 원은 과밀억제권역 소액임차인 기준(1억 4,500만 원 이하)에 들어가요. 대항력을 갖추면 경매 때 최대 4,800만 원을 먼저 받을 수 있어요(선순위 담보 설정일 기준 확인).",
+     "check": [
+      "한글·숫자 금액 일치",
+      "전세가율 계산",
+      "보증보험 가입 가능 금액 이내"
+     ],
+     "calculatorId": "calc_jeonse_ratio",
+     "quizIds": [
+      "q_cs_04"
+     ]
+    },
+    {
+     "id": "hs_down_payment",
+     "level": "important",
+     "title": "계약금",
+     "explain": "보통 보증금의 10%입니다. 계약금을 넣은 뒤 마음이 바뀌면 임차인은 계약금을 포기, 임대인은 두 배를 돌려줘야 해제할 수 있어요(제5조).",
+     "check": [
+      "영수자 서명",
+      "송금 기록 보관"
+     ],
+     "lessonIds": [
+      "ls_04_02"
+     ]
+    },
+    {
+     "id": "hs_middle_payment",
+     "level": "info",
+     "title": "중도금",
+     "explain": "중도금이 있으면 그 지급 이후에는 계약금 포기·배액상환으로 해제하기 어려워요. 전세는 중도금 없이 하는 경우가 많습니다.",
+     "check": [
+      "중도금 유무·날짜 확인"
+     ]
+    },
+    {
+     "id": "hs_balance",
+     "level": "critical",
+     "title": "잔금일 = 이사·전입신고일",
+     "explain": "잔금일에 이사·전입신고·확정일자를 함께 처리해야 해요. 잔금 송금 직전 등기부를 다시 확인하세요.",
+     "check": [
+      "잔금일과 입주일 동일",
+      "대출 실행일 = 잔금일",
+      "잔금 직전 등기부 재확인"
+     ],
+     "lessonIds": [
+      "ls_06_01",
+      "ls_06_02"
+     ],
+     "checklistId": "ck_moving_day"
+    },
+    {
+     "id": "hs_maintenance",
+     "level": "important",
+     "title": "관리비",
+     "explain": "정액 15만 원과 항목별 금액이 적혀 있어요. 월세를 낮추고 관리비를 올리는 '편법 월세'를 막으려면 항목을 꼭 적어야 해요.",
+     "check": [
+      "정액이면 포함 항목 명시"
+     ],
+     "clauseId": "cl_maintenance_fee"
+    },
+    {
+     "id": "hs_deposit_account",
+     "level": "critical",
+     "title": "송금 계좌 예금주",
+     "explain": "계약금·잔금은 반드시 등기부상 소유자 본인 명의 계좌로. 중개사·가족·대리인 계좌로 보내라고 하면 멈추세요.",
+     "check": [
+      "예금주 = 등기부 소유자",
+      "송금 메모에 '주소+계약금' 기재"
+     ],
+     "redFlags": [
+      "예금주가 소유자와 다름",
+      "현금 지급 요구"
+     ],
+     "quizIds": [
+      "q_cs_05"
+     ]
+    },
+    {
+     "id": "hs_period",
+     "level": "important",
+     "title": "임대차기간",
+     "explain": "1년으로 정해도 임차인은 2년을 주장할 수 있어요. 1년 뒤 나가는 것도 임차인이 선택할 수 있어요.",
+     "check": [
+      "시작일 = 잔금·인도일",
+      "만기일 플래너 등록"
+     ],
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_repair",
+     "level": "important",
+     "title": "입주 전 수리",
+     "explain": "수리할 내용·완료 시기·미이행 시 처리(잔금 공제 등)를 구체적으로 적어야 분쟁이 줄어요.",
+     "check": [
+      "수리 항목 구체적 기재",
+      "미이행 시 처리 방법 체크"
+     ],
+     "clauseId": "cl_repair_before"
+    },
+    {
+     "id": "hs_art_repair",
+     "level": "info",
+     "title": "수선 의무",
+     "explain": "보일러·배관 같은 큰 수선은 원칙적으로 임대인 부담, 전구·소모품 같은 소규모 수선은 임차인 부담으로 나누는 경우가 많아요. 표준계약서는 부담 범위를 적도록 되어 있어요."
+    },
+    {
+     "id": "hs_art_cancel",
+     "level": "important",
+     "title": "계약 해제(계약금 포기·배액상환)",
+     "explain": "중도금(없으면 잔금) 전까지는 임차인은 계약금을 포기하고, 임대인은 계약금의 두 배를 주고 계약을 해제할 수 있어요. 특약의 '무효·해제' 조항은 이와 별개로 임대인 사유 시 계약금 전액 반환을 받기 위한 장치예요.",
+     "quizIds": [
+      "q_cs_06"
+     ]
+    },
+    {
+     "id": "hs_art_renewal",
+     "level": "important",
+     "title": "갱신요구권",
+     "explain": "만료 6개월~2개월 전 갱신 요구, 1회 2년, 증액 5% 이내.",
+     "lessonIds": [
+      "ls_08_01"
+     ]
+    },
+    {
+     "id": "hs_art_end",
+     "level": "critical",
+     "title": "계약 종료 — 동시이행",
+     "explain": "집을 비워주는 것과 보증금 반환은 동시에 이뤄져야 해요. 돈을 받기 전에 전출하면 대항력을 잃을 수 있으니 임차권등기명령을 활용하세요.",
+     "lessonIds": [
+      "ls_08_02"
+     ]
+    },
+    {
+     "id": "hs_art_ltrf",
+     "level": "info",
+     "title": "장기수선충당금",
+     "explain": "아파트 관리비에 포함된 장기수선충당금은 원래 소유자 부담이라, 임차인이 냈다면 퇴거 시 돌려받을 수 있어요."
+    },
+    {
+     "id": "hs_special_terms",
+     "level": "critical",
+     "title": "특약사항 — 이 계약서의 심장",
+     "explain": "예시 계약서에는 담보 설정 금지, 권리상태 유지, 보증보험 가입 불가 시 무효, 체납 시 해제, 매도 통지, 전입신고 보장 특약이 들어 있어요. 내 상황에 맞는 특약은 '특약 생성기'에서 추가하세요.",
+     "check": [
+      "담보 설정 금지(잔금 다음 날까지)",
+      "보증보험 불가 시 무효",
+      "근저당 금액 명시",
+      "체납 시 해제"
+     ],
+     "redFlags": [
+      "특약란이 비어 있음",
+      "'현 시설 상태로 임대' 한 줄만 있음"
+     ],
+     "lessonIds": [
+      "ls_04_03"
+     ],
+     "quizIds": [
+      "q_cs_07"
+     ]
+    },
+    {
+     "id": "hs_contract_date",
+     "level": "info",
+     "title": "계약일",
+     "explain": "계약일로부터 30일 이내 임대차 신고(대상 시). 계약일 당일 아침이 아니라 '서명 직전' 등기부를 확인하세요.",
+     "check": [
+      "임대차 신고 기한 플래너 등록"
+     ]
+    },
+    {
+     "id": "hs_broker",
+     "level": "important",
+     "title": "중개사 날인·확인설명서",
+     "explain": "개업공인중개사의 서명·날인과 등록번호, 중개대상물 확인·설명서, 공제증서 사본을 받으세요. 중개사 날인이 없는 계약서는 보증보험이 거절될 수 있어요.",
+     "check": [
+      "등록번호 조회",
+      "확인·설명서 수령",
+      "공제증서 사본 수령"
+     ],
+     "quizIds": [
+      "q_cs_08"
+     ]
+    },
+    {
+     "id": "hs_annex",
+     "level": "info",
+     "title": "별지 중요확인사항",
+     "explain": "표준계약서 뒤에 붙은 '법의 보호를 받기 위한 체크리스트'예요. 앱의 단계별 체크리스트와 같은 흐름입니다."
+    },
+    {
+     "id": "hs_off_rent",
+     "level": "important",
+     "title": "월세(차임)",
+     "explain": "지급일·선불/후불·입금 계좌(소유자 명의)를 적어요. 월세를 2기(두 달치) 이상 밀리면 임대인이 계약을 해지할 수 있어요.",
+     "check": [
+      "입금 계좌 예금주 = 소유자",
+      "지급일·후불 여부"
+     ]
+    },
+    {
+     "id": "hs_off_movein",
+     "level": "critical",
+     "title": "전입신고 보장 특약",
+     "explain": "일부 오피스텔 임대인은 세금 문제로 '전입신고 금지'를 요구해요. 전입신고를 못 하면 대항력도, 최우선변제도 없어요. 반대로 '전입신고 보장' 특약을 넣으세요.",
+     "redFlags": [
+      "'전입신고 하지 않는다'는 특약",
+      "'사업자 등록 때문에 전입 불가'라는 설명"
+     ]
+    },
+    {
+     "id": "hs_off_fee",
+     "level": "important",
+     "title": "관리비 정액 고정 특약",
+     "explain": "계약 중 관리비를 마음대로 올리지 못하게 하는 특약이에요. 2024년 7월부터 중개사도 관리비 총액·항목·부과방식을 확인설명서에 적어야 해요.",
+     "documentId": "doc_explain"
+    }
+   ],
+   "viewerTour": [
+    "hs_lease_kind",
+    "hs_building_use",
+    "hs_deposit",
+    "hs_off_rent",
+    "hs_maintenance",
+    "hs_off_movein",
+    "hs_period",
+    "hs_deposit_account"
+   ],
+   "label": "오피스텔 월세",
+   "summary": "보증금 5천만 원 · 월세 70만 원 · 관리비 정액 15만 원 — 소액임차인 보호와 관리비·전입신고 체크",
+   "verdict": {
+    "level": "green",
+    "title": "월세 계약의 기본기를 갖춘 예시",
+    "points": [
+     "전입신고 보장 특약으로 대항력·최우선변제 확보",
+     "관리비 항목 명시·인상 제한",
+     "보증금 소액 → 최우선변제 대상(설정일 기준 확인)"
+    ]
+   }
+  }
+ ],
+ "trapExercises": [
+  {
+   "id": "trap_01",
+   "title": "위험한 계약서 찾기 — 6군데를 찾아보세요",
+   "baseSampleId": "contract_apt_jeonse_01",
+   "instruction": "아래는 같은 집의 '위험한 버전' 계약서입니다. 바뀐 부분을 눌러 위험 요소를 찾아보세요.",
+   "overrides": [
+    {
+     "fieldKey": "leasedPart",
+     "value": "샘플마을아파트 제101동 제1230호 전부 / 84.97㎡",
+     "isTrap": true,
+     "answer": "호수 오기(1203호 → 1230호). 다른 집에 전입신고하게 되어 대항력을 잃을 수 있어요.",
+     "hotspotId": "hs_address"
+    },
+    {
+     "fieldKey": "taxArrears",
+     "value": "☐ 없음  ☐ 있음 (공란)",
+     "isTrap": true,
+     "answer": "미납 국세·지방세 확인이 비어 있어요. 납세증명서를 받고 체크·서명을 받아야 해요.",
+     "hotspotId": "hs_tax"
+    },
+    {
+     "fieldKey": "account",
+     "value": "가상은행 111-1111-1111 (예금주: 김대리)",
+     "isTrap": true,
+     "answer": "예금주가 소유자(김안심)가 아니에요. 소유자 명의 계좌로만 송금하세요.",
+     "hotspotId": "hs_deposit_account"
+    },
+    {
+     "fieldKey": "period",
+     "value": "임대인은 임차주택을 2026년 12월 20일까지 인도하고, 임대차기간은 2026년 12월 15일부터 2028년 12월 14일까지로 한다.",
+     "isTrap": true,
+     "answer": "잔금일(12/15)과 인도일(12/20)이 달라요. 잔금을 먼저 주고 5일간 전입을 못 하면 그 사이 권리 변동 위험이 생겨요.",
+     "hotspotId": "hs_balance"
+    },
+    {
+     "fieldKey": "sp1",
+     "value": "현 시설 상태에서의 임대차 계약이며, 기타 사항은 민법 및 주택임대차보호법에 따른다.",
+     "isTrap": true,
+     "answer": "핵심 특약(담보 설정 금지, 보증보험 불가 시 무효 등)이 모두 빠졌어요.",
+     "hotspotId": "hs_special_terms"
+    },
+    {
+     "fieldKey": "broker",
+     "value": "사무소: (공란) / 등록번호: (공란) / 서명 없음",
+     "isTrap": true,
+     "answer": "중개사 날인·등록번호가 없어요. 보증보험 거절 사유가 되고 사고 시 공제 보상도 어려워요.",
+     "hotspotId": "hs_broker"
+    }
+   ],
+   "decoys": [
+    "deposit",
+    "contractDate",
+    "maintenanceFee"
+   ],
+   "scoring": {
+    "perCorrect": 10,
+    "perWrongTap": -2,
+    "passScore": 50
+   },
+   "label": "아파트 전세 — 6군데"
+  },
+  {
+   "id": "trap_02",
+   "label": "오피스텔 월세 — 독소조항 5군데",
+   "title": "독소조항 찾기 — 5군데를 찾아보세요",
+   "baseSampleId": "contract_officetel_monthly_01",
+   "instruction": "임대인에게만 유리하게 바뀐 '독소조항' 버전입니다. 위험한 칸을 눌러보세요.",
+   "overrides": [
+    {
+     "fieldKey": "sp1",
+     "value": "임차인은 임대인의 사업자 사정으로 주민등록 전입신고를 하지 않으며, 이로 인한 불이익은 임차인이 부담한다.",
+     "isTrap": true,
+     "answer": "전입신고를 못 하면 대항력·우선변제권·최우선변제가 모두 없어요. 가장 치명적인 독소조항이에요.",
+     "hotspotId": "hs_off_movein"
+    },
+    {
+     "fieldKey": "maintenanceFee",
+     "value": "정액 월 250,000원 (항목은 관리사무소 기준에 따름)",
+     "isTrap": true,
+     "answer": "관리비가 크고 항목이 없어요. 월세를 낮춘 척 관리비로 받는 편법일 수 있어요.",
+     "hotspotId": "hs_maintenance"
+    },
+    {
+     "fieldKey": "rent",
+     "value": "월 금 칠십만원정(₩700,000)은 매월 1일에 선불로 지불한다. 입금계좌: 가상은행 555-5555-5555 (예금주: 오관리)",
+     "isTrap": true,
+     "answer": "월세 입금 계좌 예금주가 소유자가 아니에요. 소유자 명의 계좌로 바꿔야 해요.",
+     "hotspotId": "hs_off_rent"
+    },
+    {
+     "fieldKey": "sp4",
+     "value": "임차인은 퇴거 시 사용 기간과 관계없이 도배·장판 전체를 새로 시공하여 반환한다.",
+     "isTrap": true,
+     "answer": "자연 마모까지 임차인에게 떠넘기는 과도한 원상복구 조항이에요.",
+     "hotspotId": "hs_special_terms"
+    },
+    {
+     "fieldKey": "sp2",
+     "value": "임차인은 계약기간 중 중도 해지 시 잔여 기간 월세 전액을 위약금으로 지급한다.",
+     "isTrap": true,
+     "answer": "중도 해지 위약금이 지나치게 커요. 보통은 새 임차인 중개보수 부담 정도로 협의해요.",
+     "hotspotId": "hs_special_terms"
+    }
+   ],
+   "decoys": [
+    "deposit",
+    "period",
+    "contractDate"
+   ],
+   "scoring": {
+    "perCorrect": 10,
+    "perWrongTap": -2,
+    "passScore": 40
+   }
+  }
+ ],
+ "viewerSpec": {
+  "modes": [
+   {
+    "id": "read",
+    "label": "계약서 보기",
+    "desc": "실제 양식처럼 페이지를 넘기며 보기. 중요 칸에 색 점(빨강 중요 · 노랑 확인 · 파랑 참고) 표시"
+   },
+   {
+    "id": "tour",
+    "label": "핵심 10곳 투어",
+    "desc": "viewerTour 순서대로 자동 스크롤·하이라이트하며 설명 카드 표시"
+   },
+   {
+    "id": "trap",
+    "label": "위험 찾기 게임",
+    "desc": "trapExercises의 위험 버전을 보여주고 사용자가 탭해서 찾기"
+   },
+   {
+    "id": "mine",
+    "label": "내 계약서와 비교",
+    "desc": "사용자가 촬영한 계약서 사진 옆에 체크포인트 목록을 띄워 하나씩 확인(OCR은 후속 버전)"
+   }
+  ],
+  "hotspotCard": [
+   "title",
+   "explain",
+   "check",
+   "redFlags",
+   "관련 학습 바로가기",
+   "관련 특약 추가하기",
+   "관련 퀴즈 풀기"
+  ],
+  "levelColors": {
+   "critical": "#D32F2F",
+   "important": "#F9A825",
+   "info": "#1976D2"
+  }
+ }
+}
