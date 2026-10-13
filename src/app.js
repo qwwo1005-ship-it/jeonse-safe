@@ -1048,14 +1048,14 @@ function vIntro() {
     <h1 class="in-h"><span class="ln"><span>당신의 보증금,</span></span><span class="ln"><span>지금 안전한가요?</span></span></h1>
     <div class="in-money"><span class="num" data-count="200000000">200,000,000</span><span class="unit">원</span></div>
     <p class="in-sub">평생 모은 돈이 들어가는 계약이에요.<br>하루의 틈, 서류 한 장이 결과를 바꿔요.</p>
-    <div class="in-hero-cta"><button class="btn in-go" data-act="introStart">바로 시작하기</button><button class="in-tour" data-act="introJump" data-to="2">5장면 둘러보기 <span aria-hidden="true">↓</span></button></div>
+    <div class="in-hero-cta"><button class="btn in-go in-go-hero" data-act="introStart">바로 시작하기 <span class="arr" aria-hidden="true">→</span></button></div>
     <div class="in-stamp" data-at="0.3" aria-hidden="true">확인<br>필요</div>
     <button class="in-cue" data-act="introJump" data-to="2" aria-label="다음 장면으로 내려가기"><span>아래로 내려보세요</span><span class="chev" aria-hidden="true"><i></i><i></i></span></button>
   </div></section>
 
   <section class="fr fr2" data-fr="2"><div class="fr-stick">
     <p class="in-label"><span class="num">02</span> 피해 통계</p>
-    <div class="in-big"><small>약</small><span class="num" data-scrub="36950" data-a="0.05" data-b="0.55">0</span><small>건</small></div>
+    <div class="in-big"><small>약</small><span class="num" data-count-to="36950">0</span><small>건</small></div>
     <p class="in-line">2023년 6월부터 2026년 3월까지<br>전세사기 피해자 결정을 신청한 수예요.</p>
     <p class="in-note" data-at="0.55">처음 전세를 구하는 20~30대가 특히 많았어요.<br>'처음이라서', '몰라서' 놓친 경우가 많았어요.</p>
   </div></section>
@@ -1075,7 +1075,7 @@ function vIntro() {
 
   <section class="fr fr4" data-fr="4"><div class="fr-stick">
     <p class="in-label"><span class="num">04</span> 깡통전세 구조</p>
-    <h2 class="in-h2">집값보다 빚이 많으면<br>보증금이 <em>비어요</em></h2>
+    <h2 class="in-h2">집값보다 빚이 많으면<br>보증금이 <em>위험해요</em></h2>
     <div class="cans">
       <div class="can-col"><div class="bar-area"><div class="bar-v house" style="--h:87;--b:0"><span>집값 <b>2억</b></span></div></div><p>집을 팔면 나오는 돈</p></div>
       <div class="can-col"><div class="bar-area"><div class="bar-v loan" style="--h:21.7;--b:0"><span>대출 <b>5천만</b></span></div><div class="bar-v dep" style="--h:65.3;--b:21.7"><span>내 보증금 <b>1억 8천만</b></span></div><div class="bar-v over" style="--h:13;--b:87"></div></div><p>돌려받아야 할 돈</p></div>
@@ -1107,23 +1107,37 @@ function vIntro() {
 }
 function introFx() {
   if (S.route !== 'intro') return;
-  const still = reduceMotion(); let cur = 1;
-  document.querySelectorAll('[data-fr]').forEach(sec => {
-    const r = sec.getBoundingClientRect(), span = r.height - innerHeight;
-    // 동작 줄이기: 움직임 없이 '완성된 장면'으로 보여줌. 단, 첫 장면은 스크롤하면 흐려지는 장면이라 시작 상태(0)로 둔다
-    const first = sec.dataset.fr === '1';
-    const p = still ? (first ? 0 : 1) : Math.min(1, Math.max(0, -r.top / (span > 0 ? span : 1)));
-    sec.style.setProperty('--p', p.toFixed(4));
-    sec.style.setProperty('--k', Math.min(1, p / 0.6).toFixed(4));
-    if (r.top <= innerHeight * 0.5) cur = +sec.dataset.fr;
-    sec.querySelectorAll('[data-at]').forEach(el => el.classList.toggle('on', still || p >= +el.dataset.at));
-    sec.querySelectorAll('[data-scrub]').forEach(el => { const t = Math.min(1, Math.max(0, (p - +el.dataset.a) / (+el.dataset.b - +el.dataset.a))); el.textContent = Math.round(+el.dataset.scrub * (1 - Math.pow(1 - t, 3))).toLocaleString('ko-KR'); });
-  });
+  let cur = 1;
+  document.querySelectorAll('[data-fr]').forEach(sec => { if (sec.getBoundingClientRect().top <= innerHeight * 0.5) cur = +sec.dataset.fr; });
   const f = document.getElementById('inFrame'); if (f) f.textContent = `${String(cur).padStart(2, '0')} / 05`;
   document.querySelectorAll('.in-dots button').forEach(b => b.toggleAttribute('aria-current', +b.dataset.to === cur));
-  document.querySelector('.in-dots')?.classList.toggle('done', !!document.querySelector('.in-cta') && document.querySelector('.in-cta').getBoundingClientRect().top < innerHeight * 0.6);
+  const cta = document.querySelector('.in-cta'); document.querySelector('.in-dots')?.classList.toggle('done', !!cta && cta.getBoundingClientRect().top < innerHeight * 0.6);
   const max = document.documentElement.scrollHeight - innerHeight, pg = document.getElementById('inProg');
   if (pg) pg.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+}
+// 장면 자동 재생: 장면이 화면에 자리 잡으면(절반 이상 보이면) 시간 기준으로 재생, 완전히 벗어나면 되감아 다시 볼 수 있게
+let introIO = null;
+function playCount(el, on) {
+  const to = +el.dataset.countTo; cancelAnimationFrame(el._raf);
+  if (!on) { el.textContent = '0'; return; }
+  if (reduceMotion()) { el.textContent = to.toLocaleString('ko-KR'); return; }
+  const t0 = performance.now() + 250, dur = 1600;
+  const step = now => { const k = Math.min(1, Math.max(0, (now - t0) / dur)); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('ko-KR'); if (k < 1) el._raf = requestAnimationFrame(step); };
+  el._raf = requestAnimationFrame(step);
+}
+function setPlay(sec, on) {
+  if (sec.classList.contains('play') === on) return;
+  sec.classList.toggle('play', on);
+  sec.querySelectorAll('[data-count-to]').forEach(el => playCount(el, on));
+}
+function introPlayer() {
+  introIO?.disconnect(); introIO = null;
+  if (S.route !== 'intro') return;
+  const secs = document.querySelectorAll('[data-fr]');
+  secs.forEach(sec => sec.querySelectorAll('[data-at]').forEach(el => el.style.setProperty('--dl', (+el.dataset.at * 1.8).toFixed(2) + 's')));
+  if (!('IntersectionObserver' in window)) { secs.forEach(s => setPlay(s, true)); return; }
+  introIO = new IntersectionObserver(es => es.forEach(e => { if (e.intersectionRatio >= 0.5) setPlay(e.target, true); else if (!e.isIntersecting) setPlay(e.target, false); }), { threshold: [0, 0.5] });
+  secs.forEach(s => introIO.observe(s));
 }
 
 /* ================= 이용약관·면책 동의 ================= */
@@ -1176,6 +1190,7 @@ function render(keepScroll) {
   if (!termsOk && S.route !== 'intro' && S.route !== 'terms') { S.termsNext = S.route; history.replaceState(null, '', '#terms'); S.route = 'terms'; }
   document.body.dataset.route = S.route;
   document.body.classList.toggle('bare', S.route === 'intro' || S.route === 'terms');
+  document.documentElement.classList.toggle('intro-snap', S.route === 'intro');
   const main = document.getElementById('main');
   const key = viewKey(), q = S.session ? S.session.i : null;
   const anim = key !== lastKey ? 'enter' : q != null && q !== lastQ ? 'enter-q' : '';
@@ -1207,6 +1222,7 @@ function render(keepScroll) {
   revealOnScroll(main, anim === 'enter');
   readProgress();
   introFx();
+  if (anim === 'enter' || S.route !== 'intro') introPlayer();
   fitPapers();
 }
 // 스크롤로 화면에 들어올 때 등장(형광펜·도장 포함). 같은 화면을 다시 그릴 때는 바로 보이게
@@ -1300,7 +1316,7 @@ const A = {
   // 인트로 장면 이동: 그 장면이 시작되는 위치로 부드럽게 (지원 안 하는 브라우저는 바로 이동)
   introJump: el => {
     const sec = document.querySelector(`[data-fr="${el.dataset.to}"]`); if (!sec) return;
-    const top = el.dataset.to === '1' ? 0 : Math.round(sec.offsetTop + (sec.offsetHeight - innerHeight) * 0.2), y0 = scrollY;
+    const top = sec.offsetTop, y0 = scrollY;
     window.scrollTo({ top, behavior: reduceMotion() ? 'auto' : 'smooth' });
     setTimeout(() => { if (Math.abs(scrollY - y0) < 2) window.scrollTo(0, top); }, 450);
   },
