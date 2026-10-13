@@ -59,7 +59,7 @@
 [data-r="news"], body[data-route="news"] { --c: #b2939e; }
 [data-r="glossary"], body[data-route="glossary"] { --c: #a5a283; }
 body[data-route] { --accent: var(--c); }
-:root { --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface)); --accent-ink: color-mix(in srgb, var(--accent) 55%, var(--ink)); }
+:root { --c-my: #a199b7; --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface)); --accent-ink: color-mix(in srgb, var(--accent) 55%, var(--ink)); }
 body { --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface)); --accent-ink: color-mix(in srgb, var(--accent) 55%, var(--ink)); }
 
 * { box-sizing: border-box; }
@@ -634,6 +634,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 /* ================= 디자인 시안 A·B·C (html[data-design]) =================
    A 솜사탕: 핑크·라일락, 아주 둥글게, 알약 버튼 / B 민트 글라스: 민트·하늘, 반투명 유리 카드 / C 피치 스티커: 복숭아·버터, 굵은 테두리 + 어긋난 그림자 */
 :root[data-design="a"] {
+  --c-my: #b7a6f2;
   --bg: #fcf7fc; --surface: #ffffff; --surface-2: #f7eff8; --paper: #fffdfe; --ink: #3b3147; --muted: #7c7089;
   --line: #f0e5f2; --line-strong: #dccde2; --stamp: #dd6f88; --stamp-soft: #fde9ef; --ok: #3f9a78; --ok-soft: #e2f6ed;
   --warn: #b7802a; --warn-soft: #fff1da; --info: #6a7fd6; --info-soft: #eceffe; --focus: #8f6cc4; --accent: #c39be2;
@@ -641,6 +642,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
   --f-display: "Jua", "Pretendard Variable", sans-serif; --primary: #8a63bf;
 }
 :root[data-design="b"] {
+  --c-my: #b3b8f0;
   --bg: #f1faf8; --surface: #ffffff; --surface-2: #e9f6f3; --paper: #fbfffe; --ink: #21403c; --muted: #5d7a76;
   --line: #d8eeea; --line-strong: #b5dbd4; --stamp: #e9796c; --stamp-soft: #fdebe8; --ok: #2f9a7c; --ok-soft: #dcf5ec;
   --warn: #b98a22; --warn-soft: #fdf2d8; --info: #3f8fd2; --info-soft: #e1effc; --focus: #2a8a7a; --accent: #7fcfbf;
@@ -648,6 +650,7 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
   --f-display: "Gowun Dodum", "Pretendard Variable", sans-serif; --primary: #2a8a7a;
 }
 :root[data-design="c"] {
+  --c-my: #c9bfff;
   --bg: #fff8ee; --surface: #ffffff; --surface-2: #fff0df; --paper: #fffdf8; --ink: #3a2e28; --muted: #82716a;
   --line: #f2e1cf; --line-strong: #3a2e28; --stamp: #e8665a; --stamp-soft: #ffe7e3; --ok: #3b9f78; --ok-soft: #defbe9;
   --warn: #b98316; --warn-soft: #fff4cf; --info: #4f82d8; --info-soft: #e6efff; --focus: #3a2e28; --accent: #ffc89a;
@@ -798,6 +801,33 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 main.enter.dir-next .page > *:not([data-io]) { animation-name: from-right; }
 main.enter.dir-prev .page > *:not([data-io]) { animation-name: from-left; }
 main.enter.dir-next .page [data-io] { transition: opacity .5s var(--ease), transform .5s var(--ease); }
+
+/* ---------- 핵심 기능 강조: 내 계약 플래너 ---------- */
+.plan-spot { --pc: var(--c-my, #a199b7); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 16px; padding: 22px 20px; border-radius: calc(var(--r) + 6px);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pc) 26%, var(--surface)) 0%, var(--surface) 70%); border: 1.5px solid color-mix(in srgb, var(--pc) 55%, var(--line)); box-shadow: var(--shadow); }
+.plan-spot::after { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: color-mix(in srgb, var(--pc) 22%, transparent); pointer-events: none; }
+.plan-spot-head { display: flex; flex-direction: column; gap: 6px; position: relative; z-index: 1; }
+.plan-spot-head h2 { font-size: 1.45rem; }
+.plan-chip { align-self: flex-start; color: color-mix(in srgb, var(--pc) 45%, var(--ink)); background: color-mix(in srgb, var(--pc) 30%, var(--surface)); border-color: transparent; }
+.plan-feats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px; position: relative; z-index: 1; }
+.plan-feat { display: grid; grid-template-columns: 30px 1fr; gap: 2px 10px; align-items: start; padding: 12px; border-radius: var(--r); background: color-mix(in srgb, var(--surface) 82%, transparent); border: 1px solid var(--line); }
+.plan-feat svg { grid-row: span 2; width: 26px; height: 26px; color: color-mix(in srgb, var(--pc) 60%, var(--ink)); }
+.plan-feat b { font-size: .95rem; }
+.plan-feat span { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+.plan-next { gap: 10px; }
+.plan-next li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--r); background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid var(--line); }
+.plan-next li div { display: flex; flex-direction: column; min-width: 0; }
+.dday.big { font-size: .95rem; padding: 4px 10px; min-width: 64px; text-align: center; }
+.plan-spot > .row { position: relative; z-index: 1; }
+.plan-start { margin-top: 4px; }
+.plan-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px; border-radius: var(--r); background: color-mix(in srgb, var(--c-my, #a199b7) 16%, var(--surface)); border: 1px dashed color-mix(in srgb, var(--c-my, #a199b7) 60%, var(--line)); }
+.plan-hint > svg { width: 28px; height: 28px; flex: none; color: color-mix(in srgb, var(--c-my, #a199b7) 60%, var(--ink)); }
+.plan-hint > div { flex: 1 1 200px; }
+/* 메뉴: '핵심' 배지, 3일 안 할 일 숫자 */
+.nav-badge { margin-left: auto; font-style: normal; font-size: .66rem; font-weight: 800; letter-spacing: .02em; padding: 1px 7px; border-radius: 999px; color: #fff; background: color-mix(in srgb, var(--c) 75%, var(--ink)); }
+.nav button[data-badge]::after, .tabbar button[data-badge]::after { content: attr(data-badge); position: absolute; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--stamp); color: #fff; font-size: .66rem; font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--surface); animation: pop .5s var(--spring); }
+.tabbar button[data-badge]::after { top: 0; left: calc(50% + 6px); }
+.nav button[data-badge]::after { left: 22px; top: 4px; }
 
 /* ---------- 알려진 사기 수법 ---------- */
 .redflags { background: var(--stamp-soft) !important; border-color: transparent !important; }

@@ -224,25 +224,30 @@ function fitPapers() {
 }
 
 /* ================= views ================= */
+// 핵심 기능: 내 계약 플래너 — 홈 스포트라이트, 빈 플래너 시작 화면에 같이 씀
+const PLAN_FEATS = [['my', '날짜만 넣으면 끝', '계약일·잔금일·만기일 기준으로 할 일과 D-day가 자동으로 생겨요'], ['news', '달력 · 내 일정', '은행 방문 같은 내 일정도 넣고, 폰 캘린더 알림까지 받아요'], ['exam', '그날 체크리스트', '계약 당일·이사 당일 할 일을 현장에서 하나씩 체크해요'], ['docs', '특약 요청서 PDF', '중개사에게 보낼 특약·서류 요청을 한 장으로 만들어요']];
+const planFeatGrid = () => `<div class="plan-feats">${PLAN_FEATS.map(([ic, t, d]) => `<div class="plan-feat">${icon(ic)}<b>${t}</b><span>${d}</span></div>`).join('')}</div>`;
+function soonCount(c) { return c ? buildEvents(c).filter(e => { const n = ddays(e.date); return n >= 0 && n <= 3 && !evDone(c, e); }).length : 0; }
+function plannerSpot() {
+  const c = activeContract();
+  if (!c) return `<section class="plan-spot"><div class="plan-spot-head"><span class="chip plan-chip">핵심 기능</span><h2>내 계약 플래너</h2><p>계약 날짜만 넣으면, 그날그날 할 일이 정리돼요.</p></div>
+    ${planFeatGrid()}<div class="row"><button class="btn primary" data-act="planStart">내 계약 만들기 ${ARR}</button><button class="btn" data-act="planExample">예시로 둘러보기</button></div></section>`;
+  const evs = buildEvents(c).filter(e => ddays(e.date) >= 0 && !evDone(c, e)).slice(0, 3);
+  return `<section class="plan-spot"><div class="plan-spot-head"><span class="chip plan-chip">내 계약 플래너</span><h2>${esc(c.name)}</h2>${soonCount(c) ? `<p><b>3일 안에 할 일 ${soonCount(c)}개</b>가 있어요.</p>` : '<p>다가오는 일정을 챙겨 드릴게요.</p>'}</div>
+    ${evs.length ? `<ul class="clean plan-next">${evs.map(e => { const n = ddays(e.date); return `<li><span class="dday big${n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><div><b>${esc(e.title)}</b><span class="small muted num">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span></div></li>`; }).join('')}</ul>` : `<p class="muted">남은 일정이 없어요. '계약 정보'에서 날짜를 넣거나 내 일정을 추가해 보세요.</p>`}
+    <div class="row"><button class="btn primary" data-act="nav" data-r="my">플래너 열기 ${ARR}</button><button class="btn" data-act="planCal">달력 보기</button><button class="btn ghost" data-act="remNewHome">+ 내 일정</button></div></section>`;
+}
 function vHome() {
   const readN = Object.keys(store.read).filter(id => lessonById[id]).length;
   const best = store.results.reduce((m, r) => Math.max(m, r.score), 0);
   const wrongN = Object.keys(store.wrong).length;
-  const c = activeContract();
-  let next = '';
-  if (c) {
-    const evs = buildEvents(c).filter(e => ddays(e.date) >= 0).slice(0, 3);
-    next = `<section class="card stack"><div class="row" style="justify-content:space-between"><h2>내 계약 · 다가오는 일정</h2><button class="btn ghost" data-act="nav" data-r="my">플래너 열기</button></div>
-      <p class="muted small">${esc(c.name)}</p>
-      ${evs.length ? `<ul class="clean">${evs.map(e => `<li class="row"><span class="dday${ddays(e.date) <= 3 ? ' soon' : ''}">${ddayLabel(ddays(e.date))}</span><span class="num small muted">${fmt(e.date)}</span><b>${esc(e.title)}</b></li>`).join('')}</ul>` : '<p class="muted">남은 일정이 없어요.</p>'}</section>`;
-  }
   const where = [['집 보러 다녀요', 'stage_02'], ['계약을 앞두고 있어요', 'stage_03'], ['오늘 계약해요', 'stage_04'], ['이사를 앞두고 있어요', 'stage_06'], ['살고 있어요', 'stage_08'], ['보증금을 못 받고 있어요', 'stage_09']];
   return `<div class="page">
   <section class="hero"><div><div class="eyebrow">전세사기 예방 교육 · ${esc(C.meta.baseDate)} 기준</div><h1>전세지킴이</h1>
     <p>등기부등본 읽는 법부터 계약서 특약, 이사 날 체크리스트, 보증금을 돌려받는 날까지. 한 단계씩 따라오면 내 보증금을 지키는 방법이 보여요.</p>${continueCta()}</div>
     <div class="big-seal" aria-hidden="true">보증금<br>지킴</div></section>
+  ${plannerSpot()}
   <section class="stack"><h2>지금 어디쯤인가요?</h2><div class="where">${where.map(([t, id]) => `<button data-act="stage" data-id="${id}">${t}</button>`).join('')}</div></section>
-  ${next}
   <section class="grid">
     <div class="card stat"><span class="eyebrow">학습 진도</span><b><span data-count="${readN}">${readN}</span> / ${lessons.length}</b><div class="bar"><i style="width:${Math.round(readN / lessons.length * 100)}%"></i></div></div>
     <div class="card stat"><span class="eyebrow">모의고사 최고 점수</span><b>${best ? `<span data-count="${best}" data-suffix="점">${best}점</span>` : '-'}</b><span class="small muted">${store.results.length}회 응시</span></div>
@@ -285,6 +290,7 @@ function vStage(s) {
   ${nxt ? `<div class="cta-row"><button class="btn primary glow" data-act="lesson" data-id="${nxt.id}" data-dir="next">${started ? '이어서 읽기' : '이 단계 시작하기'} ${ARR}</button><span class="small muted">${esc(nxt.title)}</span></div>`
     : `<div class="cta-row"><button class="btn primary glow" data-act="examStart" data-id="unit" data-stage="${s.id}">다 읽었어요! 단원 퀴즈 풀기 ${ARR}</button></div>`}
   <div class="grid">${s.lessons.map(l => `<button class="linkcard" data-act="lesson" data-id="${l.id}"><div class="row">${levelChip(l.riskLevel === 'critical' ? 'critical' : l.riskLevel === 'important' ? 'important' : 'info')}${store.read[l.id] ? '<span class="chip green">읽음</span>' : ''}</div><h3>${esc(l.title)}</h3><p>${esc(l.oneLine || l.summary[0])}</p></button>`).join('')}</div>
+  ${s.checklistIds.length ? `<div class="plan-hint">${icon('my')}<div><b>이 단계 할 일, 날짜별로 챙기세요</b><p class="small muted">'${s.checklistIds.map(id => esc(ckById[id].title)).join("', '")}' 체크리스트가 내 계약 플래너 일정에 날짜와 함께 들어가요.</p></div><button class="btn" data-act="nav" data-r="my">플래너 열기 ${ARR}</button></div>` : ''}
   <div class="row">${s.checklistIds.map(id => `<button class="btn" data-act="cksheet" data-id="${id}">체크리스트: ${esc(ckById[id].title)}</button>`).join('')}
     ${s.contractSampleId ? `<button class="btn" data-act="sample" data-id="${s.contractSampleId}">계약서 예시 보기</button>` : ''}
     <button class="btn primary" data-act="examStart" data-id="unit" data-stage="${s.id}">단원 퀴즈 풀기</button></div></div>`;
@@ -521,7 +527,9 @@ function diagnose(c) {
 function vMy() {
   const c = activeContract();
   const head = `<div class="head"><div class="eyebrow">내 계약 플래너</div><h1>날짜만 넣으면 할 일이 정리돼요</h1><p>계약일·잔금일·만기일을 넣으면 그날 할 일, 체크리스트, 특약 문구, 위험 진단이 만들어져요. 이 기기 브라우저에만 저장돼요.</p></div>`;
-  if (!c) return `<div class="page">${head}<div class="empty stack"><p>아직 등록한 계약이 없어요.</p><div class="row" style="justify-content:center"><button class="btn primary" data-act="cNew">내 계약 만들기</button><button class="btn" data-act="cExample">예시 계약으로 둘러보기</button></div></div>
+  if (!c) return `<div class="page">${head}<section class="plan-spot plan-start"><div class="plan-spot-head"><span class="chip plan-chip">핵심 기능</span><h2>내 계약을 만들면 이렇게 도와드려요</h2></div>${planFeatGrid()}
+    <div class="row"><button class="btn primary glow" data-act="cNew">내 계약 만들기 ${ARR}</button><button class="btn" data-act="cExample">예시 계약으로 둘러보기</button></div>
+    <p class="small muted">입력한 내용은 이 기기 브라우저에만 저장돼요. '저장·PDF'에서 파일로 옮길 수 있어요.</p></section>
     <div class="card stack"><h2>특약 문구만 보고 싶다면</h2><p class="muted">계약을 만들지 않아도 특약 라이브러리 전체를 볼 수 있어요.</p><div><button class="btn" data-act="myTab" data-t="library">특약 라이브러리 열기</button></div></div>${S.myTab === 'library' ? vLibrary() : ''}</div>`;
   const tabs = [['plan', '일정·체크리스트'], ['cal', '달력·내 일정'], ['risk', '위험 진단'], ['clauses', '특약 만들기'], ['info', '계약 정보'], ['backup', '저장·PDF']];
   const tab = tabs.some(t => t[0] === S.myTab) ? S.myTab : 'plan';
@@ -1107,6 +1115,9 @@ function render(keepScroll) {
     setTimeout(() => { if (scrollY >= y0 - 1) window.scrollTo(0, 0); }, 450); // 부드러운 스크롤을 지원하지 않는 앱 안 브라우저 대비
   }
   document.querySelectorAll('[data-act="nav"][data-r]').forEach(b => { if (b.closest('.nav, .tabbar')) b.setAttribute('aria-current', b.dataset.r === S.route ? 'page' : 'false'); });
+  // 플래너 메뉴: 3일 안에 할 일 개수 배지
+  const soon = termsOk ? soonCount(activeContract()) : 0;
+  document.querySelectorAll('.tabbar [data-r="my"], .nav [data-r="my"]').forEach(b => { if (soon) { b.dataset.badge = soon; b.setAttribute('aria-label', `내 계약 플래너, 3일 안에 할 일 ${soon}개`); } else { delete b.dataset.badge; b.removeAttribute('aria-label'); } });
   renderSheet();
   if (S.route !== lastRoute && !keepScroll) window.scrollTo(0, 0);
   lastRoute = S.route;
@@ -1162,6 +1173,11 @@ const A = {
   term: el => { S.sheet = { type: 'term', id: el.dataset.id }; renderSheet(); },
   cksheet: el => { S.sheet = { type: 'ck', id: el.dataset.id }; renderSheet(); },
   sheetClose: () => closeSheet(),
+  // 홈 플래너 카드
+  planStart: () => { const c = newContract(); store.contracts.push(c); store.active = c.id; save(); go('my', { myTab: 'info', confirmDel: false }); },
+  planExample: () => { const c = exampleContract(); store.contracts.push(c); store.active = c.id; save(); go('my', { myTab: 'plan' }); },
+  planCal: () => go('my', { myTab: 'cal', remForm: null }),
+  remNewHome: () => { const date = ymd(today()); go('my', { myTab: 'cal', calDay: date, calMonth: `${today().getFullYear()}-${today().getMonth()}`, remForm: { id: null, date, time: '', type: 'bank', title: REMIND.bank.label, memo: '' }, remMsg: '' }); },
   scamFilter: el => { S.scamFilter = el.dataset.f; S.scamOpen = null; render(true); },
   newsFilter: el => { S.newsFilter = el.dataset.f; render(true); },
   scamOpen: el => go('scams', { scamOpen: el.dataset.id, scamFilter: 'all', focusId: el.dataset.id }),
@@ -1303,7 +1319,7 @@ window.addEventListener('resize', () => { if (!narrow() && S.sheet?.type === 'hs
 setInterval(() => { if (!S.session?.limit) return; const t = remain(); const el = document.getElementById('timer'); if (el) el.textContent = mmss(t); if (t <= 0) { submitExam(); render(); toast('시간이 끝나 자동 제출했어요'); } }, 1000);
 
 /* ================= shell ================= */
-document.getElementById('nav').innerHTML = NAV.map(([r, t]) => `<button data-act="nav" data-r="${r}">${icon(r)}<span>${t}</span></button>`).join('');
+document.getElementById('nav').innerHTML = NAV.map(([r, t]) => `<button data-act="nav" data-r="${r}">${icon(r)}<span>${t}</span>${r === 'my' ? '<em class="nav-badge">핵심</em>' : ''}</button>`).join('');
 document.getElementById('tabbar').innerHTML = TABS.map(([r, t]) => `<button data-act="nav" data-r="${r}">${icon(r)}<span>${t}</span></button>`).join('');
 document.getElementById('more').innerHTML = NAV.filter(([r]) => !TABS.some(t => t[0] === r)).map(([r, t]) => `<button class="chip plain" data-act="nav" data-r="${r}" style="cursor:pointer">${t}</button>`).join('');
 document.getElementById('foot').textContent = `콘텐츠 기준일 ${C.meta.baseDate} · v${C.meta.contentVersion}`;
