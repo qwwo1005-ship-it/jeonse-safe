@@ -7,7 +7,7 @@ content = {
     "meta": c("meta.json"), "lessons": c("lessons.json"), "glossary": c("glossary.json"),
     "checklists": c("checklists.json"), "clauses": c("clauses.json"), "insurance": c("insurance.json"),
     "policy": c("policy_updates.json"), "quiz": c("quiz.json"), "contracts": c("contract_sample.json"),
-    "documents": c("documents.json"), "scams": c("scams.json"),
+    "documents": c("documents.json"), "scams": c("scams.json"), "onboarding": c("onboarding.json"),
 }
 content["meta"]["files"]["documents"] = "documents.json"
 blob = json.dumps(content, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")

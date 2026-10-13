@@ -5,7 +5,8 @@
 ## 구조
 - `content/*.json` — 모든 교육 콘텐츠(진짜 데이터). 화면 문구 대부분이 여기 있음.
   - lessons(9단계 학습카드·계산기), glossary, checklists(플래너 일정 연동), clauses(특약), insurance,
-    policy_updates(최신 제도, 상태 태그), documents(서류 읽는 법 10종), contract_sample(계약서 예시 4종·위험찾기), quiz(223문항·시험 설정), meta
+    policy_updates(최신 제도, 상태 태그), documents(서류 읽는 법 10종), contract_sample(계약서 예시 4종·위험찾기), quiz(223문항·시험 설정), meta,
+    scams(알려진 사기 수법 13가지), onboarding(약관 다음 수준 확인 9문항·결과별 추천·기초 단어 10개)
 - `src/index.template.html`, `src/style.css`, `src/app.js` — 앱 본체(해시 라우팅 SPA, 상태는 localStorage)
 - `tools/build.py` — content + src를 하나로 묶어 `dist/standalone.html`(배포용), `dist/index.html`(Claude 아티팩트용) 생성
 - `tools/validate.py` — JSON 간 ID 연결(lessonId, hotspotId, clauseId 등) 검사

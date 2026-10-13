@@ -21,6 +21,16 @@ for s in L["stages"]:
         chk(l.get("linkIds", []), links, l["id"])
 for x in L["calculators"]: chk(x.get("linkIds", []), links, x["id"])
 srcs = {s["id"] for s in c("meta.json")["sources"]}
+OB = c("onboarding.json")
+for a in OB["areas"].values(): chk(a["lessonIds"], lessons, "onboarding area")
+for q in OB["questions"]:
+    if q["area"] not in OB["areas"]: err.append(f"{q['id']}: unknown area")
+    if not 0 <= q["answer"] < len(q["options"]): err.append(f"{q['id']}: answer out of range")
+for lv in OB["levels"]: chk([lv["startLesson"]], lessons, lv["id"])
+covered = {s for lv in OB["levels"] for s in range(lv["min"], lv["max"] + 1)}
+if covered != set(range(0, len(OB["questions"]) + 1)): err.append("onboarding levels do not cover every score")
+for p in OB["primer"]:
+    if p.get("glossaryId"): chk([p["glossaryId"]], gl, "primer " + p["term"])
 SC = c("scams.json"); groups = {g["id"] for g in SC["groups"]}
 for x in SC["items"]:
     if x["group"] not in groups: err.append(f"{x['id']}: unknown group {x['group']}")

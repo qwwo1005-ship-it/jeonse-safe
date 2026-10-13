@@ -32,7 +32,7 @@ try { const raw = localStorage.getItem(KEY); if (raw) store = Object.assign(blan
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* ignore */ } };
 
 /* ================= state ================= */
-const ROUTES = ['intro', 'terms', 'home', 'learn', 'scams', 'glossary', 'docs', 'contract', 'my', 'insurance', 'exam', 'news'];
+const ROUTES = ['intro', 'terms', 'level', 'home', 'learn', 'scams', 'glossary', 'docs', 'contract', 'my', 'insurance', 'exam', 'news'];
 const S = {
   route: 'home', stageId: null, lessonId: null, gq: '',
   docId: null, docTab: 'guide', docSample: 0,
@@ -248,7 +248,7 @@ function vHome() {
   const where = [['집 보러 다녀요', 'stage_02'], ['계약을 앞두고 있어요', 'stage_03'], ['오늘 계약해요', 'stage_04'], ['이사를 앞두고 있어요', 'stage_06'], ['살고 있어요', 'stage_08'], ['보증금을 못 받고 있어요', 'stage_09']];
   return `<div class="page">
   <section class="hero"><div><div class="eyebrow">전세사기 예방 교육 · ${esc(C.meta.baseDate)} 기준</div><h1>전세지킴이</h1>
-    <p>등기부등본 읽는 법부터 계약서 특약, 이사 날 체크리스트, 보증금을 돌려받는 날까지. 한 단계씩 따라오면 내 보증금을 지키는 방법이 보여요.</p>${continueCta()}</div>
+    <p>등기부등본 읽는 법부터 계약서 특약, 이사 날 체크리스트, 보증금을 돌려받는 날까지. 한 단계씩 따라오면 내 보증금을 지키는 방법이 보여요.</p>${continueCta()}${levelRow()}</div>
     <div class="big-seal" aria-hidden="true">보증금<br>지킴</div></section>
   ${plannerSpot()}
   <section class="stack"><h2>지금 어디쯤인가요?</h2><div class="where">${where.map(([t, id]) => `<button data-act="stage" data-id="${id}">${t}</button>`).join('')}</div></section>
@@ -272,10 +272,14 @@ function continueCta() {
   if (!nxt) return `<div class="cta-row"><button class="btn primary glow" data-act="nav" data-r="exam">모의고사로 마무리하기 ${ARR}</button><span class="small muted">학습카드를 모두 읽었어요</span></div>`;
   return `<div class="cta-row"><button class="btn primary glow" data-act="lesson" data-id="${nxt.id}" data-dir="next">${started ? '이어서 배우기' : '1단계부터 배우기'} ${ARR}</button><span class="small muted">${stageById[nxt.stageId].order}단계 · ${esc(nxt.title)}</span></div>`;
 }
+function levelRow() {
+  return `<div class="row lv-row">${store.level ? `<span class="chip plan-chip">내 수준: ${esc(store.level.name)} · ${store.level.score}/${OB.questions.length}</span><button class="btn ghost small" data-act="lvRetake">다시 확인</button>` : '<button class="btn ghost small" data-act="lvRetake">내 수준 확인하기 (2분)</button>'}<button class="btn ghost small" data-act="lvPrimer">기초 단어 10개</button></div>`;
+}
 function vLearn() {
   if (S.lessonId && lessonById[S.lessonId]) return vLesson(lessonById[S.lessonId]);
   if (S.stageId && stageById[S.stageId]) return vStage(stageById[S.stageId]);
   return `<div class="page"><div class="head"><div class="eyebrow">배우기</div><h1>계약 전부터 보증금 받는 날까지 9단계</h1><p>순서대로 따라오면 돼요. 단계마다 학습카드와 체크리스트, 단원 퀴즈가 있어요.</p></div>
+  ${levelRow()}
   ${continueCta()}
   <div class="steps">${STAGES.map(s => { const done = s.lessons.every(l => store.read[l.id]); const n = s.lessons.filter(l => store.read[l.id]).length;
     return `<button class="step" data-act="stage" data-id="${s.id}"><span class="n${done ? ' done' : ''}">${s.order}</span><div><h3>${esc(s.title)}</h3><p class="small muted">${esc(s.subtitle)}</p><div class="bar thin"><i style="width:${Math.round(n / s.lessons.length * 100)}%"></i></div></div><span class="small muted num">${n}/${s.lessons.length}</span></button>`; }).join('')}</div>
@@ -1100,6 +1104,58 @@ function openSheet(next, el) {
   document.querySelector('#sheet .sheet')?.scrollTo(0, 0);
 }
 
+/* ================= 수준 확인 + 기초 단어 (약관 다음, 건너뛰기 가능) ================= */
+const OB = C.onboarding;
+const levelOf = score => OB.levels.find(l => score >= l.min && score <= l.max) || OB.levels[0];
+function vLevel() {
+  const L = (S.lv ||= { step: 'start' });
+  const top = `<header class="lv-top"><div class="brand"><span class="seal" aria-hidden="true">전</span><b>전세지킴이</b></div>${L.step === 'result' ? '' : '<button class="lv-skip" data-act="lvSkip">건너뛰기 →</button>'}</header>`;
+  let body = '';
+  if (L.step === 'start') {
+    body = `<div class="lv-card lv-hero"><div class="lv-badge">2분 체크</div><h1>${esc(OB.intro.title)}</h1><p>${esc(OB.intro.desc)}</p>
+      <div class="lv-actions"><button class="btn primary glow" data-act="lvStart">수준 확인 시작 ${ARR}</button><button class="btn" data-act="lvPrimer">기초 단어부터 볼래요</button></div></div>`;
+  }
+  if (L.step === 'q') {
+    const total = OB.questions.length + 1, i = L.i;
+    const prog = `<div class="lv-prog"><span class="num">${i + 1} / ${total}</span><div class="bar"><i style="width:${Math.round((i + 1) / total * 100)}%"></i></div></div>`;
+    if (i === 0) {
+      body = `${prog}<div class="lv-card"><div class="eyebrow">먼저 알려 주세요</div><h2 class="lv-q">${esc(OB.self.prompt)}</h2><div class="opts">${OB.self.options.map((o, k) => `<button class="opt" data-act="lvSelf" data-i="${k}"><span class="k">${k + 1}</span><span>${esc(o)}</span></button>`).join('')}</div></div>`;
+    } else {
+      const q = OB.questions[i - 1], pick = L.ans?.[q.id], done = pick != null;
+      const cls = k => !done ? '' : k === q.answer ? 'right' : k === pick ? 'wrong' : '';
+      body = `${prog}<div class="lv-card"><div class="eyebrow">${esc(OB.areas[q.area].label)}</div><h2 class="lv-q">${esc(q.prompt)}</h2>
+        <div class="opts">${q.options.map((o, k) => `<button class="opt ${cls(k)}" data-act="lvPick" data-i="${k}" ${done ? 'disabled' : ''}><span class="k">${k + 1}</span><span>${esc(o)}</span></button>`).join('')}
+        <button class="opt lv-dunno${done && pick === -1 ? ' sel' : ''}" data-act="lvPick" data-i="-1" ${done ? 'disabled' : ''}><span class="k">?</span><span>잘 모르겠어요</span></button></div>
+        ${done ? `<div class="callout ${pick === q.answer ? 'green' : pick === -1 ? '' : 'red'} lv-fb"><b>${pick === q.answer ? '정답이에요!' : pick === -1 ? '괜찮아요, 이렇게 기억하세요' : `정답은 '${esc(q.options[q.answer])}'예요`}</b><br>${esc(q.explain)}</div>
+          <div class="lv-actions"><button class="btn primary glow" data-act="lvNext">${i === total - 1 ? '결과 보기' : '다음 문제'} ${ARR}</button></div>` : ''}</div>`;
+    }
+  }
+  if (L.step === 'result') {
+    const qsOB = OB.questions, score = qsOB.filter(q => L.ans?.[q.id] === q.answer).length, lv = levelOf(score);
+    const area = Object.entries(OB.areas).map(([k, a]) => { const qq = qsOB.filter(q => q.area === k); const ok = qq.filter(q => L.ans?.[q.id] === q.answer).length; return { k, a, ok, n: qq.length, good: ok === qq.length }; });
+    const weak = area.filter(x => !x.good);
+    const start = lessonById[lv.startLesson];
+    body = `<div class="lv-card lv-result"><div class="lv-medal lv-${lv.id}">${esc(lv.name)}</div><h1>${esc(lv.headline)}</h1><p class="num lv-score">${score} / ${qsOB.length} 정답</p><p>${esc(lv.desc)}</p>
+      <div class="lv-areas">${area.map(x => `<div class="lv-area ${x.good ? 'good' : 'weak'}"><b>${esc(x.a.label)}</b><span>${x.good ? '알고 있어요' : '더 배워요'} · ${x.ok}/${x.n}</span></div>`).join('')}</div>
+      <div class="lv-actions">${lv.primer ? `<button class="btn primary glow" data-act="lvPrimer">기초 단어 10개 먼저 보기 ${ARR}</button><button class="btn" data-act="lvGo" data-id="${lv.startLesson}">바로 학습 시작</button>`
+        : `<button class="btn primary glow" data-act="lvGo" data-id="${lv.startLesson}">${esc(start.title)}부터 시작 ${ARR}</button><button class="btn" data-act="lvPrimer">기초 단어 복습</button>`}</div>
+      ${weak.length ? `<div class="lv-weak"><div class="eyebrow">헷갈린 분야를 먼저 채워 보세요</div><div class="row">${[...new Set(weak.flatMap(x => x.a.lessonIds))].map(id => `<button class="btn ghost small" data-act="lessonSheet" data-id="${id}">${esc(lessonById[id].title)}</button>`).join('')}</div></div>` : ''}
+      <button class="btn ghost" data-act="lvHome">홈으로</button></div>`;
+  }
+  if (L.step === 'primer') {
+    const P = OB.primer, j = L.j || 0, p = P[j];
+    body = `<div class="lv-prog"><span class="num">${j + 1} / ${P.length}</span><div class="bar"><i style="width:${Math.round((j + 1) / P.length * 100)}%"></i></div></div>
+      <div class="lv-card primer-card"><div class="eyebrow">꼭 알아야 할 단어</div><h1 class="primer-term">${esc(p.term)}</h1><p class="primer-easy">${esc(p.easy)}</p>
+        <div class="easy"><span class="easy-tag">비유하면</span><p>${esc(p.analogy)}</p></div>
+        <p class="primer-why"><b>왜 알아야 해요?</b> ${esc(p.why)}</p>
+        ${p.glossaryId ? `<button class="btn ghost small" data-act="term" data-id="${p.glossaryId}">조금 더 자세히</button>` : ''}
+        <div class="lv-actions">${j > 0 ? '<button class="btn" data-act="lvPrimerMove" data-d="-1">← 이전</button>' : ''}${j < P.length - 1 ? `<button class="btn primary glow" data-act="lvPrimerMove" data-d="1">다음 단어 ${ARR}</button>` : `<button class="btn primary glow" data-act="lvGo" data-id="${(store.level && levelOf(store.level.score).startLesson) || 'ls_01_01'}">다 봤어요, 학습 시작 ${ARR}</button>`}</div>
+        <div class="primer-dots">${P.map((_, k) => `<i class="${k === j ? 'on' : k < j ? 'seen' : ''}"></i>`).join('')}</div></div>`;
+  }
+  return `<div class="page level">${top}${body}</div>`;
+}
+function finishOnboarding(status) { if (!store.onboarded) store.onboarded = status; save(); }
+
 /* ================= 알려진 사기 수법 ================= */
 const scamTagCls = t => /피해 큼|빠르게|회복|2026/.test(t) ? 'red' : /진화|신종|청년|악용/.test(t) ? 'yellow' : 'plain';
 function scamCard(x) {
@@ -1270,22 +1326,23 @@ function closeSheet() {
 }
 
 /* ================= render ================= */
-const VIEWS = { intro: vIntro, terms: vTerms, home: vHome, learn: vLearn, scams: vScams, glossary: vGlossary, docs: vDocs, contract: vContract, my: vMy, insurance: vInsurance, exam: vExam, news: vNews };
+const VIEWS = { intro: vIntro, terms: vTerms, level: vLevel, home: vHome, learn: vLearn, scams: vScams, glossary: vGlossary, docs: vDocs, contract: vContract, my: vMy, insurance: vInsurance, exam: vExam, news: vNews };
 let lastRoute = null, lastKey = null, lastQ = null, lastPage = null;
 // 화면이 '바뀌었을 때'만 등장 애니메이션 — 체크·입력으로 다시 그릴 때는 움직이지 않게
-const viewKey = () => [S.route, S.stageId, S.lessonId, S.docId, S.docTab, S.docSample, S.sampleId, S.cmode, S.trap?.id, S.myTab, store.active, S.session ? 'exam' : '', S.result ? 'result' : ''].join('|');
+const viewKey = () => [S.lv?.step, S.lv?.i, S.lv?.j, S.route, S.stageId, S.lessonId, S.docId, S.docTab, S.docSample, S.sampleId, S.cmode, S.trap?.id, S.myTab, store.active, S.session ? 'exam' : '', S.result ? 'result' : ''].join('|');
 function render(keepScroll) {
   S.route = routeFromHash();
   // 약관 동의 전에는 인트로·약관 화면만 — 가려던 곳은 기억해 두었다가 동의 후 보내줌
   if (!termsOk && S.route !== 'intro' && S.route !== 'terms') { S.termsNext = S.route; history.replaceState(null, '', '#terms'); S.route = 'terms'; }
+  if (termsOk && !PREVIEW && store.onboarded == null && !['intro', 'terms', 'level'].includes(S.route)) { S.termsNext = S.route; history.replaceState(null, '', '#level'); S.route = 'level'; }
   document.body.dataset.route = S.route;
-  document.body.classList.toggle('bare', S.route === 'intro' || S.route === 'terms');
+  document.body.classList.toggle('bare', S.route === 'intro' || S.route === 'terms' || S.route === 'level');
   document.documentElement.classList.toggle('intro-snap', S.route === 'intro');
   const main = document.getElementById('main');
   const key = viewKey(), q = S.session ? S.session.i : null;
   const anim = key !== lastKey ? 'enter' : q != null && q !== lastQ ? 'enter-q' : '';
   // 다른 '페이지'(카드·단계·서류·계약서·시험)로 넘어가면 맨 위로 — 같은 페이지 안 탭 전환은 제자리
-  const pk = [S.route, S.stageId, S.lessonId, S.docId, S.sampleId, !!S.session, !!S.result].join('|');
+  const pk = [S.lv?.step, S.lv?.i, S.lv?.j, S.route, S.stageId, S.lessonId, S.docId, S.sampleId, !!S.session, !!S.result].join('|');
   const newPage = pk !== lastPage; lastPage = pk;
   lastKey = key; lastQ = q;
   main.classList.remove('enter', 'enter-q', 'dir-next', 'dir-prev');
@@ -1357,6 +1414,17 @@ const A = {
   term: el => openSheet({ type: 'term', id: el.dataset.id }, el),
   cksheet: el => openSheet({ type: 'ck', id: el.dataset.id }, el),
   sheetClose: () => closeSheet(),
+  // 수준 확인
+  lvStart: () => { S.lv = { step: 'q', i: 0, ans: {} }; render(true); },
+  lvSelf: el => { S.lv.self = +el.dataset.i; S.lv.i = 1; render(true); },
+  lvPick: el => { const q = OB.questions[S.lv.i - 1]; if (S.lv.ans[q.id] != null) return; S.lv.ans[q.id] = +el.dataset.i; render(true); setTimeout(() => document.querySelector('.lv-fb')?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }), 60); },
+  lvNext: () => { if (S.lv.i >= OB.questions.length) { const score = OB.questions.filter(q => S.lv.ans[q.id] === q.answer).length; const lv = levelOf(score); store.level = { id: lv.id, name: lv.name, score, self: S.lv.self ?? null, at: Date.now() }; finishOnboarding('done'); S.lv.step = 'result'; } else S.lv.i++; render(true); },
+  lvPrimer: () => { S.lv = { ...(S.lv || {}), step: 'primer', j: 0 }; if (S.route !== 'level') go('level'); else render(true); },
+  lvPrimerMove: el => { const n = OB.primer.length; S.lv.j = Math.max(0, Math.min(n - 1, (S.lv.j || 0) + +el.dataset.d)); render(true); },
+  lvGo: el => { finishOnboarding('done'); const id = el.dataset.id; S.termsNext = null; go('learn', { lessonId: id, stageId: lessonById[id].stageId, navDir: 'next' }); },
+  lvSkip: () => { finishOnboarding('skipped'); const next = S.termsNext && !['level', 'terms', 'intro'].includes(S.termsNext) ? S.termsNext : 'home'; S.termsNext = null; go(next); },
+  lvHome: () => { S.termsNext = null; go('home'); },
+  lvRetake: () => { S.lv = { step: 'start' }; go('level'); },
   sheetBack: () => { S.sheet = S.sheetStack.pop() || null; renderSheet(); },
   // 팝업으로 보는 연결
   lessonSheet: el => openSheet({ type: 'lesson', id: el.dataset.id }, el),
