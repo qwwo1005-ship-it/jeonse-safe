@@ -737,13 +737,14 @@ function vNews() {
 /* ================= intro (랜딩) — 스크롤이 곧 재생 헤드: 장면(frame)마다 --p(0~1)로 움직임 ================= */
 function vIntro() {
   return `<div class="intro">
-  <header class="in-top"><div class="brand" data-act="introStart" role="button" tabindex="0" aria-label="홈으로"><span class="seal" aria-hidden="true">전</span><b>전세지킴이</b></div><span class="in-frame num" id="inFrame" aria-hidden="true">01 / 05</span><button class="in-skip" data-act="introStart">건너뛰기</button></header>
+  <header class="in-top"><div class="brand" data-act="introStart" role="button" tabindex="0" aria-label="홈으로"><span class="seal" aria-hidden="true">전</span><b>전세지킴이</b></div><span class="in-frame num" id="inFrame" aria-hidden="true">01 / 05</span><button class="in-skip" data-act="introStart">건너뛰기 →</button></header>
 
   <section class="fr fr1" data-fr="1"><div class="fr-stick">
     <p class="in-kicker"><span>전세사기 예방 교육</span><span class="num">${esc(C.meta.baseDate)} 기준</span></p>
     <h1 class="in-h"><span class="ln"><span>당신의 보증금,</span></span><span class="ln"><span>지금 안전한가요?</span></span></h1>
     <div class="in-money"><span class="num" data-count="200000000">200,000,000</span><span class="unit">원</span></div>
     <p class="in-sub">평생 모은 돈이 들어가는 계약이에요.<br>하루의 틈, 서류 한 장이 결과를 바꿔요.</p>
+    <div class="in-hero-cta"><button class="btn in-go" data-act="introStart">바로 시작하기</button><span>또는 아래로 내려 5장면 보기</span></div>
     <div class="in-stamp" data-at="0.3" aria-hidden="true">확인<br>필요</div>
     <div class="in-cue" aria-hidden="true"><span>스크롤</span><i></i></div>
   </div></section>
@@ -804,11 +805,13 @@ function introFx() {
   const still = reduceMotion(); let cur = 1;
   document.querySelectorAll('[data-fr]').forEach(sec => {
     const r = sec.getBoundingClientRect(), span = r.height - innerHeight;
-    const p = still ? 1 : Math.min(1, Math.max(0, -r.top / (span > 0 ? span : 1)));
+    // 동작 줄이기: 움직임 없이 '완성된 장면'으로 보여줌. 단, 첫 장면은 스크롤하면 흐려지는 장면이라 시작 상태(0)로 둔다
+    const first = sec.dataset.fr === '1';
+    const p = still ? (first ? 0 : 1) : Math.min(1, Math.max(0, -r.top / (span > 0 ? span : 1)));
     sec.style.setProperty('--p', p.toFixed(4));
     sec.style.setProperty('--k', Math.min(1, p / 0.6).toFixed(4));
     if (r.top <= innerHeight * 0.5) cur = +sec.dataset.fr;
-    sec.querySelectorAll('[data-at]').forEach(el => el.classList.toggle('on', p >= +el.dataset.at));
+    sec.querySelectorAll('[data-at]').forEach(el => el.classList.toggle('on', still || p >= +el.dataset.at));
     sec.querySelectorAll('[data-scrub]').forEach(el => { const t = Math.min(1, Math.max(0, (p - +el.dataset.a) / (+el.dataset.b - +el.dataset.a))); el.textContent = Math.round(+el.dataset.scrub * (1 - Math.pow(1 - t, 3))).toLocaleString('ko-KR'); });
   });
   const f = document.getElementById('inFrame'); if (f) f.textContent = `${String(cur).padStart(2, '0')} / 05`;
