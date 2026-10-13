@@ -145,10 +145,10 @@ const go = (route, patch = {}) => { Object.assign(S, patch); if (location.hash.r
 
 function hotspotLinks(h) {
   const out = [];
-  (h.lessonIds || []).forEach(id => lessonById[id] && out.push(`<button class="btn ghost" data-act="lesson" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>`));
-  if (h.documentId && docById[h.documentId]) out.push(`<button class="btn ghost" data-act="doc" data-id="${h.documentId}">서류: ${esc(docById[h.documentId].name)}</button>`);
-  if (h.calculatorId && calcById[h.calculatorId]) out.push(`<button class="btn ghost" data-act="calc" data-id="${h.calculatorId}">${esc(calcById[h.calculatorId].title)}</button>`);
-  if (h.clauseId && clauseById[h.clauseId]) out.push(`<button class="btn ghost" data-act="clauses">특약: ${esc(clauseById[h.clauseId].title)}</button>`);
+  (h.lessonIds || []).forEach(id => lessonById[id] && out.push(`<button class="btn ghost" data-act="lessonSheet" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>`));
+  if (h.documentId && docById[h.documentId]) out.push(`<button class="btn ghost" data-act="docSheet" data-id="${h.documentId}">서류: ${esc(docById[h.documentId].name)}</button>`);
+  if (h.calculatorId && calcById[h.calculatorId]) out.push(`<button class="btn ghost" data-act="calcSheet" data-id="${h.calculatorId}">${esc(calcById[h.calculatorId].title)}</button>`);
+  if (h.clauseId && clauseById[h.clauseId]) out.push(`<button class="btn ghost" data-act="clauseSheet" data-ids="${h.clauseId}">특약: ${esc(clauseById[h.clauseId].title)}</button>`);
   if (h.checklistId && ckById[h.checklistId]) out.push(`<button class="btn ghost" data-act="cksheet" data-id="${h.checklistId}">체크리스트: ${esc(ckById[h.checklistId].title)}</button>`);
   if ((h.quizIds || []).length) out.push(`<button class="btn" data-act="quizIds" data-ids="${h.quizIds.join(',')}">관련 문제 풀기</button>`);
   return out.length ? `<div class="row">${out.join('')}</div>` : '';
@@ -254,7 +254,7 @@ function vHome() {
     <div class="card stat"><span class="eyebrow">오답노트</span><b><span data-count="${wrongN}">${wrongN}</span>문항</b><button class="btn ghost" data-act="examStart" data-id="wrong" ${wrongN ? '' : 'disabled'}>다시 풀기</button></div>
   </section>
   <section class="stack"><div class="row" style="justify-content:space-between"><h2>최신 제도</h2><button class="btn ghost" data-act="nav" data-r="news">전체 보기</button></div>
-    <div class="grid">${C.policy.items.slice(0, 4).map(p => `<button class="linkcard" data-act="nav" data-r="news">${statusChip(p.status)}<h3>${esc(p.title)}</h3></button>`).join('')}</div></section>
+    <div class="grid">${C.policy.items.slice(0, 4).map(p => `<button class="linkcard" data-act="policySheet" data-id="${p.id}">${statusChip(p.status)}<h3>${esc(p.title)}</h3></button>`).join('')}</div></section>
   <section class="stack"><h2>바로 가기</h2><div class="grid">
     ${[['scams', '알려진 사기 수법', `깡통전세·신탁·이중계약부터 신종 수법까지 ${C.scams.items.length}가지와 예방법.`], ['docs', '서류 읽는 법', '등기부등본·건축물대장·확인설명서 등 10종을 견본으로 읽어봐요.'], ['contract', '계약서 예시', '아파트·빌라·다가구·오피스텔 월세 계약서의 중요한 칸과 위험 찾기.'], ['my', '내 계약 플래너', '날짜를 넣으면 할 일과 체크리스트, 특약 문구가 만들어져요.'], ['insurance', '보증보험 비교', 'HUG·HF·SGI 비교와 126% 룰·보증료 계산기.'], ['exam', '모의고사', `${qs.length}문항 문제은행으로 실전 모의고사와 오답노트.`], ['glossary', '용어사전', '대항력, 확정일자 같은 말을 쉬운 말로.']]
       .map(([r, t, d]) => `<button class="linkcard" data-act="nav" data-r="${r}"><h3>${t}</h3><p>${d}</p></button>`).join('')}</div></section>
@@ -346,12 +346,12 @@ function vLesson(l) {
   ${l.warning ? `<div class="callout red stack" data-io role="note"><div class="row"><span class="chip red">주의</span><b>${esc(l.warning.title)}</b></div><p>${rich(l.warning.text, seen, false)}</p>${l.warning.actions?.length ? `<div><b>지금 할 일</b><ul class="clean ticks">${l.warning.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}</div>` : ''}
   <details class="more" data-io><summary>자세히 알아보기</summary><p class="body">${rich(l.body, seen, false)}</p></details>
   ${(l.keyTerms || []).some(t => termById[t] && !seen.has(t)) ? `<div class="stack"><div class="eyebrow">함께 알면 좋은 용어</div><div class="row">${l.keyTerms.filter(t => termById[t] && !seen.has(t)).map(t => `<button class="term" data-act="term" data-id="${t}">${esc(termById[t].term)}</button>`).join(' · ')}</div></div>` : ''}
-  ${(() => { const sc = C.scams.items.filter(x => (x.lessonIds || []).includes(l.id)); return sc.length ? `<div class="stack"><div class="eyebrow">이 카드와 관련된 사기 수법</div><div class="row">${sc.map(x => `<button class="btn ghost small scam-link" data-act="scamOpen" data-id="${x.id}">${icon('scams')} ${esc(x.name)}</button>`).join('')}</div></div>` : ''; })()}
-  ${l.policyUpdateIds?.length ? `<div class="stack"><div class="eyebrow">관련 최신 제도</div>${l.policyUpdateIds.map(id => puById[id] ? `<div class="row">${statusChip(puById[id].status)}<button class="btn ghost" data-act="nav" data-r="news">${esc(puById[id].title)}</button></div>` : '').join('')}</div>` : ''}
-  ${l.relatedClauseIds?.length ? `<div class="stack"><div class="eyebrow">관련 특약</div><div class="row">${l.relatedClauseIds.map(id => `<span class="chip plain">${esc(clauseById[id]?.title)}</span>`).join('')}<button class="btn" data-act="clauses">특약 문구 보기</button></div></div>` : ''}
-  ${l.contractHotspotIds?.length ? `<div class="row"><button class="btn" data-act="sample" data-id="contract_apt_jeonse_01">계약서 예시에서 확인하기</button></div>` : ''}
+  ${(() => { const sc = C.scams.items.filter(x => (x.lessonIds || []).includes(l.id)); return sc.length ? `<div class="stack"><div class="eyebrow">이 카드와 관련된 사기 수법</div><div class="row">${sc.map(x => `<button class="btn ghost small scam-link" data-act="scamSheet" data-id="${x.id}">${icon('scams')} ${esc(x.name)}</button>`).join('')}</div></div>` : ''; })()}
+  ${l.policyUpdateIds?.length ? `<div class="stack"><div class="eyebrow">관련 최신 제도</div>${l.policyUpdateIds.map(id => puById[id] ? `<div class="row">${statusChip(puById[id].status)}<button class="btn ghost" data-act="policySheet" data-id="${id}">${esc(puById[id].title)}</button></div>` : '').join('')}</div>` : ''}
+  ${l.relatedClauseIds?.length ? `<div class="stack"><div class="eyebrow">관련 특약</div><div class="row">${l.relatedClauseIds.map(id => `<span class="chip plain">${esc(clauseById[id]?.title)}</span>`).join('')}<button class="btn" data-act="clauseSheet" data-ids="${l.relatedClauseIds.join(',')}">특약 문구 보기</button></div></div>` : ''}
+  ${l.contractHotspotIds?.length ? `<div class="row"><button class="btn" data-act="hsListSheet" data-ids="${l.contractHotspotIds.join(',')}">계약서에서 확인하기</button></div>` : ''}
   ${refLinks(l.linkIds, '바로 확인하기')}
-  ${l.calculatorId ? `<div class="row"><button class="btn" data-act="calc" data-id="${l.calculatorId}">${esc(calcById[l.calculatorId].title)} 열기</button></div>` : ''}
+  ${l.calculatorId ? `<div class="row"><button class="btn" data-act="calcSheet" data-id="${l.calculatorId}">${esc(calcById[l.calculatorId].title)} 열기</button></div>` : ''}
   ${l.contacts ? `<div class="card"><div class="eyebrow">연락처</div><ul class="clean">${l.contacts.map(c => `<li><b>${esc(c.name)}</b> <span class="num">${esc(c.phone)}</span></li>`).join('')}</ul></div>` : ''}
   ${relatedDocsForLesson(l.id)}
   ${lessonQuiz(l)}
@@ -360,7 +360,7 @@ function vLesson(l) {
 }
 function relatedDocsForLesson(id) {
   const ds = C.documents.documents.filter(d => (d.lessonIds || []).includes(id));
-  return ds.length ? `<div class="stack"><div class="eyebrow">이 카드와 함께 읽을 서류</div><div class="row">${ds.map(d => `<button class="btn" data-act="doc" data-id="${d.id}">${esc(d.name)}</button>`).join('')}</div></div>` : '';
+  return ds.length ? `<div class="stack"><div class="eyebrow">이 카드와 함께 읽을 서류</div><div class="row">${ds.map(d => `<button class="btn" data-act="docSheet" data-id="${d.id}">${esc(d.name)}</button>`).join('')}</div></div>` : '';
 }
 
 function vGlossary() {
@@ -391,7 +391,7 @@ function vDoc(d) {
     <div class="grid"><div class="card stack"><h3>3초 체크</h3><ul class="clean ticks">${d.quickCheck.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
       <div class="card stack"><h3>이런 게 보이면 멈추세요</h3><ul class="clean flags">${d.redFlags.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
     ${d.tips?.length ? `<div class="callout"><b>알아두면 좋은 점</b><ul class="clean">${d.tips.map(t => `<li>· ${esc(t)}</li>`).join('')}</ul></div>` : ''}
-    <div class="row"><button class="btn primary" data-act="docTab" data-t="sample">견본으로 연습하기</button>${(d.lessonIds || []).map(id => `<button class="btn" data-act="lesson" data-id="${id}">학습: ${esc(lessonById[id]?.title)}</button>`).join('')}
+    <div class="row"><button class="btn primary" data-act="docTab" data-t="sample">견본으로 연습하기</button>${(d.lessonIds || []).map(id => `<button class="btn" data-act="lessonSheet" data-id="${id}">학습: ${esc(lessonById[id]?.title)}</button>`).join('')}
       ${qs.some(q => q.documentId === d.id) ? `<button class="btn" data-act="quizDoc" data-id="${d.id}">이 서류 문제 풀기</button>` : ''}</div>`;
   } else {
     const smp = d.samples[Math.min(S.docSample, d.samples.length - 1)];
@@ -445,7 +445,7 @@ function vContract() {
   <div class="card stack"><div class="row">${smp.verdict ? `<span class="chip ${verdictColor[smp.verdict.level]}">${smp.verdict.level === 'red' ? '위험' : smp.verdict.level === 'yellow' ? '주의' : '양호'}</span>` : ''}<h3>${esc(smp.title)}</h3></div><p class="muted">${esc(smp.summary || '')}</p>
     ${nums.length ? `<div class="row">${nums.map(([k, v, note]) => `<span class="chip plain">${k} <span class="num">${won(v)}</span>${note ? ` (${esc(note)})` : ''}</span>`).join('')}</div>` : ''}
     ${ctx.calc?.explain ? `<p class="small">${esc(ctx.calc.explain)}</p>` : ''}
-    ${(ctx.documentIds || []).length ? `<div class="row"><span class="small muted">함께 볼 서류</span>${ctx.documentIds.map(id => `<button class="btn ghost" data-act="doc" data-id="${id}" data-t="sample">${esc(docById[id].name)}</button>`).join('')}</div>` : ''}</div>
+    ${(ctx.documentIds || []).length ? `<div class="row"><span class="small muted">함께 볼 서류</span>${ctx.documentIds.map(id => `<button class="btn ghost" data-act="docSheet" data-id="${id}">${esc(docById[id].name)}</button>`).join('')}</div>` : ''}</div>
   <div class="seg" role="group" aria-label="보기 방식"><button data-act="cmode" data-m="read" aria-pressed="${S.cmode === 'read'}">계약서 보기</button><button data-act="cmode" data-m="tour" aria-pressed="${S.cmode === 'tour'}">핵심 투어</button><button data-act="cmode" data-m="trap" aria-pressed="${S.cmode === 'trap'}">위험 찾기 게임</button></div>
   ${S.cmode === 'trap' && traps.length > 1 ? `<div class="seg">${traps.map(t => `<button data-act="trapPick" data-id="${t.id}" aria-pressed="${S.trap?.id === t.id}">${esc(t.label)}</button>`).join('')}</div>` : ''}
   ${paperModes()}
@@ -561,7 +561,7 @@ function vPlan(c) {
       ${e.note ? `<p class="small ${e.custom ? '' : 'muted'}" style="white-space:pre-line">${esc(e.note)}</p>` : ''}
       ${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<div class="row"><label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>${e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : ''}</div>`}
       ${e.ck && open ? `<div class="card" data-evbody="${e.id}" style="padding:8px;margin-top:6px">${ckById[e.ck].fieldMode ? '<p class="small muted" style="padding:4px 10px">현장 모드: 이 화면을 켜두고 하나씩 체크하세요.</p>' : ''}${items.map(it => `<label class="check${ch[it.id] ? ' done' : ''}"><input type="checkbox" data-act="ckItem" data-id="${it.id}" ${ch[it.id] ? 'checked' : ''}><span><span class="t">${esc(it.text)}</span> ${it.required ? '' : '<span class="chip plain">권장</span>'}
-        ${it.helpLessonId ? `<button class="btn ghost small" data-act="lesson" data-id="${it.helpLessonId}">왜?</button>` : ''}${it.contractHotspotId ? `<button class="btn ghost small" data-act="hsSheet" data-id="${it.contractHotspotId}">계약서 칸</button>` : ''}${it.calculatorId ? `<button class="btn ghost small" data-act="calc" data-id="${it.calculatorId}">계산기</button>` : ''}</span></label>`).join('')}</div>` : ''}</div>`;
+        ${it.helpLessonId ? `<button class="btn ghost small" data-act="lessonSheet" data-id="${it.helpLessonId}">왜?</button>` : ''}${it.contractHotspotId ? `<button class="btn ghost small" data-act="hsSheet" data-id="${it.contractHotspotId}">계약서 칸</button>` : ''}${it.calculatorId ? `<button class="btn ghost small" data-act="calcSheet" data-id="${it.calculatorId}">계산기</button>` : ''}</span></label>`).join('')}</div>` : ''}</div>`;
   }).join('')}</div>`;
 }
 function vRisk(c) {
@@ -577,7 +577,7 @@ function vRisk(c) {
       ${d.capLimit ? `<p class="small">보증금 한도(${REGIONS[c.region][3] ? '수도권' : '그 외'}): ${won(d.capLimit)} — <b>${d.capPass ? '이내' : '초과(SGI 검토)'}</b></p>` : ''}</div>
     <div class="card stack"><div class="eyebrow">소액임차인 최우선변제</div><p><b>${esc(REGIONS[c.region][0])}</b> 기준: 보증금 ${won(d.smallTh)} 이하</p>${d.small ? `<span class="chip green">해당 가능</span><p class="small">대항력을 갖추면 경매 때 최대 ${won(d.smallAmt)}까지 먼저 받을 수 있어요. 기준 시점은 선순위 근저당 설정일이에요.</p>` : '<span class="chip plain">해당 없음</span><p class="small">보증금이 기준보다 커요. 보증보험이 더 중요해요.</p>'}</div>
   </div>
-  ${d.items.length ? `<div class="stack">${d.items.map(([lv, t, doc]) => `<div class="callout ${lv}">${esc(t)}${doc ? ` <button class="btn ghost" data-act="doc" data-id="${doc}">${esc(docById[doc].name)} 읽는 법</button>` : ''}</div>`).join('')}</div>` : ''}
+  ${d.items.length ? `<div class="stack">${d.items.map(([lv, t, doc]) => `<div class="callout ${lv}">${esc(t)}${doc ? ` <button class="btn ghost" data-act="docSheet" data-id="${doc}">${esc(docById[doc].name)} 읽는 법</button>` : ''}</div>`).join('')}</div>` : ''}
   <p class="small muted">이 진단은 교육용 참고 계산이에요. 실제 보증 가능 여부는 보증기관 심사, 안심전세앱 위험진단과 서류 확인으로 판단하세요.</p>`;
 }
 function clauseList(c) {
@@ -890,7 +890,7 @@ function vSession() {
     <p class="qprompt">${esc(q.prompt)}</p>
     <div class="opts${ox ? ' ox' : ''}">${(s.perm?.[q.id] || q.options.map((_, i) => i)).map((i, pos) => { const o = q.options[i]; let cls = ''; if (showNow) cls = i === q.answer ? 'right' : i === a ? 'wrong' : ''; else if (a === i) cls = 'sel';
       return `<button class="opt ${cls}" data-act="answer" data-i="${i}" ${showNow ? 'disabled' : ''}>${ox ? '' : `<span class="k">${pos + 1}</span>`}<span>${esc(o)}</span></button>`; }).join('')}</div>
-    ${showNow ? `<div class="callout ${a === q.answer ? 'green' : 'red'}"><b>${a === q.answer ? '정답이에요' : `정답은 ${q.options[q.answer]}`}</b><br>${esc(q.explanation)}${q.lessonId && lessonById[q.lessonId] ? ` <button class="btn ghost" data-act="lesson" data-id="${q.lessonId}">학습카드 보기</button>` : ''}${q.documentId ? ` <button class="btn ghost" data-act="doc" data-id="${q.documentId}">${esc(docById[q.documentId].name)}</button>` : ''}</div>` : ''}</div>
+    ${showNow ? `<div class="callout ${a === q.answer ? 'green' : 'red'}"><b>${a === q.answer ? '정답이에요' : `정답은 ${q.options[q.answer]}`}</b><br>${esc(q.explanation)}${q.lessonId && lessonById[q.lessonId] ? ` <button class="btn ghost" data-act="lessonSheet" data-id="${q.lessonId}">학습카드 보기</button>` : ''}${q.documentId ? ` <button class="btn ghost" data-act="docSheet" data-id="${q.documentId}">${esc(docById[q.documentId].name)}</button>` : ''}</div>` : ''}</div>
   <div class="row" style="justify-content:space-between"><button class="btn" data-act="qMove" data-d="-1" ${s.i === 0 ? 'disabled' : ''}>이전</button>
     ${s.i < n - 1 ? `<button class="btn primary" data-act="qMove" data-d="1">다음</button>` : `<button class="btn primary" data-act="submit">${S.submitWarn && unanswered ? `${unanswered}문항이 비어 있어요. 그래도 제출` : '제출하기'}</button>`}</div>
   ${s.mode === 'after' ? `<div class="row small muted">${s.ids.map((id, i) => `<button class="btn ghost small" style="padding:2px 6px;${i === s.i ? 'color:var(--stamp);font-weight:800' : s.ans[id] != null ? '' : 'color:var(--muted)'}" data-act="qJump" data-i="${i}">${i + 1}</button>`).join('')}</div>` : ''}</div>`;
@@ -915,7 +915,7 @@ function vResult() {
   <div class="row" style="gap:20px"><div class="score-ring" style="--c:${color};--p:${r.score}" role="img" aria-label="${r.score}점"><span data-count="${r.score}">${r.score}</span></div>
     <div class="stack">${r.pass != null ? `<span class="chip ${r.pass ? 'green' : 'red'}">${r.pass ? '합격' : '불합격'}</span>` : ''}<div class="table-wrap"><table class="data"><tbody>${Object.entries(cats).map(([k, [a, b]]) => `<tr><th>${CAT[k]}</th><td class="num">${a}/${b}</td></tr>`).join('')}</tbody></table></div></div></div>
   ${r.cert ? `<div class="cert"><div class="eyebrow">전세지킴이</div><h2>전세 안전 수료</h2><p>${esc(r.title)} ${r.score}점으로 수료 기준을 넘었어요.</p></div>` : ''}
-  ${wrong.length ? `<section class="stack"><h2>틀린 문제 다시 보기</h2>${wrong.map(x => `<div class="card stack"><p><b>${esc(x.q.prompt)}</b></p><p class="small">내 답: ${x.a == null ? '(빈칸)' : esc(x.q.options[x.a])} · 정답: <b>${esc(x.q.options[x.q.answer])}</b></p><p class="small muted">${esc(x.q.explanation)}</p>${x.q.lessonId ? `<div><button class="btn ghost" data-act="lesson" data-id="${x.q.lessonId}">학습카드</button></div>` : ''}</div>`).join('')}</section>` : '<div class="callout green">모두 맞혔어요!</div>'}
+  ${wrong.length ? `<section class="stack"><h2>틀린 문제 다시 보기</h2>${wrong.map(x => `<div class="card stack"><p><b>${esc(x.q.prompt)}</b></p><p class="small">내 답: ${x.a == null ? '(빈칸)' : esc(x.q.options[x.a])} · 정답: <b>${esc(x.q.options[x.q.answer])}</b></p><p class="small muted">${esc(x.q.explanation)}</p>${x.q.lessonId ? `<div><button class="btn ghost" data-act="lessonSheet" data-id="${x.q.lessonId}">학습카드</button></div>` : ''}</div>`).join('')}</section>` : '<div class="callout green">모두 맞혔어요!</div>'}
   <div class="row"><button class="btn primary" data-act="examStart" data-id="wrong" ${Object.keys(store.wrong).length ? '' : 'disabled'}>오답노트 풀기</button><button class="btn" data-act="examHome">시험 목록</button></div></div>`;
 }
 
@@ -925,27 +925,67 @@ function vNews() {
   const f = NEWS_F.find(x => x[0] === S.newsFilter) || NEWS_F[0];
   return `<div class="page"><div class="head"><div class="eyebrow">최신 제도 · ${esc(C.policy.baseDate)} 기준</div><h1>지금 바뀌고 있는 것들</h1><p>시행 중인지, 아직 추진 중인지 꼭 구분해서 보세요. 추진 중인 제도는 시행 전까지 현행법 기준으로 행동해야 해요.</p></div>
   <div class="seg" role="group" aria-label="상태별 보기">${NEWS_F.map(([k, t, fn]) => `<button data-act="newsFilter" data-f="${k}" aria-pressed="${f[0] === k}">${t} <span class="num small">${C.policy.items.filter(fn).length}</span></button>`).join('')}</div>
-  ${C.policy.items.filter(f[2]).map(p => `<div class="card stack" data-io><div class="row">${statusChip(p.status)}${p.checkAgain ? '<span class="chip plain">시행일 재확인 필요</span>' : ''}</div><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
-    <div><div class="eyebrow">지금 할 일</div><ul class="clean ticks">${p.whatToDoNow.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
-    <p class="small muted">출처: ${p.sourceIds.map(id => srcById[id] ? `<a href="${esc(srcById[id].url)}" target="_blank" rel="noopener">${esc(srcById[id].publisher)}</a>` : '').join(' · ')}</p></div>`).join('')}
+  ${C.policy.items.filter(f[2]).map(p => `<div class="card stack" data-io>${policyBody(p)}</div>`).join('')}
   <p class="small muted">${esc(C.meta.disclaimer)}</p></div>`;
+}
+function policyBody(p) {
+  return `<div class="row">${statusChip(p.status)}${p.checkAgain ? '<span class="chip plain">시행일 재확인 필요</span>' : ''}</div><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
+    <div><div class="eyebrow">지금 할 일</div><ul class="clean ticks">${p.whatToDoNow.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
+    <p class="small muted">출처: ${p.sourceIds.map(id => srcById[id] ? `<a href="${esc(srcById[id].url)}" target="_blank" rel="noopener">${esc(srcById[id].publisher)}</a>` : '').join(' · ')}</p>`;
+}
+
+/* ================= 팝업(시트)으로 보는 연결 — 학습·체크·시험 흐름을 끊지 않게 ================= */
+const peekLesson = l => { const s = stageById[l.stageId], seen = new Set(); return `<div class="eyebrow">${s.order}단계 학습카드</div><h2>${esc(l.title)}</h2>
+  ${l.oneLine ? `<p class="one-line">${rich(l.oneLine, seen)}</p>` : ''}${l.easy ? `<div class="easy"><span class="easy-tag">쉽게 말하면</span><p>${rich(l.easy, seen, false)}</p></div>` : ''}
+  <div class="eyebrow">이것만 기억해요</div><ol class="peek-summary">${l.summary.map(x => `<li>${rich(x, seen, false)}</li>`).join('')}</ol>
+  <div class="row"><button class="btn primary" data-act="lesson" data-id="${l.id}">카드 전체 보기 ${ARR}</button></div>`; };
+const peekDoc = d => `<div class="row">${priChip(d.priority)}<span class="eyebrow">${esc(d.aka)}</span></div><h2>${esc(d.name)}</h2><p>${esc(d.short)}</p>
+  <p class="small muted">${esc(d.why)}</p>
+  <div class="small"><b>어디서</b> ${d.where.map(w => w.url ? `<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.name)}</a>` : esc(w.name)).join(' · ')} · <b>비용</b> ${esc(d.cost)}</div>
+  <div><div class="eyebrow">3초 체크</div><ul class="clean ticks">${d.quickCheck.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+  <div><div class="eyebrow">이런 게 보이면 멈추세요</div><ul class="clean flags">${d.redFlags.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+  <div class="row"><button class="btn primary" data-act="doc" data-id="${d.id}" data-t="sample">견본 눌러보기 ${ARR}</button><button class="btn" data-act="doc" data-id="${d.id}">읽는 법 전체</button></div>`;
+const peekClauses = ids => { const cs = ids.map(id => clauseById[id]).filter(Boolean); return `<h2>관련 특약 문구</h2>${cs.map(cl => `<div class="clause"><div class="row"><span class="chip ${cl.priority === 'MUST' ? 'red' : cl.priority === 'RECOMMENDED' ? 'yellow' : 'plain'}">${cl.priority === 'MUST' ? '필수' : cl.priority === 'RECOMMENDED' ? '권장' : '상황별'}</span><b>${esc(cl.title)}</b></div><p style="font-family:var(--f-doc)">${esc(cl.text)}</p><p class="small muted">왜? ${esc(cl.why)}</p></div>`).join('')}
+  <div class="row"><button class="btn primary" data-act="clauses">내 계약 특약 만들기 ${ARR}</button></div>`; };
+const peekHotspots = ids => `<h2>계약서에서 이 칸을 보세요</h2><p class="small muted">아파트 전세 계약서 예시 기준이에요.</p>${ids.map(id => hotspotCard(allHotspots[id])).join('')}
+  <div class="row"><button class="btn primary" data-act="sample" data-id="contract_apt_jeonse_01">계약서 예시에서 보기 ${ARR}</button></div>`;
+const peekScam = x => `<div class="row">${x.tags.map(t => `<span class="chip ${scamTagCls(t)}">${esc(t)}</span>`).join('')}</div><h2>${esc(x.name)}</h2><p>${esc(x.oneLine)}</p>${scamBody(x)}<div class="row"><button class="btn" data-act="nav" data-r="scams">사기 수법 전체 보기 ${ARR}</button></div>`;
+const peekCalc = cl => `${calcCard(cl)}<p class="small muted">계산 값은 이 화면을 닫아도 남아 있어요.</p>`;
+const SHEET = {
+  term: s => { const t = termById[s.id]; return `<h2>${esc(t.term)}</h2><p><b>${esc(t.easy)}</b></p><p class="muted">${esc(t.detail)}</p>${t.example ? `<p class="small">예) ${esc(t.example)}</p>` : ''}`; },
+  hs: s => hotspotCard(s.h, S.tour ? `<div style="margin-top:6px">${tourControls(S._tourOrder || [], {})}</div>` : ''),
+  ck: s => { const ck = ckById[s.id]; return `<h2>${esc(ck.title)}</h2><ul class="clean ticks">${ck.items.map(i => `<li>${esc(i.text)}${i.required ? '' : ' <span class="chip plain">권장</span>'}</li>`).join('')}</ul><p class="small muted">내 계약 플래너에서 날짜를 넣으면 체크하며 관리할 수 있어요.</p><div><button class="btn primary" data-act="nav" data-r="my">플래너 열기</button></div>`; },
+  lesson: s => peekLesson(lessonById[s.id]),
+  doc: s => peekDoc(docById[s.id]),
+  clauses: s => peekClauses(s.ids),
+  hsList: s => peekHotspots(s.ids),
+  scam: s => peekScam(C.scams.items.find(x => x.id === s.id)),
+  policy: s => policyBody(puById[s.id]),
+  calc: s => peekCalc(calcById[s.id]),
+};
+// 팝업 안에서 또 열면 이전 팝업을 기억해 '← 이전'으로 돌아갈 수 있게
+function openSheet(next, el) {
+  if (S.sheet && el?.closest('#sheet')) (S.sheetStack ||= []).push(S.sheet); else S.sheetStack = [];
+  S.sheet = next; renderSheet();
+  document.querySelector('#sheet .sheet')?.scrollTo(0, 0);
 }
 
 /* ================= 알려진 사기 수법 ================= */
 const scamTagCls = t => /피해 큼|빠르게|회복|2026/.test(t) ? 'red' : /진화|신종|청년|악용/.test(t) ? 'yellow' : 'plain';
 function scamCard(x) {
-  const srcs = (x.sourceIds || []).map(id => srcById[id]).filter(Boolean);
   return `<details class="scam card" id="${x.id}" data-io ${S.scamOpen === x.id ? 'open' : ''}>
     <summary><div class="row">${x.tags.map(t => `<span class="chip ${scamTagCls(t)}">${esc(t)}</span>`).join('')}</div><h3>${esc(x.name)}</h3><p>${esc(x.oneLine)}</p></summary>
-    <div class="scam-body stack">
-      <div><div class="eyebrow">이렇게 속여요</div><ul class="clean flags">${x.how.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>
+    <div class="scam-body stack">${scamBody(x)}</div></details>`;
+}
+function scamBody(x) {
+  const srcs = (x.sourceIds || []).map(id => srcById[id]).filter(Boolean);
+  return `<div><div class="eyebrow">이렇게 속여요</div><ul class="clean flags">${x.how.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>
       ${x.case ? `<div class="callout small"><b>실제 사례</b><br>${esc(x.case)}</div>` : ''}
       ${x.signs?.length ? `<div><div class="eyebrow">이런 신호가 보이면 멈추세요</div><ul class="clean">${x.signs.map(s => `<li>· ${esc(s)}</li>`).join('')}</ul></div>` : ''}
       <div class="callout green"><b>이렇게 예방해요</b><ul class="clean ticks">${x.defense.map(d => `<li>${esc(d)}</li>`).join('')}</ul></div>
       ${x.note ? `<p class="small muted">${esc(x.note)}</p>` : ''}
-      ${(x.lessonIds?.length || x.documentIds?.length) ? `<div class="row">${(x.lessonIds || []).map(id => lessonById[id] ? `<button class="btn ghost small" data-act="lesson" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>` : '').join('')}${(x.documentIds || []).map(id => docById[id] ? `<button class="btn ghost small" data-act="doc" data-id="${id}">${esc(docById[id].name)} 읽는 법</button>` : '').join('')}</div>` : ''}
-      ${srcs.length ? `<p class="small muted">출처: ${srcs.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.publisher)}</a>`).join(' · ')}</p>` : ''}
-    </div></details>`;
+      ${(x.lessonIds?.length || x.documentIds?.length) ? `<div class="row">${(x.lessonIds || []).map(id => lessonById[id] ? `<button class="btn ghost small" data-act="lessonSheet" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>` : '').join('')}${(x.documentIds || []).map(id => docById[id] ? `<button class="btn ghost small" data-act="docSheet" data-id="${id}">${esc(docById[id].name)} 읽는 법</button>` : '').join('')}</div>` : ''}
+      ${srcs.length ? `<p class="small muted">출처: ${srcs.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.publisher)}</a>`).join(' · ')}</p>` : ''}`;
 }
 function vScams() {
   const SC = C.scams, f = S.scamFilter || 'all';
@@ -1071,17 +1111,15 @@ function renderSheet() {
   host.classList.remove('closing');
   document.documentElement.classList.toggle('sheet-open', !!S.sheet);
   if (!S.sheet) { host.innerHTML = ''; return; }
-  let inner = '';
-  if (S.sheet.type === 'term') { const t = termById[S.sheet.id]; inner = `<h2>${esc(t.term)}</h2><p><b>${esc(t.easy)}</b></p><p class="muted">${esc(t.detail)}</p>${t.example ? `<p class="small">예) ${esc(t.example)}</p>` : ''}`; }
-  if (S.sheet.type === 'hs') inner = hotspotCard(S.sheet.h, S.tour ? `<div style="margin-top:6px">${tourControls(S._tourOrder || [], {})}</div>` : '');
-  if (S.sheet.type === 'ck') { const ck = ckById[S.sheet.id]; inner = `<h2>${esc(ck.title)}</h2><ul class="clean ticks">${ck.items.map(i => `<li>${esc(i.text)}${i.required ? '' : ' <span class="chip plain">권장</span>'}</li>`).join('')}</ul><p class="small muted">내 계약 플래너에서 날짜를 넣으면 체크하며 관리할 수 있어요.</p><div><button class="btn primary" data-act="nav" data-r="my">플래너 열기</button></div>`; }
-  host.innerHTML = `<div class="sheet-bg" data-act="sheetClose"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${inner}<button class="btn" data-act="sheetClose">닫기</button></div>`;
+  const inner = SHEET[S.sheet.type]?.(S.sheet) || '';
+  const back = (S.sheetStack || []).length ? '<button class="btn ghost small sheet-back" data-act="sheetBack">← 이전</button>' : '<span></span>';
+  host.innerHTML = `<div class="sheet-bg" data-act="sheetClose"></div><div class="sheet" role="dialog" aria-modal="true"><div class="sheet-top"><div class="grab"></div>${back}<button class="sheet-x" data-act="sheetClose" aria-label="닫기">✕</button></div><div class="sheet-body stack">${inner}</div><button class="btn" data-act="sheetClose">닫기</button></div>`;
   host.classList.toggle('settled', wasOpen); // 열린 시트 내용만 바뀔 때는 다시 튀어나오지 않게
 }
 function closeSheet() {
   const host = document.getElementById('sheet');
   if (!S.sheet) return;
-  S.sheet = null;
+  S.sheet = null; S.sheetStack = [];
   if (reduceMotion() || !host.querySelector('.sheet')) { renderSheet(); return; }
   host.classList.add('closing');
   setTimeout(() => { if (!S.sheet) renderSheet(); }, 190);
@@ -1112,7 +1150,7 @@ function render(keepScroll) {
   if (newPage && keepScroll && !S.calcFocus && !S.focusId && !S.tour && scrollY > 0) {
     const y0 = scrollY;
     window.scrollTo({ top: 0, behavior: reduceMotion() || y0 > 3000 ? 'auto' : 'smooth' });
-    setTimeout(() => { if (scrollY >= y0 - 1) window.scrollTo(0, 0); }, 450); // 부드러운 스크롤을 지원하지 않는 앱 안 브라우저 대비
+    setTimeout(() => { if (Math.abs(scrollY - y0) < 2 && !S.sheet) window.scrollTo(0, 0); }, 450); // 부드러운 스크롤을 지원하지 않는 앱 안 브라우저 대비 — 그새 직접 스크롤했거나 팝업을 열었으면 건드리지 않음
   }
   document.querySelectorAll('[data-act="nav"][data-r]').forEach(b => { if (b.closest('.nav, .tabbar')) b.setAttribute('aria-current', b.dataset.r === S.route ? 'page' : 'false'); });
   // 플래너 메뉴: 3일 안에 할 일 개수 배지
@@ -1166,13 +1204,22 @@ function showHotspot(id) {
 
 /* ================= actions ================= */
 const A = {
-  nav: el => go(el.dataset.r, el.dataset.r === 'learn' ? { stageId: null, lessonId: null } : el.dataset.r === 'docs' ? { docId: null } : el.dataset.r === 'exam' ? { result: S.session ? null : S.result } : {}),
+  nav: el => { S.sheet = null; S.sheetStack = []; return go(el.dataset.r, el.dataset.r === 'learn' ? { stageId: null, lessonId: null } : el.dataset.r === 'docs' ? { docId: null } : el.dataset.r === 'exam' ? { result: S.session ? null : S.result } : {}); },
   stage: el => go('learn', { stageId: el.dataset.id, lessonId: null }),
   learnHome: () => go('learn', { stageId: null, lessonId: null }),
   lesson: el => go('learn', { lessonId: el.dataset.id, stageId: lessonById[el.dataset.id].stageId, sheet: null, navDir: el.dataset.dir || null }),
-  term: el => { S.sheet = { type: 'term', id: el.dataset.id }; renderSheet(); },
-  cksheet: el => { S.sheet = { type: 'ck', id: el.dataset.id }; renderSheet(); },
+  term: el => openSheet({ type: 'term', id: el.dataset.id }, el),
+  cksheet: el => openSheet({ type: 'ck', id: el.dataset.id }, el),
   sheetClose: () => closeSheet(),
+  sheetBack: () => { S.sheet = S.sheetStack.pop() || null; renderSheet(); },
+  // 팝업으로 보는 연결
+  lessonSheet: el => openSheet({ type: 'lesson', id: el.dataset.id }, el),
+  docSheet: el => openSheet({ type: 'doc', id: el.dataset.id }, el),
+  calcSheet: el => openSheet({ type: 'calc', id: el.dataset.id }, el),
+  clauseSheet: el => openSheet({ type: 'clauses', ids: el.dataset.ids.split(',') }, el),
+  hsListSheet: el => openSheet({ type: 'hsList', ids: el.dataset.ids.split(',') }, el),
+  scamSheet: el => openSheet({ type: 'scam', id: el.dataset.id }, el),
+  policySheet: el => openSheet({ type: 'policy', id: el.dataset.id }, el),
   // 홈 플래너 카드
   planStart: () => { const c = newContract(); store.contracts.push(c); store.active = c.id; save(); go('my', { myTab: 'info', confirmDel: false }); },
   planExample: () => { const c = exampleContract(); store.contracts.push(c); store.active = c.id; save(); go('my', { myTab: 'plan' }); },
@@ -1228,7 +1275,7 @@ const A = {
   docTab: el => { S.docTab = el.dataset.t; S.hsId = null; S.tour = null; render(true); },
   docSample: el => { S.docSample = +el.dataset.i; S.hsId = null; S.tour = null; render(true); },
   hs: el => showHotspot(el.dataset.id),
-  hsSheet: el => { const h = allHotspots[el.dataset.id]; if (h) { S.sheet = { type: 'hs', h }; renderSheet(); } },
+  hsSheet: el => { const h = allHotspots[el.dataset.id]; if (h) openSheet({ type: 'hs', h }, el); },
   tourStart: () => { const o = S._tourOrder || []; if (!o.length) return; S.tour = { i: 0 }; showHotspot(o[0]); },
   tourMove: el => { const o = S._tourOrder || []; const i = S.tour.i + +el.dataset.d; if (i >= o.length) { S.tour = null; S.hsId = null; S.sheet = null; render(true); toast('투어를 마쳤어요'); return; } S.tour.i = Math.max(0, i); showHotspot(o[S.tour.i]); },
   tourEnd: () => { S.tour = null; S.hsId = null; S.sheet = null; render(true); },
@@ -1244,7 +1291,7 @@ const A = {
   trapReveal: () => { S.trap.revealed = !S.trap.revealed; render(true); },
   trapReset: () => { S.trap = { id: S.trap.id, found: [], wrong: 0, revealed: false }; render(true); },
   calc: el => go('insurance', { calcFocus: el.dataset.id, sheet: null }),
-  clauses: () => go('my', { myTab: activeContract() ? 'clauses' : 'library' }),
+  clauses: () => go('my', { myTab: activeContract() ? 'clauses' : 'library', sheet: null, sheetStack: [] }),
   myTab: el => { S.myTab = el.dataset.t; S.confirmDel = false; S.remForm = null; S.remMsg = ''; render(true); },
   cNew: () => { const c = newContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'info'; S.confirmDel = false; render(true); },
   cExample: () => { const c = exampleContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'plan'; render(true); },

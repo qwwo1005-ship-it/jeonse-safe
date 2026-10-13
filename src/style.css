@@ -802,6 +802,24 @@ main.enter.dir-next .page > *:not([data-io]) { animation-name: from-right; }
 main.enter.dir-prev .page > *:not([data-io]) { animation-name: from-left; }
 main.enter.dir-next .page [data-io] { transition: opacity .5s var(--ease), transform .5s var(--ease); }
 
+/* ---------- 팝업(시트): 위쪽 고정 바(이전·닫기) + 내용 ---------- */
+.sheet { padding-top: 0 !important; max-height: 86vh; max-height: 86dvh; }
+.sheet-top { position: sticky; top: 0; z-index: 2; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 0 -16px; padding: 10px 12px 8px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.sheet-top .grab { grid-column: 2; grid-row: 1; margin: 0; }
+.sheet-top .sheet-back { grid-column: 1; grid-row: 1; justify-self: start; }
+.sheet-top > span { grid-column: 1; grid-row: 1; }
+.sheet-x { all: unset; grid-column: 3; grid-row: 1; justify-self: end; cursor: pointer; width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; font-size: 1rem; color: var(--muted); background: var(--surface-2); }
+.sheet-x:hover { color: var(--ink); }
+.sheet-x:focus-visible { outline: 2px solid var(--focus); }
+@media (min-width: 861px) { .sheet-top { margin: 0 -16px; } .sheet-top .grab { visibility: hidden; } }
+.sheet-body { gap: 12px; padding-top: 6px; }
+.sheet-body h2 { font-size: 1.3rem; }
+.sheet-body .card { box-shadow: none; }
+.sheet-body .clause { background: var(--surface-2); }
+.peek-summary { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-family: var(--f-display); }
+.peek-summary li::marker { color: var(--accent-ink); }
+#sheet:not(.settled) .sheet-body { animation: none; }
+
 /* ---------- 핵심 기능 강조: 내 계약 플래너 ---------- */
 .plan-spot { --pc: var(--c-my, #a199b7); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 16px; padding: 22px 20px; border-radius: calc(var(--r) + 6px);
   background: linear-gradient(135deg, color-mix(in srgb, var(--pc) 26%, var(--surface)) 0%, var(--surface) 70%); border: 1.5px solid color-mix(in srgb, var(--pc) 55%, var(--line)); box-shadow: var(--shadow); }
