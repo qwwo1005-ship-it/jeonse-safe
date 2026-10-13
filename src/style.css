@@ -930,6 +930,22 @@ details.scam[open] .scam-body { animation: rise .35s var(--ease) both; }
 .ev.mine::before { border-color: var(--stamp); }
 .mine-chip { color: var(--stamp); background: var(--stamp-soft); border-color: transparent; }
 .rem-form { border: 2px solid var(--accent) !important; }
+/* 일정 색깔 마커 */
+.field-label { font-size: .8rem; font-weight: 700; color: var(--muted); }
+.mk-pick { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px 0; }
+.mk-sw { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; background: var(--mk); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); position: relative; transition: transform .2s var(--spring); }
+.mk-sw.none { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+.mk-sw.none::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 1.5px; background: var(--line-strong); transform: rotate(45deg); }
+.mk-sw:hover { transform: scale(1.1); }
+.mk-sw[aria-checked="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.mk-sw[aria-checked="true"]::after { content: ""; position: absolute; left: 11px; top: 7px; width: 6px; height: 12px; border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg); filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
+.mk-sw.none[aria-checked="true"]::after { display: none; }
+.mk-sw:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.cal-ev.marked { background: color-mix(in srgb, var(--mk) 60%, var(--surface)); }
+.ev.marked::before { background: var(--mk); border-color: var(--mk); }
+.ev.marked > .ev-head b { box-shadow: inset 0 -.45em 0 color-mix(in srgb, var(--mk) 40%, transparent); }
+.day-ev.marked { border-left-color: var(--mk); border-left-width: 4px; }
+.plan-next li.marked { border-left: 4px solid var(--mk); }
 .ics-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; }
 .ics-opt { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: var(--r); border: 1.5px solid var(--line-strong); background: var(--surface); transition: border-color .2s, background-color .2s, transform .2s var(--ease); }
 .ics-opt:hover { border-color: var(--accent); background: var(--accent-soft); }

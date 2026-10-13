@@ -234,7 +234,7 @@ function plannerSpot() {
     ${planFeatGrid()}<div class="row"><button class="btn primary" data-act="planStart">내 계약 만들기 ${ARR}</button><button class="btn" data-act="planExample">예시로 둘러보기</button></div></section>`;
   const evs = buildEvents(c).filter(e => ddays(e.date) >= 0 && !evDone(c, e)).slice(0, 3);
   return `<section class="plan-spot"><div class="plan-spot-head"><span class="chip plan-chip">내 계약 플래너</span><h2>${esc(c.name)}</h2>${soonCount(c) ? `<p><b>3일 안에 할 일 ${soonCount(c)}개</b>가 있어요.</p>` : '<p>다가오는 일정을 챙겨 드릴게요.</p>'}</div>
-    ${evs.length ? `<ul class="clean plan-next">${evs.map(e => { const n = ddays(e.date); return `<li><span class="dday big${n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><div><b>${esc(e.title)}</b><span class="small muted num">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span></div></li>`; }).join('')}</ul>` : `<p class="muted">남은 일정이 없어요. '계약 정보'에서 날짜를 넣거나 내 일정을 추가해 보세요.</p>`}
+    ${evs.length ? `<ul class="clean plan-next">${evs.map(e => { const n = ddays(e.date); return `<li class="${mkCls(e).trim()}"${mkSty(e)}><span class="dday big${n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><div><b>${esc(e.title)}</b><span class="small muted num">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span></div></li>`; }).join('')}</ul>` : `<p class="muted">남은 일정이 없어요. '계약 정보'에서 날짜를 넣거나 내 일정을 추가해 보세요.</p>`}
     <div class="row"><button class="btn primary" data-act="nav" data-r="my">플래너 열기 ${ARR}</button><button class="btn" data-act="planCal">달력 보기</button><button class="btn ghost" data-act="remNewHome">+ 내 일정</button></div></section>`;
 }
 function vHome() {
@@ -480,9 +480,9 @@ function buildEvents(c) {
   }
   // 자동 일정을 사용자가 고친 내용(날짜·시간·제목·메모) 반영, 숨긴 일정은 빼기
   const ov = c.evOverride || {}, out = [];
-  ev.forEach(e => { const o = ov[e.id]; if (!o) return out.push(e); if (o.hidden) return; out.push({ ...e, origDate: e.date, origTitle: e.title, date: pDate(o.date) || e.date, time: o.time || '', title: o.title || e.title, memo: o.memo || '', edited: true }); });
+  ev.forEach(e => { const o = ov[e.id]; if (!o) return out.push(e); if (o.hidden) return; out.push({ ...e, origDate: e.date, origTitle: e.title, date: pDate(o.date) || e.date, time: o.time || '', title: o.title || e.title, memo: o.memo || '', color: o.color || '', edited: true }); });
   // 내가 직접 넣은 일정(리마인더)
-  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) out.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type }); });
+  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) out.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type, color: r.color || '' }); });
   return out.sort((a, b) => a.date - b.date || (a.time || '').localeCompare(b.time || ''));
 }
 // 숨긴 자동 일정(다시 보이기 목록용)
@@ -508,6 +508,12 @@ const REMIND = {
   counsel: { label: '법률·피해 상담 (132 등)', hint: '예) 대한법률구조공단 132, 전세피해지원센터' },
   custom: { label: '직접 입력', hint: '무엇을 할지 자유롭게 적어 주세요' },
 };
+// 일정 색깔 마커 (파스텔)
+const MARKS = [['pink', '#f4a9b8', '분홍'], ['orange', '#f6b48f', '주황'], ['yellow', '#f3d27f', '노랑'], ['green', '#8fd3b6', '초록'], ['teal', '#7fcfd6', '청록'], ['sky', '#9ec5f0', '하늘'], ['purple', '#b7a6f2', '보라'], ['gray', '#c4bfc9', '회색']];
+const MARK_HEX = Object.fromEntries(MARKS.map(([k, h]) => [k, h]));
+const mkCls = e => e.color && MARK_HEX[e.color] ? ' marked' : '';
+const mkSty = e => e.color && MARK_HEX[e.color] ? ` style="--mk:${MARK_HEX[e.color]}"` : '';
+const colorPicker = sel => `<div class="field"><span class="field-label">색깔 표시</span><div class="mk-pick" role="radiogroup" aria-label="색깔 표시"><button class="mk-sw none" data-act="remColor" data-c="" role="radio" aria-checked="${!sel}" aria-label="기본"></button>${MARKS.map(([k, h, n]) => `<button class="mk-sw" style="--mk:${h}" data-act="remColor" data-c="${k}" role="radio" aria-checked="${sel === k}" aria-label="${n}"></button>`).join('')}</div></div>`;
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 function ckItems(c, ckId) { return ckById[ckId].items.filter(it => !it.condition || c.flags[it.condition]); }
 function evDone(c, e) { if (!e.ck) return !!(store.checks[c.id] || {})['ev:' + e.id]; const ch = store.checks[c.id] || {}; const req = ckItems(c, e.ck).filter(i => i.required); return req.length > 0 && req.every(i => ch[i.id]); }
@@ -564,7 +570,7 @@ function vPlan(c) {
     const n = ddays(e.date), done = evDone(c, e), open = S.openEv[e.id] ?? (n >= 0 && n <= 7 && !!e.ck);
     const items = e.ck ? ckItems(c, e.ck) : [];
     const cnt = items.filter(i => ch[i.id]).length;
-    return `<div class="ev${n === 0 ? ' today' : ''}${n < 0 ? ' past' : ''}${done ? ' done' : ''}${e.custom ? ' mine' : ''}">
+    return `<div class="ev${n === 0 ? ' today' : ''}${n < 0 ? ' past' : ''}${done ? ' done' : ''}${e.custom ? ' mine' : ''}${mkCls(e)}"${mkSty(e)}>
       <div class="ev-head"><span class="dday${n >= 0 && n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><span class="d">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span>${e.custom ? '<span class="chip mine-chip">내 일정</span>' : ''}<b>${esc(e.title)}</b>${e.ck ? `<span class="small muted num">${cnt}/${items.length}</span>` : ''}</div>
       ${e.note ? `<p class="small ${e.custom ? '' : 'muted'}" style="white-space:pre-line">${esc(e.note)}</p>` : ''}
       ${e.memo ? `<p class="small ev-memo" style="white-space:pre-line"><b>내 메모</b> ${esc(e.memo)}</p>` : ''}
@@ -650,7 +656,7 @@ function vCal(c) {
   for (let i = 0; i < lead; i++) cells.push('<div class="cal-cell empty" aria-hidden="true"></div>');
   for (let d = 1; d <= days; d++) {
     const k = ymd(new Date(Y, M, d, 12)), list = byDay[k] || [], dow = (lead + d - 1) % 7;
-    cells.push(`<button class="cal-cell${k === ymd(t) ? ' today' : ''}${k === sel ? ' sel' : ''}${dow === 0 ? ' sun' : dow === 6 ? ' sat' : ''}" data-act="calDay" data-d="${k}" aria-label="${M + 1}월 ${d}일${list.length ? `, 일정 ${list.length}개` : ''}"><span class="cal-n">${d}</span>${list.slice(0, 2).map(e => `<span class="cal-ev${e.custom ? ' mine' : ''}${evDone(c, e) ? ' done' : ''}">${esc(e.title)}</span>`).join('')}${list.length > 2 ? `<span class="cal-more">+${list.length - 2}</span>` : ''}</button>`);
+    cells.push(`<button class="cal-cell${k === ymd(t) ? ' today' : ''}${k === sel ? ' sel' : ''}${dow === 0 ? ' sun' : dow === 6 ? ' sat' : ''}" data-act="calDay" data-d="${k}" aria-label="${M + 1}월 ${d}일${list.length ? `, 일정 ${list.length}개` : ''}"><span class="cal-n">${d}</span>${list.slice(0, 2).map(e => `<span class="cal-ev${e.custom ? ' mine' : ''}${evDone(c, e) ? ' done' : ''}${mkCls(e)}"${mkSty(e)}>${esc(e.title)}</span>`).join('')}${list.length > 2 ? `<span class="cal-more">+${list.length - 2}</span>` : ''}</button>`);
   }
   const dayList = sel ? (byDay[sel] || []) : [];
   const selD = sel ? pDate(sel) : null;
@@ -659,7 +665,7 @@ function vCal(c) {
     <div class="cal-grid">${'일월화수목금토'.split('').map((w, i) => `<div class="cal-dow${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}">${w}</div>`).join('')}${cells.join('')}</div>
     <div class="row small muted"><span class="cal-key auto"></span>계약 일정 <span class="cal-key mine"></span>내 일정</div></div>
   ${S.remForm ? remForm() : sel ? `<section class="card stack"><div class="row" style="justify-content:space-between"><h3>${fmt(selD)}</h3><button class="btn primary" data-act="remNew" data-d="${sel}">+ 이 날 일정 추가</button></div>
-    ${dayList.length ? `<ul class="clean">${dayList.map(e => `<li class="day-ev${e.custom ? ' mine' : ''}"><div class="row"><b>${e.time ? `<span class="num">${esc(e.time)}</span> ` : ''}${esc(e.title)}</b>${editBtn(e)}</div>${e.note ? `<p class="small muted" style="white-space:pre-line">${esc(e.note)}</p>` : ''}${e.memo ? `<p class="small ev-memo" style="white-space:pre-line"><b>내 메모</b> ${esc(e.memo)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">이 날은 아직 일정이 없어요.</p>'}</section>`
+    ${dayList.length ? `<ul class="clean">${dayList.map(e => `<li class="day-ev${e.custom ? ' mine' : ''}${mkCls(e)}"${mkSty(e)}><div class="row"><b>${e.time ? `<span class="num">${esc(e.time)}</span> ` : ''}${esc(e.title)}</b>${editBtn(e)}</div>${e.note ? `<p class="small muted" style="white-space:pre-line">${esc(e.note)}</p>` : ''}${e.memo ? `<p class="small ev-memo" style="white-space:pre-line"><b>내 메모</b> ${esc(e.memo)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">이 날은 아직 일정이 없어요.</p>'}</section>`
     : `<div class="row"><button class="btn primary" data-act="remNew">+ 내 일정 추가</button><span class="small muted">달력에서 날짜를 누르면 그날 일정을 보고 추가할 수 있어요.</span></div>`}
   <section class="card stack"><h3>폰 캘린더에 넣고 알림 받기</h3><p class="small muted">일정 파일(.ics)을 받아 열면 구글·삼성·아이폰 캘린더에 들어가요. 하루 전과 당일에 알림이 울려요. 같은 파일을 두 번 넣으면 일정이 겹쳐 보일 수 있어요.</p>
     <div class="ics-opts">
@@ -679,6 +685,7 @@ function remForm() {
     </div>
     <div class="field"><label for="rm-title">제목</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}"></div>
     <div class="field"><label for="rm-memo">내 메모</label><textarea id="rm-memo" placeholder="예) 오전 10시 ○○은행 방문, 신분증 챙기기">${esc(f.memo)}</textarea></div>
+    ${colorPicker(f.color || '')}
     <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.edited ? '<button class="btn ghost" data-act="evReset">원래대로</button>' : ''}<button class="btn ghost" data-act="evHide">${f.askHide ? '정말 숨길까요? 한 번 더 누르세요' : '이 일정 숨기기'}</button>${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
   return `<section class="card stack rem-form" id="remForm"><h3>${f.id ? '내 일정 고치기' : '내 일정 추가'}</h3>
     <div class="form-grid">
@@ -688,6 +695,7 @@ function remForm() {
     </div>
     <div class="field"><label for="rm-title">제목 ${f.type === 'custom' ? '(직접 입력)' : '(고쳐 써도 돼요)'}</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}" placeholder="${f.type === 'custom' ? '예) 보증금 이체 한도 늘리기' : ''}"></div>
     <div class="field"><label for="rm-memo">상세 내용</label><textarea id="rm-memo" placeholder="${esc(hint)}">${esc(f.memo)}</textarea></div>
+    ${colorPicker(f.color || '')}
     <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.id ? `<button class="btn ghost" data-act="remDel">${f.askDel ? '정말 지울까요? 한 번 더 누르세요' : '이 일정 지우기'}</button>` : ''}${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
 }
 const readRemForm = () => { const v = id => document.getElementById(id)?.value ?? ''; Object.assign(S.remForm, { date: v('rm-date'), time: v('rm-time'), title: v('rm-title'), memo: v('rm-memo') }); };
@@ -821,7 +829,7 @@ function reportDoc(c) {
       ${d.hugLimit ? pRow(`HUG 가격 기준 (${d.hugBasis})`, `${won(d.hugLimit)} — ${d.hugPass ? '이내' : '초과'}`) : ''}
       ${d.smallTh ? pRow('소액임차인 최우선변제', d.small ? `해당 가능 (최대 ${won(d.smallAmt)})` : '해당 없음') : ''}</table>
       ${d.items.length ? `<ul>${d.items.map(([, t]) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
-    <h2>3. 일정</h2>${evs.length ? `<table class="pdoc-sched"><thead><tr><th>날짜</th><th>할 일</th><th>완료</th></tr></thead><tbody>${evs.map(e => `<tr><td class="nowrap">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}<br><small>${ddayLabel(ddays(e.date))}</small></td><td><b>${esc(e.title)}</b>${e.custom ? ' <small>(내 일정)</small>' : ''}${e.note ? `<br><small>${esc(e.note)}</small>` : ''}</td><td class="c">${box(evDone(c, e))}</td></tr>`).join('')}</tbody></table>` : '<p>날짜를 넣으면 일정이 생겨요.</p>'}
+    <h2>3. 일정</h2>${evs.length ? `<table class="pdoc-sched"><thead><tr><th>날짜</th><th>할 일</th><th>완료</th></tr></thead><tbody>${evs.map(e => `<tr><td class="nowrap">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}<br><small>${ddayLabel(ddays(e.date))}</small></td><td>${e.color && MARK_HEX[e.color] ? `<span style="color:${MARK_HEX[e.color]}">●</span> ` : ''}<b>${esc(e.title)}</b>${e.custom ? ' <small>(내 일정)</small>' : ''}${e.note ? `<br><small>${esc(e.note)}</small>` : ''}</td><td class="c">${box(evDone(c, e))}</td></tr>`).join('')}</tbody></table>` : '<p>날짜를 넣으면 일정이 생겨요.</p>'}
     <h2>4. 체크리스트</h2>${evs.filter(e => e.ck).map(e => `<h3>${esc(e.title)} <small>${fmt(e.date)}</small></h3><ul class="pdoc-ck">${ckItems(c, e.ck).map(it => `<li>${box(ch[it.id])} ${esc(it.text)}${it.required ? '' : ' <small>(권장)</small>'}</li>`).join('')}</ul>`).join('') || '<p>날짜를 넣으면 체크리스트가 생겨요.</p>'}
     <h2>5. 특약 문구</h2><ol class="pdoc-cl">${onClauses(c).map(cl => `<li>${esc(clauseText(c, cl))}</li>`).join('')}</ol>
     <footer>${esc(PRINT_SIGN)} 법령·보증기관 기준은 바뀔 수 있으니 계약 전 공식 기관에서 확인하세요.</footer></article>`;
@@ -1317,8 +1325,9 @@ const A = {
   remNew: el => { const date = el.dataset.d || S.calDay || ymd(today()); openCalAt(date); S.remForm = { id: null, date, time: '', type: 'bank', title: REMIND.bank.label, memo: '' }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   remEdit: el => { const c = activeContract(); const r = (c.reminders || []).find(x => x.id === el.dataset.id); if (!r) return; openCalAt(r.date); S.remForm = { ...r }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   remCancel: () => { S.remForm = null; S.remMsg = ''; render(true); },
+  remColor: el => { readRemForm(); S.remForm.color = el.dataset.c; render(true); },
   evEdit: el => { const c = activeContract(); const e = buildEvents(c).find(x => x.id === el.dataset.id); if (!e) return; openCalAt(ymd(e.date));
-    S.remForm = { auto: true, evId: e.id, date: ymd(e.date), time: e.time || '', title: e.title, memo: e.memo || '', origDate: e.origDate || e.date, origTitle: e.origTitle || e.title, edited: !!e.edited }; S.remMsg = ''; render(true);
+    S.remForm = { auto: true, evId: e.id, date: ymd(e.date), time: e.time || '', title: e.title, memo: e.memo || '', color: e.color || '', origDate: e.origDate || e.date, origTitle: e.origTitle || e.title, edited: !!e.edited }; S.remMsg = ''; render(true);
     document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
   evReset: () => { const c = activeContract(); delete (c.evOverride || {})[S.remForm.evId]; save(); const d = ymd(S.remForm.origDate); S.remForm = null; openCalAt(d); render(true); toast('원래 일정으로 되돌렸어요'); },
   evHide: () => { const f = S.remForm; if (!f.askHide) { readRemForm(); f.askHide = true; render(true); return; } const c = activeContract(); (c.evOverride ||= {})[f.evId] = { ...(c.evOverride[f.evId] || {}), hidden: true }; save(); S.remForm = null; render(true); toast('일정을 숨겼어요. 목록 아래에서 다시 볼 수 있어요'); },
@@ -1327,12 +1336,12 @@ const A = {
     const c = activeContract(); readRemForm(); const f = S.remForm;
     if (!pDate(f.date)) { S.remMsg = '날짜를 골라 주세요.'; render(true); return; }
     if (f.auto) {
-      (c.evOverride ||= {})[f.evId] = { date: f.date, time: f.time, title: f.title.trim() || f.origTitle, memo: f.memo.trim() };
+      (c.evOverride ||= {})[f.evId] = { date: f.date, time: f.time, title: f.title.trim() || f.origTitle, memo: f.memo.trim(), color: f.color || '' };
       save(); S.remForm = null; S.remMsg = ''; openCalAt(f.date); render(true); toast('일정을 고쳤어요'); return;
     }
     const title = f.title.trim() || (f.type !== 'custom' ? REMIND[f.type].label : '');
     if (!title) { S.remMsg = '제목을 적어 주세요.'; render(true); return; }
-    const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim() };
+    const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim(), color: f.color || '' };
     const list = (c.reminders ||= []); const i = list.findIndex(x => x.id === r.id); if (i >= 0) list[i] = r; else list.push(r);
     save(); S.remForm = null; S.remMsg = ''; openCalAt(r.date); render(true); toast(i >= 0 ? '일정을 고쳤어요' : '일정을 추가했어요');
   },
