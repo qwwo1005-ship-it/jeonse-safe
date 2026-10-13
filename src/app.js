@@ -703,7 +703,7 @@ const safeName = s => (String(s || '').replace(/[^0-9A-Za-z가-힣-]+/g, '_').re
 /* ---------- 저장(파일) · PDF 내보내기 ---------- */
 function vBackup(c) {
   const data = JSON.stringify({ contracts: store.contracts, checks: store.checks, clauseSel: store.clauseSel }, null, 0);
-  return `<div class="card stack"><h2>PDF로 내보내기</h2><p class="muted small">인쇄 창이 열리면 '프린터'를 <b>PDF로 저장</b>으로 고르세요. 휴대폰은 공유 메뉴에서 PDF로 저장할 수 있어요.</p>
+  return `<div class="card stack"><h2>PDF로 내보내기</h2><p class="muted small">PDF 파일을 만들어 폰에 바로 저장해요. 아이폰은 공유 창에서 <b>'파일에 저장'</b>, 안드로이드·PC는 다운로드 폴더에 저장돼요. 카톡으로 바로 보낼 수도 있어요.</p>
     <div class="row"><button class="btn primary" data-act="printDoc" data-k="report">내 계약 정리 PDF</button><button class="btn" data-act="printDoc" data-k="broker">중개사 전달용 특약 요청서 PDF</button></div>
     <p class="small muted">계약 정리: 계약 정보 · 위험 진단 · 일정(내 일정 포함) · 체크리스트 · 특약 문구를 한 문서로 담아요.</p></div>
   <div class="card stack"><h2>파일로 저장·불러오기</h2><p class="muted small">플래너 내용은 이 기기 브라우저에만 저장돼요. 파일로 저장해 두면 다른 기기나 브라우저에서 불러올 수 있어요. 카카오톡 '나와의 채팅'에 보내 두면 편해요.</p>
@@ -724,17 +724,57 @@ function mergeBackup(d) {
 
 /* ---------- 인쇄용 문서 (PDF) ---------- */
 const PRINT_SIGN = '전세지킴이 · 교육용 정리 자료이며 법률 자문이 아니에요.';
+// PDF: 문서를 미리보기로 띄우고, 앱이 직접 PDF 파일을 만들어 폰에 저장(아이폰은 공유 창 → '파일에 저장')
+// 공유 창은 '누른 순간'에만 열리므로: ① 파일 만들기(자동) → ② '폰에 저장하기' 누름 → 공유/다운로드
+const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|everytimeApp|BAND\//i.test(navigator.userAgent);
+const IS_KAKAO = /KAKAOTALK/i.test(navigator.userAgent);
+const TOUCH = matchMedia('(pointer: coarse)').matches;
+const H2P_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+let h2pLoading = null, pdfJob = null;
+const loadH2P = () => h2pLoading ||= new Promise((res, rej) => { const s = document.createElement('script'); s.src = H2P_URL; s.onload = () => res(window.html2pdf); s.onerror = () => { h2pLoading = null; rej(new Error('load')); }; document.head.appendChild(s); });
+function pdfBar(state) {
+  const close = '<button class="btn" data-act="printClose">닫기</button>';
+  const ext = IN_APP ? (IS_KAKAO ? '<button class="btn" data-act="openExternal">Safari·Chrome으로 열기</button>' : '<button class="btn" data-act="copyLink">주소 복사</button>') : '';
+  const msg = { making: ['PDF 파일을 만들고 있어요…', '잠시만 기다려 주세요.'], ready: ['PDF 파일이 준비됐어요', TOUCH ? '아이폰은 공유 창에서 \'파일에 저장\'을, 안드로이드는 다운로드를 확인하세요.' : '다운로드 폴더에 저장돼요.'], fail: ['PDF를 만들지 못했어요', '인터넷 연결을 확인하고 다시 눌러 주세요. 화면을 캡처해 둬도 돼요.'] }[state];
+  const main = state === 'making' ? '<button class="btn primary" disabled>만드는 중…</button>' : state === 'ready' ? `<button class="btn primary glow" data-act="pdfSave">폰에 저장하기 ${ARR}</button>` : '<button class="btn primary" data-act="pdfRetry">다시 만들기</button>';
+  return `<div class="pb-msg"><b>${msg[0]}</b><span>${msg[1]}${IN_APP ? ' 카카오톡 등 앱 안에서는 저장이 안 될 수 있어요.' : ''}</span></div><div class="row">${main}${ext}${close}</div>`;
+}
+function setPdfBar(state) { const b = document.querySelector('#print .print-bar'); if (b) b.innerHTML = pdfBar(state); }
+async function makePdf() {
+  const job = pdfJob; if (!job) return;
+  setPdfBar('making');
+  try {
+    const h2p = await loadH2P();
+    const el = document.querySelector('#print .print-paper .pdoc');
+    // 페이지가 스크롤된 상태면 html2canvas가 어긋난 곳을 찍어 빈 PDF가 됨 → 찍는 동안만 맨 위 기준(미리보기가 덮고 있어 화면 변화 없음)
+    const y0 = scrollY; window.scrollTo(0, 0);
+    let blob;
+    try {
+      blob = await h2p().set({ margin: [10, 10, 12, 10], image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true, scrollX: 0, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'li', 'h2', 'h3', '.pdoc-sign'] } }).from(el).outputPdf('blob');
+    } finally { window.scrollTo(0, y0); }
+    if (pdfJob !== job) return; // 그새 닫았으면 무시
+    job.file = new File([blob], job.name + '.pdf', { type: 'application/pdf' });
+    setPdfBar('ready');
+  } catch (e) { if (pdfJob === job) setPdfBar('fail'); }
+}
 function printDoc(kind) {
   const c = activeContract(); if (!c) return;
   const host = document.getElementById('print');
-  host.innerHTML = kind === 'broker' ? brokerDoc(c) : reportDoc(c);
-  const old = document.title;
-  document.title = `전세지킴이_${kind === 'broker' ? '특약요청서' : '계약정리'}_${safeName(c.name)}_${fileDate()}`;
-  let restored = false;
-  const done = () => { if (restored) return; restored = true; document.title = old; host.innerHTML = ''; window.removeEventListener('afterprint', done); };
-  window.addEventListener('afterprint', done);
-  setTimeout(done, 120000); // 인쇄 창 종료 신호가 안 오는 브라우저 대비
-  setTimeout(() => window.print(), 50);
+  pdfJob = { name: `전세지킴이_${kind === 'broker' ? '특약요청서' : '계약정리'}_${safeName(c.name)}_${fileDate()}`, file: null };
+  host.innerHTML = `<div class="print-bar">${pdfBar('making')}</div><div class="print-paper">${kind === 'broker' ? brokerDoc(c) : reportDoc(c)}</div>`;
+  host.classList.add('show'); document.documentElement.classList.add('print-open');
+  host.scrollTo(0, 0);
+  setTimeout(makePdf, 60);
+}
+function printClose() {
+  const host = document.getElementById('print');
+  pdfJob = null; host.classList.remove('show'); host.innerHTML = ''; document.documentElement.classList.remove('print-open');
+}
+function pdfSave() {
+  const f = pdfJob?.file; if (!f) return;
+  if (TOUCH && navigator.canShare?.({ files: [f] })) { navigator.share({ files: [f], title: pdfJob.name }).catch(() => {}); return; }
+  const url = URL.createObjectURL(f); const a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000); toast('PDF 파일을 저장했어요');
 }
 const pRow = (k, v) => v ? `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>` : '';
 const manWon = v => man(v) ? won(man(v)) : '';
@@ -1249,6 +1289,11 @@ const A = {
   // 저장·불러오기·PDF
   saveFile: () => { const data = JSON.stringify({ app: 'jeonse-jikimi', v: 1, savedAt: new Date().toISOString(), contracts: store.contracts, checks: store.checks, clauseSel: store.clauseSel }, null, 1); download(`전세지킴이_내계약_${fileDate()}.json`, data, 'application/json'); toast('파일로 저장했어요'); },
   printDoc: el => printDoc(el.dataset.k),
+  pdfSave: () => pdfSave(),
+  pdfRetry: () => makePdf(),
+  printClose: () => printClose(),
+  openExternal: () => { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href.split('#')[0] + '#my'); },
+  copyLink: () => copyText(location.href.split('#')[0]),
   shareBroker: () => { const c = activeContract(); const text = brokerText(c); if (navigator.share) navigator.share({ title: '특약사항 요청', text }).catch(() => {}); else copyText(text); },
   paperMode: el => { S.paperMode = el.dataset.m; render(true); },
   introStart: () => go(termsOk ? 'home' : 'terms'),
@@ -1346,14 +1391,20 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act]')) { e.preventDefault(); e.target.click(); }
-  if (e.key === 'Escape' && S.sheet) closeSheet();
+  if (e.key === 'Escape' && document.getElementById('print').classList.contains('show')) printClose();
+  else if (e.key === 'Escape' && S.sheet) closeSheet();
 });
 document.addEventListener('change', e => {
   const el = e.target;
   if (el.dataset.act && CHANGE[el.dataset.act]) return CHANGE[el.dataset.act](el);
   const b = el.dataset.bind;
   if (b === 'active') { store.active = el.value; save(); S.confirmDel = false; render(true); }
-  if (b === 'c') { const c = activeContract(); c[el.dataset.k] = el.value; if (el.dataset.k !== 'name') delete c.example; save(); render(true); }
+  if (b === 'c') {
+    const c = activeContract(); c[el.dataset.k] = el.value; if (el.dataset.k !== 'name') delete c.example; save();
+    // 아이폰은 날짜 휠을 돌리는 중에도 change가 와서, 그때 다시 그리면 선택 창이 닫혀 버림 → 입력이 끝나(포커스가 빠지면) 그때 갱신
+    if (document.activeElement === el && (el.type === 'date' || el.type === 'time')) { if (!el._pendingRender) { el._pendingRender = true; el.addEventListener('blur', () => render(true), { once: true }); } }
+    else render(true);
+  }
   if (b === 'clText') { const c = activeContract(); const m = (store.clauseSel[c.id] ||= {}); m[el.dataset.id] = { ...(m[el.dataset.id] || {}), text: el.value }; save(); render(true); }
 });
 document.addEventListener('input', e => {
