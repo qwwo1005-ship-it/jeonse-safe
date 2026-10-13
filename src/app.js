@@ -256,7 +256,7 @@ function vHome() {
   <section class="stack"><div class="row" style="justify-content:space-between"><h2>최신 제도</h2><button class="btn ghost" data-act="nav" data-r="news">전체 보기</button></div>
     <div class="grid">${C.policy.items.slice(0, 4).map(p => `<button class="linkcard" data-act="nav" data-r="news">${statusChip(p.status)}<h3>${esc(p.title)}</h3></button>`).join('')}</div></section>
   <section class="stack"><h2>바로 가기</h2><div class="grid">
-    ${[['scams', '알려진 사기 수법', `깡통전세·신탁·이중계약부터 신종 수법까지 ${C.scams.items.length}가지와 막는 법.`], ['docs', '서류 읽는 법', '등기부등본·건축물대장·확인설명서 등 10종을 견본으로 읽어봐요.'], ['contract', '계약서 예시', '아파트·빌라·다가구·오피스텔 월세 계약서의 중요한 칸과 위험 찾기.'], ['my', '내 계약 플래너', '날짜를 넣으면 할 일과 체크리스트, 특약 문구가 만들어져요.'], ['insurance', '보증보험 비교', 'HUG·HF·SGI 비교와 126% 룰·보증료 계산기.'], ['exam', '모의고사', `${qs.length}문항 문제은행으로 실전 모의고사와 오답노트.`], ['glossary', '용어사전', '대항력, 확정일자 같은 말을 쉬운 말로.']]
+    ${[['scams', '알려진 사기 수법', `깡통전세·신탁·이중계약부터 신종 수법까지 ${C.scams.items.length}가지와 예방법.`], ['docs', '서류 읽는 법', '등기부등본·건축물대장·확인설명서 등 10종을 견본으로 읽어봐요.'], ['contract', '계약서 예시', '아파트·빌라·다가구·오피스텔 월세 계약서의 중요한 칸과 위험 찾기.'], ['my', '내 계약 플래너', '날짜를 넣으면 할 일과 체크리스트, 특약 문구가 만들어져요.'], ['insurance', '보증보험 비교', 'HUG·HF·SGI 비교와 126% 룰·보증료 계산기.'], ['exam', '모의고사', `${qs.length}문항 문제은행으로 실전 모의고사와 오답노트.`], ['glossary', '용어사전', '대항력, 확정일자 같은 말을 쉬운 말로.']]
       .map(([r, t, d]) => `<button class="linkcard" data-act="nav" data-r="${r}"><h3>${t}</h3><p>${d}</p></button>`).join('')}</div></section>
   <p class="small muted">${esc(C.meta.disclaimer)}</p></div>`;
 }
@@ -941,7 +941,7 @@ function scamCard(x) {
       <div><div class="eyebrow">이렇게 속여요</div><ul class="clean flags">${x.how.map(h => `<li>${esc(h)}</li>`).join('')}</ul></div>
       ${x.case ? `<div class="callout small"><b>실제 사례</b><br>${esc(x.case)}</div>` : ''}
       ${x.signs?.length ? `<div><div class="eyebrow">이런 신호가 보이면 멈추세요</div><ul class="clean">${x.signs.map(s => `<li>· ${esc(s)}</li>`).join('')}</ul></div>` : ''}
-      <div class="callout green"><b>이렇게 막아요</b><ul class="clean ticks">${x.defense.map(d => `<li>${esc(d)}</li>`).join('')}</ul></div>
+      <div class="callout green"><b>이렇게 예방해요</b><ul class="clean ticks">${x.defense.map(d => `<li>${esc(d)}</li>`).join('')}</ul></div>
       ${x.note ? `<p class="small muted">${esc(x.note)}</p>` : ''}
       ${(x.lessonIds?.length || x.documentIds?.length) ? `<div class="row">${(x.lessonIds || []).map(id => lessonById[id] ? `<button class="btn ghost small" data-act="lesson" data-id="${id}">학습: ${esc(lessonById[id].title)}</button>` : '').join('')}${(x.documentIds || []).map(id => docById[id] ? `<button class="btn ghost small" data-act="doc" data-id="${id}">${esc(docById[id].name)} 읽는 법</button>` : '').join('')}</div>` : ''}
       ${srcs.length ? `<p class="small muted">출처: ${srcs.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.publisher)}</a>`).join(' · ')}</p>` : ''}
@@ -974,14 +974,14 @@ function vIntro() {
   </div></section>
 
   <section class="fr fr2" data-fr="2"><div class="fr-stick">
-    <p class="in-label"><span class="num">02</span> 숫자</p>
+    <p class="in-label"><span class="num">02</span> 피해 통계</p>
     <div class="in-big"><small>약</small><span class="num" data-scrub="36950" data-a="0.05" data-b="0.55">0</span><small>건</small></div>
     <p class="in-line">2023년 6월부터 2026년 3월까지<br>전세사기 피해자 결정을 신청한 수예요.</p>
     <p class="in-note" data-at="0.55">처음 전세를 구하는 20~30대가 특히 많았어요.<br>'처음이라서', '몰라서' 놓친 경우가 많았어요.</p>
   </div></section>
 
   <section class="fr fr3" data-fr="3"><div class="fr-stick">
-    <p class="in-label"><span class="num">03</span> 하루의 틈</p>
+    <p class="in-label"><span class="num">03</span> 시간차 위험</p>
     <h2 class="in-h2">사기는 <em>단 하루</em>의 틈을 노려요</h2>
     <div class="tl">
       <div class="tl-track"><i class="tl-fill"></i></div>
@@ -990,11 +990,11 @@ function vIntro() {
       <div class="tl-gap" data-at="0.36"><b>같은 날 집주인이 대출(근저당)을 등기하면</b><span>은행이 내 앞 순서가 돼요</span></div>
       <div class="tl-pt last" style="--x:100%" data-at="0.6"><b>다음 날 0시</b><span>내 권리(대항력) 시작</span></div>
     </div>
-    <p class="in-fix" data-at="0.72"><span class="in-tag">막는 법</span>계약서 특약에 "잔금 다음 날까지 담보 설정 금지"를 적어요.</p>
+    <p class="in-fix" data-at="0.72"><span class="in-tag">예방 포인트</span>계약서 특약에 "잔금 다음 날까지 담보 설정 금지"를 적어요.</p>
   </div></section>
 
   <section class="fr fr4" data-fr="4"><div class="fr-stick">
-    <p class="in-label"><span class="num">04</span> 깡통전세</p>
+    <p class="in-label"><span class="num">04</span> 깡통전세 구조</p>
     <h2 class="in-h2">집값보다 빚이 많으면<br>보증금이 <em>비어요</em></h2>
     <div class="cans">
       <div class="can-col"><div class="bar-area"><div class="bar-v house" style="--h:87;--b:0"><span>집값 <b>2억</b></span></div></div><p>집을 팔면 나오는 돈</p></div>
@@ -1005,8 +1005,8 @@ function vIntro() {
   </div></section>
 
   <section class="fr fr5" data-fr="5"><div class="fr-stick">
-    <p class="in-label"><span class="num">05</span> 막는 법</p>
-    <h2 class="in-h2">확인하면, <em>막을 수 있어요</em></h2>
+    <p class="in-label"><span class="num">05</span> 예방 수칙</p>
+    <h2 class="in-h2">확인하면, <em>예방할 수 있어요</em></h2>
     <ul class="in-checks">
       <li data-at="0.12"><i aria-hidden="true"></i><div><b>등기부등본, 계약 직전에 다시 떼기</b><span>새로 생긴 대출·압류가 없는지 봐요</span></div></li>
       <li data-at="0.32"><i aria-hidden="true"></i><div><b>특약 세 줄 넣기</b><span>담보 설정 금지 · 보증보험 안 되면 무효 · 세금 체납 시 해제</span></div></li>
@@ -1022,7 +1022,7 @@ function vIntro() {
     <p class="in-disc">${esc(C.meta.disclaimer)}</p>
   </section>
   <div class="in-progress" aria-hidden="true"><i id="inProg"></i></div>
-  <nav class="in-dots" aria-label="장면 이동">${['시작', '숫자', '하루의 틈', '깡통전세', '막는 법'].map((t, i) => `<button data-act="introJump" data-to="${i + 1}" aria-label="${i + 1}장면 ${t}"${i === 0 ? ' aria-current="step"' : ''}><span>${t}</span></button>`).join('')}</nav>
+  <nav class="in-dots" aria-label="장면 이동">${['인트로', '피해 통계', '시간차 위험', '깡통전세 구조', '예방 수칙'].map((t, i) => `<button data-act="introJump" data-to="${i + 1}" aria-label="${i + 1}장면 ${t}"${i === 0 ? ' aria-current="step"' : ''}><span>${t}</span></button>`).join('')}</nav>
   </div>`;
 }
 function introFx() {
