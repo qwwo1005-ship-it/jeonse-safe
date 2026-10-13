@@ -748,6 +748,96 @@ body[data-route="terms"] main { padding: clamp(28px, 6vw, 64px) 20px 72px; }
 :root[data-design][data-theme="dark"] :is(.hero, .rail, .card, .linkcard, .steps, details.more, .lesson .summary, .table-wrap) { background: var(--surface); }
 :root[data-design="c"][data-theme="dark"] .btn.primary { color: #3a2e28; }
 
+/* ---------- 클릭 유도: 숨 쉬는 글로우 + 스치는 빛 + 콕콕 화살표 (한 화면에 하나) ---------- */
+.cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.hero .cta-row { margin-top: 16px; }
+.btn.glow { position: relative; isolation: isolate; padding: 12px 22px; font-size: 1rem;
+  background-image: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .38) 48%, transparent 66%) !important;
+  background-size: 260% 100% !important; background-repeat: no-repeat !important; animation: shine 3.4s ease-in-out 1s infinite; }
+.btn.glow::after { content: ""; position: absolute; inset: -7px; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: color-mix(in srgb, var(--primary, var(--accent)) 55%, transparent); filter: blur(12px); opacity: .35; animation: breathe 2.6s ease-in-out infinite; }
+.btn.glow:hover::after { opacity: .75; }
+@keyframes shine { 0% { background-position: 130% 0; } 45%, 100% { background-position: -40% 0; } }
+@keyframes breathe { 0%, 100% { opacity: .25; transform: scale(.94); } 50% { opacity: .7; transform: scale(1.04); } }
+.btn .arr { display: inline-block; transition: transform .25s var(--spring); }
+.btn.glow .arr { animation: nudge 1.6s ease-in-out infinite; }
+.btn:hover .arr { transform: translateX(4px); }
+@keyframes nudge { 0%, 60%, 100% { transform: none; } 30% { transform: translateX(5px); } }
+.next-card { flex-direction: column; align-items: flex-start; gap: 0; text-align: left; padding: 12px 20px; margin-left: auto; }
+.next-card .nc-label { font-size: .75rem; opacity: .85; font-weight: 600; }
+.next-card .nc-title { font-size: 1rem; }
+.lesson-nav { align-items: center; margin-top: 8px; }
+.lesson-nav .btn:not(.next-card) { max-width: 46%; }
+/* 카드 넘김 방향: 다음은 오른쪽에서, 이전은 왼쪽에서 */
+@keyframes from-right { from { opacity: 0; transform: translateX(36px); } }
+@keyframes from-left { from { opacity: 0; transform: translateX(-36px); } }
+main.enter.dir-next .page > *:not([data-io]) { animation-name: from-right; }
+main.enter.dir-prev .page > *:not([data-io]) { animation-name: from-left; }
+main.enter.dir-next .page [data-io] { transition: opacity .5s var(--ease), transform .5s var(--ease); }
+
+/* ---------- 플래너: 달력 · 내 일정 ---------- */
+.cal-head { display: flex; align-items: center; gap: 6px; }
+.cal-head b { font-family: var(--f-display); font-size: 1.15rem; min-width: 7.5em; text-align: center; }
+.cal-head [data-act="calMove"] { font-size: 1.5rem; line-height: 1; padding: 2px 12px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal-dow { text-align: center; font-size: .75rem; font-weight: 700; color: var(--muted); padding: 2px 0; }
+.cal-dow.sun, .cal-cell.sun .cal-n { color: var(--stamp); }
+.cal-dow.sat, .cal-cell.sat .cal-n { color: var(--info); }
+.cal-cell { all: unset; box-sizing: border-box; cursor: pointer; min-width: 0; min-height: 76px; padding: 4px; border-radius: 10px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; background: var(--surface-2); border: 1.5px solid transparent; transition: background-color .2s, border-color .2s; }
+.cal-cell.empty { background: transparent; cursor: default; }
+.cal-cell:not(.empty):hover { border-color: var(--accent); }
+.cal-cell:focus-visible { outline: 2px solid var(--focus); }
+.cal-cell.sel { border-color: var(--accent); background: var(--accent-soft); }
+.cal-n { align-self: flex-start; font-family: var(--f-num); font-size: .8rem; font-weight: 600; }
+.cal-cell.today .cal-n { background: var(--ink); color: var(--bg) !important; border-radius: 999px; padding: 0 6px; }
+.cal-ev { font-size: .66rem; line-height: 1.35; padding: 1px 4px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 32%, var(--surface)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-ev.mine { background: color-mix(in srgb, var(--stamp) 24%, var(--surface)); }
+.cal-ev.done { opacity: .5; text-decoration: line-through; }
+.cal-more { font-size: .64rem; color: var(--muted); }
+.cal-key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 8px; }
+.cal-key.auto { background: color-mix(in srgb, var(--accent) 32%, var(--surface)); }
+.cal-key.mine { background: color-mix(in srgb, var(--stamp) 24%, var(--surface)); }
+@media (max-width: 560px) { .cal-cell { min-height: 60px; padding: 3px; border-radius: 8px; } .cal-ev { font-size: .56rem; padding: 0 3px; } .cal-head b { min-width: 6.5em; } }
+.day-ev { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border-left: 3px solid var(--accent); }
+.day-ev.mine { border-left-color: var(--stamp); }
+.ev.mine::before { border-color: var(--stamp); }
+.mine-chip { color: var(--stamp); background: var(--stamp-soft); border-color: transparent; }
+.rem-form { border: 2px solid var(--accent) !important; }
+.broker-box { padding: 14px 16px; border-radius: var(--r); background: var(--accent-soft); }
+
+/* ---------- 인쇄·PDF 문서 (화면에는 안 보임) ---------- */
+#print { display: none; }
+@media print {
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  html, body { background: #fff !important; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block !important; }
+}
+.pdoc { color: #222; font-family: var(--f-ui); font-size: 10.5pt; line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pdoc header { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #3b3147; padding-bottom: 10px; margin-bottom: 14px; }
+.pdoc-seal { flex: none; width: 46px; height: 46px; border: 2.5px solid #dd6f88; color: #dd6f88; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-seal); font-size: 21px; transform: rotate(-8deg); }
+.pdoc h1 { margin: 0; font-family: var(--f-display); font-size: 19pt; font-weight: 400; }
+.pdoc header p { margin: 2px 0 0; color: #666; font-size: 9.5pt; }
+.pdoc h2 { margin: 16px 0 6px; padding: 4px 10px; background: #f6eff8; border-left: 4px solid #c39be2; font-family: var(--f-ui); font-size: 12pt; font-weight: 700; break-after: avoid; }
+.pdoc h3 { margin: 10px 0 4px; font-family: var(--f-ui); font-size: 10.5pt; font-weight: 700; break-after: avoid; }
+.pdoc table { width: 100%; border-collapse: collapse; margin: 4px 0 8px; }
+.pdoc th, .pdoc td { border: 1px solid #ddd; padding: 5px 8px; text-align: left; vertical-align: top; }
+.pdoc th { width: 30%; background: #faf7fb; font-weight: 600; }
+.pdoc .pdoc-sched th { width: auto; }
+.pdoc .nowrap { white-space: nowrap; }
+.pdoc .c { width: 44px; text-align: center; }
+.pdoc tr, .pdoc li { break-inside: avoid; }
+.pdoc small { color: #777; }
+.pdoc ul, .pdoc ol { margin: 4px 0 8px; padding-left: 20px; }
+.pdoc .pdoc-ck { list-style: none; padding-left: 4px; }
+.pdoc .pdoc-cl li { margin-bottom: 6px; font-family: var(--f-doc); }
+.pdoc-lead { margin: 0 0 8px; }
+.pdoc .small-note { color: #555; font-size: 9.5pt; }
+.pdoc .pdoc-sign { margin-top: 18px; }
+.pdoc .pdoc-sign th { width: 14%; }
+.pdoc .pdoc-sign td { height: 40px; color: #aaa; }
+.pdoc footer { margin-top: 18px; padding-top: 8px; border-top: 1px solid #ddd; color: #888; font-size: 8.5pt; }
+
 /* 동작 줄이기 설정 존중 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }

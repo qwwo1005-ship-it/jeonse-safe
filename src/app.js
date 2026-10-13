@@ -238,7 +238,7 @@ function vHome() {
   const where = [['집 보러 다녀요', 'stage_02'], ['계약을 앞두고 있어요', 'stage_03'], ['오늘 계약해요', 'stage_04'], ['이사를 앞두고 있어요', 'stage_06'], ['살고 있어요', 'stage_08'], ['보증금을 못 받고 있어요', 'stage_09']];
   return `<div class="page">
   <section class="hero"><div><div class="eyebrow">전세사기 예방 교육 · ${esc(C.meta.baseDate)} 기준</div><h1>전세지킴이</h1>
-    <p>등기부등본 읽는 법부터 계약서 특약, 이사 날 체크리스트, 보증금을 돌려받는 날까지. 한 단계씩 따라오면 내 보증금을 지키는 방법이 보여요.</p></div>
+    <p>등기부등본 읽는 법부터 계약서 특약, 이사 날 체크리스트, 보증금을 돌려받는 날까지. 한 단계씩 따라오면 내 보증금을 지키는 방법이 보여요.</p>${continueCta()}</div>
     <div class="big-seal" aria-hidden="true">보증금<br>지킴</div></section>
   <section class="stack"><h2>지금 어디쯤인가요?</h2><div class="where">${where.map(([t, id]) => `<button data-act="stage" data-id="${id}">${t}</button>`).join('')}</div></section>
   ${next}
@@ -255,10 +255,18 @@ function vHome() {
   <p class="small muted">${esc(C.meta.disclaimer)}</p></div>`;
 }
 
+// 클릭 유도: 한 화면에 하나만 빛나는 '다음 할 일' 버튼
+const ARR = '<span class="arr" aria-hidden="true">→</span>';
+function continueCta() {
+  const nxt = lessons.find(l => !store.read[l.id]), started = lessons.some(l => store.read[l.id]);
+  if (!nxt) return `<div class="cta-row"><button class="btn primary glow" data-act="nav" data-r="exam">모의고사로 마무리하기 ${ARR}</button><span class="small muted">학습카드를 모두 읽었어요</span></div>`;
+  return `<div class="cta-row"><button class="btn primary glow" data-act="lesson" data-id="${nxt.id}" data-dir="next">${started ? '이어서 배우기' : '1단계부터 배우기'} ${ARR}</button><span class="small muted">${stageById[nxt.stageId].order}단계 · ${esc(nxt.title)}</span></div>`;
+}
 function vLearn() {
   if (S.lessonId && lessonById[S.lessonId]) return vLesson(lessonById[S.lessonId]);
   if (S.stageId && stageById[S.stageId]) return vStage(stageById[S.stageId]);
   return `<div class="page"><div class="head"><div class="eyebrow">배우기</div><h1>계약 전부터 보증금 받는 날까지 9단계</h1><p>순서대로 따라오면 돼요. 단계마다 학습카드와 체크리스트, 단원 퀴즈가 있어요.</p></div>
+  ${continueCta()}
   <div class="steps">${STAGES.map(s => { const done = s.lessons.every(l => store.read[l.id]); const n = s.lessons.filter(l => store.read[l.id]).length;
     return `<button class="step" data-act="stage" data-id="${s.id}"><span class="n${done ? ' done' : ''}">${s.order}</span><div><h3>${esc(s.title)}</h3><p class="small muted">${esc(s.subtitle)}</p><div class="bar thin"><i style="width:${Math.round(n / s.lessons.length * 100)}%"></i></div></div><span class="small muted num">${n}/${s.lessons.length}</span></button>`; }).join('')}</div>
   ${hlNote()}
@@ -270,8 +278,11 @@ function hlNote() {
   return `<section class="stack"><h2>내 밑줄 노트 <span class="small muted num">${ent.reduce((t, [, a]) => t + a.length, 0)}</span></h2><div class="card stack hl-note">${ent.map(([id, a]) => `<div class="stack" style="gap:4px"><button class="btn ghost small" style="align-self:flex-start" data-act="lesson" data-id="${id}">${stageById[lessonById[id].stageId].order}단계 · ${esc(lessonById[id].title)} →</button><ul class="clean">${a.slice().sort((x, y) => x - y).map(i => `<li><span class="mine-ink">${esc(lessonById[id].summary[i])}</span></li>`).join('')}</ul></div>`).join('')}</div></section>`;
 }
 function vStage(s) {
+  const nxt = s.lessons.find(l => !store.read[l.id]), started = s.lessons.some(l => store.read[l.id]);
   return `<div class="page"><div class="row"><button class="btn ghost" data-act="learnHome">← 9단계 목록</button></div>
   <div class="head"><div class="eyebrow">${s.order}단계 · 약 ${s.estimatedMinutes}분</div><h1>${esc(s.title)}</h1><p>${esc(s.subtitle)}</p></div>
+  ${nxt ? `<div class="cta-row"><button class="btn primary glow" data-act="lesson" data-id="${nxt.id}" data-dir="next">${started ? '이어서 읽기' : '이 단계 시작하기'} ${ARR}</button><span class="small muted">${esc(nxt.title)}</span></div>`
+    : `<div class="cta-row"><button class="btn primary glow" data-act="examStart" data-id="unit" data-stage="${s.id}">다 읽었어요! 단원 퀴즈 풀기 ${ARR}</button></div>`}
   <div class="grid">${s.lessons.map(l => `<button class="linkcard" data-act="lesson" data-id="${l.id}"><div class="row">${levelChip(l.riskLevel === 'critical' ? 'critical' : l.riskLevel === 'important' ? 'important' : 'info')}${store.read[l.id] ? '<span class="chip green">읽음</span>' : ''}</div><h3>${esc(l.title)}</h3><p>${esc(l.oneLine || l.summary[0])}</p></button>`).join('')}</div>
   <div class="row">${s.checklistIds.map(id => `<button class="btn" data-act="cksheet" data-id="${id}">체크리스트: ${esc(ckById[id].title)}</button>`).join('')}
     ${s.contractSampleId ? `<button class="btn" data-act="sample" data-id="${s.contractSampleId}">계약서 예시 보기</button>` : ''}
@@ -337,7 +348,7 @@ function vLesson(l) {
   ${relatedDocsForLesson(l.id)}
   ${lessonQuiz(l)}
   <div class="done-stamp" data-io aria-hidden="true"><span>학습<br>완료</span></div>
-  <div class="lesson-nav">${prev ? `<button class="btn" data-act="lesson" data-id="${prev.id}">← ${esc(prev.title)}</button>` : '<span></span>'}${next ? `<button class="btn primary" data-act="lesson" data-id="${next.id}">${esc(next.title)} →</button>` : `<button class="btn primary" data-act="nav" data-r="exam">모의고사 보러 가기 →</button>`}</div></div>`;
+  <div class="lesson-nav">${prev ? `<button class="btn" data-act="lesson" data-id="${prev.id}" data-dir="prev"><span class="small muted">이전</span> ${esc(prev.title)}</button>` : '<span></span>'}${next ? `<button class="btn primary glow next-card" data-act="lesson" data-id="${next.id}" data-dir="next"><span class="nc-label">다음 카드</span><span class="nc-title">${esc(next.title)} ${ARR}</span></button>` : `<button class="btn primary glow" data-act="nav" data-r="exam">모의고사 보러 가기 ${ARR}</button>`}</div></div>`;
 }
 function relatedDocsForLesson(id) {
   const ds = C.documents.documents.filter(d => (d.lessonIds || []).includes(id));
@@ -438,8 +449,9 @@ function vContract() {
 const REGIONS = { seoul: ['서울', 165e6, 55e6, true], dense: ['수도권 과밀억제권역·세종·용인·화성·김포', 145e6, 48e6, true], metroOther: ['그 밖의 수도권', 75e6, 25e6, true], city: ['광역시 등(안산·광주·파주·이천·평택 포함)', 85e6, 28e6, false], other: ['그 밖의 지역', 75e6, 25e6, false] };
 const HOUSE = { APARTMENT: '아파트', VILLA: '빌라(다세대·연립)', OFFICETEL: '오피스텔', MULTI_FAMILY: '다가구', DETACHED: '단독' };
 const FLAGS = C.clauses.conditions.filter(c => c.key !== 'all' && c.key !== 'isApartment');
-const newContract = () => ({ id: 'c' + Date.now().toString(36), name: '새 계약', house: 'APARTMENT', region: 'dense', lease: 'JEONSE', deposit: '', rent: '', market: '', official: '', debt: '', seniorDep: '', visit: '', contract: '', balance: '', end: '', flags: { usesInsurance: true } });
-const exampleContract = () => ({ id: 'cex' + Date.now().toString(36), example: true, name: '예시 · 샘플마을아파트 1203호', house: 'APARTMENT', region: 'dense', lease: 'JEONSE', deposit: 32000, rent: '', market: 50000, official: 36000, debt: 6000, seniorDep: '', visit: '2026-10-25', contract: '2026-11-02', balance: '2026-12-15', end: '2028-12-14', flags: { usesLoan: true, usesInsurance: true, hasMortgage: true, needsRepair: true } });
+const newContract = () => ({ id: 'c' + Date.now().toString(36), name: '새 계약', address: '', reminders: [], house: 'APARTMENT', region: 'dense', lease: 'JEONSE', deposit: '', rent: '', market: '', official: '', debt: '', seniorDep: '', visit: '', contract: '', balance: '', end: '', flags: { usesInsurance: true } });
+const exampleContract = () => ({ id: 'cex' + Date.now().toString(36), example: true, name: '예시 · 샘플마을아파트 1203호', house: 'APARTMENT', region: 'dense', lease: 'JEONSE', deposit: 32000, rent: '', market: 50000, official: 36000, debt: 6000, seniorDep: '', visit: '2026-10-25', contract: '2026-11-02', balance: '2026-12-15', end: '2028-12-14', flags: { usesLoan: true, usesInsurance: true, hasMortgage: true, needsRepair: true },
+  reminders: [{ id: 'ex1', date: '2026-11-10', time: '10:00', type: 'bank', title: '은행 방문 (전세대출 상담)', memo: '신분증, 계약서 사본 챙기기. ○○은행 ○○지점' }, { id: 'ex2', date: '2026-12-01', time: '', type: 'moving', title: '이사업체 예약', memo: '견적 2곳 비교' }] });
 function activeContract() { return store.contracts.find(c => c.id === store.active) || store.contracts[0] || null; }
 const man = v => (v === '' || v == null || isNaN(+v)) ? null : +v * 1e4;
 
@@ -458,8 +470,29 @@ function buildEvents(c) {
     ev.push({ id: 'r:notice', date: addDays(base.END, -60), title: '갱신·이사 의사 통지 마감(만료 2개월 전)', note: '기록이 남는 방식으로 통지하세요.' });
     ev.push({ id: 'r:end', date: base.END, title: '계약 만료일 — 보증금 반환·이사', note: '보증금을 받기 전에는 전출하지 마세요. 먼저 나가야 하면 임차권등기명령.' });
   }
-  return ev.sort((a, b) => a.date - b.date);
+  // 내가 직접 넣은 일정(리마인더)
+  (c.reminders || []).forEach(r => { const d = pDate(r.date); if (d) ev.push({ id: 'u:' + r.id, date: d, title: r.title || REMIND[r.type]?.label || '내 일정', note: r.memo, time: r.time, custom: r.id, type: r.type }); });
+  return ev.sort((a, b) => a.date - b.date || (a.time || '').localeCompare(b.time || ''));
 }
+
+/* ---------- 내 일정(리마인더) 프리셋 — 제목은 고쳐 쓸 수 있고, 상세 내용은 본인이 작성 ---------- */
+const REMIND = {
+  bank: { label: '은행 방문 (전세대출 상담·신청)', hint: '예) 준비물: 신분증, 계약서, 소득·재직 서류. 필요한 서류는 은행마다 달라서 미리 전화로 확인' },
+  loanDocs: { label: '대출 서류 제출', hint: '예) 확정일자 받은 계약서 사본, 등기부등본 등 은행이 요청한 서류' },
+  community: { label: '주민센터 방문 (전입신고·확정일자)', hint: '예) 정부24 온라인으로도 가능. 동·호수가 계약서와 같은지 확인' },
+  registry: { label: '등기부등본 다시 떼기', hint: '예) 인터넷등기소에서 열람. 새 근저당·가압류가 없는지 확인' },
+  hug: { label: '보증보험 상담·신청', hint: '예) HUG·HF·SGI 중 어디로 할지, 가입 가능 여부 문의' },
+  broker: { label: '중개사무소 미팅', hint: '예) 특약 문구 전달, 확인·설명서 받기' },
+  landlord: { label: '집주인 연락·통화', hint: '예) 통화 내용은 문자로 한 번 더 남겨 두기' },
+  transfer: { label: '계약금·잔금 송금', hint: '예) 등기부 속 집주인 이름의 통장인지 송금 직전 다시 확인' },
+  moving: { label: '이사업체 예약·확인', hint: '예) 업체명, 연락처, 견적 금액' },
+  repair: { label: '하자·수리 확인', hint: '예) 수리 약속 내용, 사진 찍어 두기' },
+  utilities: { label: '관리비·공과금 정산', hint: '예) 계량기 숫자 사진, 정산 금액' },
+  notice: { label: '갱신·이사 의사 알리기 (내용증명)', hint: '예) 만기 2개월 전까지 집주인에게 도착해야 해요' },
+  counsel: { label: '법률·피해 상담 (132 등)', hint: '예) 대한법률구조공단 132, 전세피해지원센터' },
+  custom: { label: '직접 입력', hint: '무엇을 할지 자유롭게 적어 주세요' },
+};
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 function ckItems(c, ckId) { return ckById[ckId].items.filter(it => !it.condition || c.flags[it.condition]); }
 function evDone(c, e) { if (!e.ck) return !!(store.checks[c.id] || {})['ev:' + e.id]; const ch = store.checks[c.id] || {}; const req = ckItems(c, e.ck).filter(i => i.required); return req.length > 0 && req.every(i => ch[i.id]); }
 
@@ -488,14 +521,15 @@ function vMy() {
   const head = `<div class="head"><div class="eyebrow">내 계약 플래너</div><h1>날짜만 넣으면 할 일이 정리돼요</h1><p>계약일·잔금일·만기일을 넣으면 그날 할 일, 체크리스트, 특약 문구, 위험 진단이 만들어져요. 이 기기 브라우저에만 저장돼요.</p></div>`;
   if (!c) return `<div class="page">${head}<div class="empty stack"><p>아직 등록한 계약이 없어요.</p><div class="row" style="justify-content:center"><button class="btn primary" data-act="cNew">내 계약 만들기</button><button class="btn" data-act="cExample">예시 계약으로 둘러보기</button></div></div>
     <div class="card stack"><h2>특약 문구만 보고 싶다면</h2><p class="muted">계약을 만들지 않아도 특약 라이브러리 전체를 볼 수 있어요.</p><div><button class="btn" data-act="myTab" data-t="library">특약 라이브러리 열기</button></div></div>${S.myTab === 'library' ? vLibrary() : ''}</div>`;
-  const tabs = [['plan', '일정·체크리스트'], ['risk', '위험 진단'], ['clauses', '특약 만들기'], ['info', '계약 정보'], ['backup', '백업']];
+  const tabs = [['plan', '일정·체크리스트'], ['cal', '달력·내 일정'], ['risk', '위험 진단'], ['clauses', '특약 만들기'], ['info', '계약 정보'], ['backup', '저장·PDF']];
   const tab = tabs.some(t => t[0] === S.myTab) ? S.myTab : 'plan';
   let body = '';
   if (tab === 'plan') body = vPlan(c);
+  if (tab === 'cal') body = vCal(c);
   if (tab === 'risk') body = vRisk(c);
   if (tab === 'clauses') body = vClauses(c);
   if (tab === 'info') body = vInfo(c);
-  if (tab === 'backup') body = vBackup();
+  if (tab === 'backup') body = vBackup(c);
   return `<div class="page">${head}
   <div class="row"><div class="field" style="min-width:min(100%,280px)"><label for="csel">계약 선택</label><select id="csel" data-bind="active">${store.contracts.map(x => `<option value="${x.id}" ${x.id === c.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
     <button class="btn" data-act="cNew" style="align-self:end">+ 새 계약</button>
@@ -505,16 +539,17 @@ function vMy() {
 }
 function vPlan(c) {
   const evs = buildEvents(c);
-  if (!evs.length) return `<div class="empty">'계약 정보'에서 날짜를 넣으면 일정이 생겨요.<div style="margin-top:10px"><button class="btn primary" data-act="myTab" data-t="info">날짜 넣기</button></div></div>`;
+  const addBtn = `<div class="row"><button class="btn primary" data-act="remNew">+ 내 일정 추가</button><button class="btn" data-act="myTab" data-t="cal">달력으로 보기</button></div>`;
+  if (!evs.length) return `<div class="empty">'계약 정보'에서 날짜를 넣으면 일정이 생겨요. 은행 방문처럼 내 일정을 직접 넣을 수도 있어요.<div class="row" style="justify-content:center;margin-top:10px"><button class="btn primary" data-act="myTab" data-t="info">날짜 넣기</button><button class="btn" data-act="remNew">+ 내 일정 추가</button></div></div>`;
   const ch = store.checks[c.id] || {};
-  return `<div class="timeline">${evs.map(e => {
+  return `${addBtn}<div class="timeline">${evs.map(e => {
     const n = ddays(e.date), done = evDone(c, e), open = S.openEv[e.id] ?? (n >= 0 && n <= 7 && !!e.ck);
     const items = e.ck ? ckItems(c, e.ck) : [];
     const cnt = items.filter(i => ch[i.id]).length;
-    return `<div class="ev${n === 0 ? ' today' : ''}${n < 0 ? ' past' : ''}${done ? ' done' : ''}">
-      <div class="ev-head"><span class="dday${n >= 0 && n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><span class="d">${fmt(e.date)}</span><b>${esc(e.title)}</b>${e.ck ? `<span class="small muted num">${cnt}/${items.length}</span>` : ''}</div>
-      ${e.note ? `<p class="small muted">${esc(e.note)}</p>` : ''}
-      ${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>`}
+    return `<div class="ev${n === 0 ? ' today' : ''}${n < 0 ? ' past' : ''}${done ? ' done' : ''}${e.custom ? ' mine' : ''}">
+      <div class="ev-head"><span class="dday${n >= 0 && n <= 3 ? ' soon' : ''}">${ddayLabel(n)}</span><span class="d">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}</span>${e.custom ? '<span class="chip mine-chip">내 일정</span>' : ''}<b>${esc(e.title)}</b>${e.ck ? `<span class="small muted num">${cnt}/${items.length}</span>` : ''}</div>
+      ${e.note ? `<p class="small ${e.custom ? '' : 'muted'}" style="white-space:pre-line">${esc(e.note)}</p>` : ''}
+      ${e.ck ? `<button class="btn ghost small" data-act="evToggle" data-id="${e.id}">${open ? '체크리스트 접기' : '체크리스트 펼치기'}</button>` : `<div class="row"><label class="check${done ? ' done' : ''}"><input type="checkbox" data-act="evCheck" data-id="${e.id}" ${done ? 'checked' : ''}><span class="t">완료</span></label>${e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : ''}</div>`}
       ${e.ck && open ? `<div class="card" data-evbody="${e.id}" style="padding:8px;margin-top:6px">${ckById[e.ck].fieldMode ? '<p class="small muted" style="padding:4px 10px">현장 모드: 이 화면을 켜두고 하나씩 체크하세요.</p>' : ''}${items.map(it => `<label class="check${ch[it.id] ? ' done' : ''}"><input type="checkbox" data-act="ckItem" data-id="${it.id}" ${ch[it.id] ? 'checked' : ''}><span><span class="t">${esc(it.text)}</span> ${it.required ? '' : '<span class="chip plain">권장</span>'}
         ${it.helpLessonId ? `<button class="btn ghost small" data-act="lesson" data-id="${it.helpLessonId}">왜?</button>` : ''}${it.contractHotspotId ? `<button class="btn ghost small" data-act="hsSheet" data-id="${it.contractHotspotId}">계약서 칸</button>` : ''}${it.calculatorId ? `<button class="btn ghost small" data-act="calc" data-id="${it.calculatorId}">계산기</button>` : ''}</span></label>`).join('')}</div>` : ''}</div>`;
   }).join('')}</div>`;
@@ -559,7 +594,9 @@ function vClauses(c) {
     <textarea id="cl-${cl.id}" data-bind="clText" data-id="${cl.id}" aria-label="${esc(cl.title)} 문구">${esc(clauseText(c, cl))}</textarea>
     <p class="small muted">왜? ${esc(cl.why)}</p>${cl.talkToBroker ? `<p class="small">중개사에게: “${esc(cl.talkToBroker)}”</p>` : ''}${(cl.fillFields || []).length ? '<p class="small muted">○○ 부분은 내 계약에 맞게 고쳐 쓰세요.</p>' : ''}</div>`; }).join('')}</section>` : ''; }).join('')}
   <section class="card stack"><h2>완성된 특약 (${on.length}개)</h2><textarea id="clOut" readonly style="min-height:220px">${esc(out)}</textarea>
-  <div class="row"><button class="btn primary" data-act="copyOut">복사하기</button><span class="small muted">복사해서 중개사에게 문자로 미리 보내두세요.</span></div>
+  <div class="row"><button class="btn" data-act="copyOut">복사하기</button><span class="small muted">복사해서 중개사에게 문자로 미리 보내두세요.</span></div>
+  <div class="broker-box stack"><b>중개사에게 보낼 '특약사항 요청서'</b><p class="small muted">계약 정보 · 요청 특약 · 미리 받아볼 서류 목록 · 서명란을 한 장으로 정리해요. 주소를 '계약 정보'에 넣으면 요청서에 함께 들어가요.</p>
+    <div class="row"><button class="btn primary" data-act="printDoc" data-k="broker">요청서 PDF로 저장</button><button class="btn" data-act="shareBroker">카톡·문자로 보내기</button></div></div>
   <div class="callout red small"><b>특약을 거부한다면</b><ul class="clean">${C.clauses.redFlagsWhenRefused.map(x => `<li>· ${esc(x)}</li>`).join('')}</ul></div></section>`;
 }
 function vLibrary() {
@@ -567,7 +604,7 @@ function vLibrary() {
 }
 function vInfo(c) {
   const f = (k, label, type = 'text', extra = '') => `<div class="field"><label for="f-${k}">${label}</label><input id="f-${k}" type="${type}" data-bind="c" data-k="${k}" value="${esc(c[k] ?? '')}" ${extra}></div>`;
-  return `<div class="card stack"><h2>기본 정보</h2><div class="form-grid">${f('name', '계약 이름(메모)')}
+  return `<div class="card stack"><h2>기본 정보</h2><div class="form-grid">${f('name', '계약 이름(메모)')}${f('address', '주소 (선택 · 요청서·PDF에만 쓰여요)', 'text', 'autocomplete="off"')}
     <div class="field"><label for="f-house">주택 유형</label><select id="f-house" data-bind="c" data-k="house">${Object.entries(HOUSE).map(([k, v]) => `<option value="${k}" ${c.house === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
     <div class="field"><label for="f-region">지역(소액임차인·보증 한도 기준)</label><select id="f-region" data-bind="c" data-k="region">${Object.entries(REGIONS).map(([k, v]) => `<option value="${k}" ${c.region === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select></div>
     <div class="field"><label for="f-lease">계약 형태</label><select id="f-lease" data-bind="c" data-k="lease"><option value="JEONSE" ${c.lease === 'JEONSE' ? 'selected' : ''}>전세</option><option value="MONTHLY" ${c.lease === 'MONTHLY' ? 'selected' : ''}>보증금 있는 월세</option></select></div></div></div>
@@ -576,11 +613,157 @@ function vInfo(c) {
   <div class="card stack"><h2>날짜</h2><div class="form-grid">${f('visit', '집 보러 가는 날', 'date')}${f('contract', '계약일', 'date')}${f('balance', '잔금·이사일', 'date')}${f('end', '만기일', 'date')}</div></div>
   <div class="card stack"><h2>내 상황</h2><p class="small muted">체크한 항목에 맞춰 체크리스트와 특약이 바뀌어요.</p><div class="form-grid">${FLAGS.map(fl => `<label class="check"><input type="checkbox" data-act="flag" data-k="${fl.key}" ${c.flags[fl.key] ? 'checked' : ''}><span>${esc(fl.label)}</span></label>`).join('')}</div></div>`;
 }
-function vBackup() {
+/* ---------- 달력 · 내 일정 ---------- */
+function vCal(c) {
+  const evs = buildEvents(c);
+  const t = today();
+  if (!S.calMonth) { const next = evs.find(e => ddays(e.date) >= 0); const b = next ? next.date : t; S.calMonth = `${b.getFullYear()}-${b.getMonth()}`; }
+  const [Y, M] = S.calMonth.split('-').map(Number);
+  const first = new Date(Y, M, 1, 12), days = new Date(Y, M + 1, 0).getDate(), lead = first.getDay();
+  const byDay = {}; evs.forEach(e => { const k = ymd(e.date); (byDay[k] ||= []).push(e); });
+  const sel = S.calDay || null;
+  const cells = [];
+  for (let i = 0; i < lead; i++) cells.push('<div class="cal-cell empty" aria-hidden="true"></div>');
+  for (let d = 1; d <= days; d++) {
+    const k = ymd(new Date(Y, M, d, 12)), list = byDay[k] || [], dow = (lead + d - 1) % 7;
+    cells.push(`<button class="cal-cell${k === ymd(t) ? ' today' : ''}${k === sel ? ' sel' : ''}${dow === 0 ? ' sun' : dow === 6 ? ' sat' : ''}" data-act="calDay" data-d="${k}" aria-label="${M + 1}월 ${d}일${list.length ? `, 일정 ${list.length}개` : ''}"><span class="cal-n">${d}</span>${list.slice(0, 2).map(e => `<span class="cal-ev${e.custom ? ' mine' : ''}${evDone(c, e) ? ' done' : ''}">${esc(e.title)}</span>`).join('')}${list.length > 2 ? `<span class="cal-more">+${list.length - 2}</span>` : ''}</button>`);
+  }
+  const dayList = sel ? (byDay[sel] || []) : [];
+  const selD = sel ? pDate(sel) : null;
+  return `<div class="card stack cal">
+    <div class="cal-head"><button class="btn ghost" data-act="calMove" data-d="-1" aria-label="이전 달">‹</button><b class="num">${Y}년 ${M + 1}월</b><button class="btn ghost" data-act="calMove" data-d="1" aria-label="다음 달">›</button><button class="btn ghost small" data-act="calToday">오늘</button></div>
+    <div class="cal-grid">${'일월화수목금토'.split('').map((w, i) => `<div class="cal-dow${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}">${w}</div>`).join('')}${cells.join('')}</div>
+    <div class="row small muted"><span class="cal-key auto"></span>계약 일정 <span class="cal-key mine"></span>내 일정</div></div>
+  ${S.remForm ? remForm() : sel ? `<section class="card stack"><div class="row" style="justify-content:space-between"><h3>${fmt(selD)}</h3><button class="btn primary" data-act="remNew" data-d="${sel}">+ 이 날 일정 추가</button></div>
+    ${dayList.length ? `<ul class="clean">${dayList.map(e => `<li class="day-ev${e.custom ? ' mine' : ''}"><div class="row"><b>${e.time ? `<span class="num">${esc(e.time)}</span> ` : ''}${esc(e.title)}</b>${e.custom ? `<button class="btn ghost small" data-act="remEdit" data-id="${e.custom}">수정</button>` : ''}</div>${e.note ? `<p class="small muted" style="white-space:pre-line">${esc(e.note)}</p>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">이 날은 아직 일정이 없어요.</p>'}</section>`
+    : `<div class="row"><button class="btn primary" data-act="remNew">+ 내 일정 추가</button><span class="small muted">달력에서 날짜를 누르면 그날 일정을 보고 추가할 수 있어요.</span></div>`}
+  <section class="card stack"><h3>폰 캘린더에 넣고 알림 받기</h3><p class="small muted">일정 파일(.ics)을 받아 열면 구글·삼성·아이폰 캘린더에 들어가요. 하루 전과 당일에 알림이 울리도록 함께 설정돼요. 같은 파일을 다시 넣으면 일정이 겹쳐 보일 수 있어요.</p>
+    <div class="row"><button class="btn" data-act="icsExport" data-w="mine">내 일정만 보내기</button><button class="btn" data-act="icsExport" data-w="all">전체 일정 보내기</button></div></section>`;
+}
+// 일정 입력 폼 — 값은 S.remForm에 들고 있어서 종류를 바꿔도 적던 내용이 남음
+function remForm() {
+  const f = S.remForm, hint = REMIND[f.type]?.hint || '';
+  const opt = Object.entries(REMIND).map(([k, v]) => `<option value="${k}" ${k === f.type ? 'selected' : ''}>${esc(v.label)}</option>`).join('');
+  return `<section class="card stack rem-form" id="remForm"><h3>${f.id ? '내 일정 고치기' : '내 일정 추가'}</h3>
+    <div class="form-grid">
+      <div class="field"><label for="rm-date">날짜</label><input id="rm-date" type="date" value="${esc(f.date)}"></div>
+      <div class="field"><label for="rm-time">시간 (선택)</label><input id="rm-time" type="time" value="${esc(f.time)}"></div>
+      <div class="field"><label for="rm-type">무슨 일인가요?</label><select id="rm-type" data-act="remType">${opt}</select></div>
+    </div>
+    <div class="field"><label for="rm-title">제목 ${f.type === 'custom' ? '(직접 입력)' : '(고쳐 써도 돼요)'}</label><input id="rm-title" type="text" maxlength="60" value="${esc(f.title)}" placeholder="${f.type === 'custom' ? '예) 보증금 이체 한도 늘리기' : ''}"></div>
+    <div class="field"><label for="rm-memo">상세 내용</label><textarea id="rm-memo" placeholder="${esc(hint)}">${esc(f.memo)}</textarea></div>
+    <div class="row"><button class="btn primary" data-act="remSave">저장</button><button class="btn" data-act="remCancel">취소</button>${f.id ? `<button class="btn ghost" data-act="remDel">${f.askDel ? '정말 지울까요? 한 번 더 누르세요' : '이 일정 지우기'}</button>` : ''}${S.remMsg ? `<span class="small" style="color:var(--stamp)">${esc(S.remMsg)}</span>` : ''}</div></section>`;
+}
+const readRemForm = () => { const v = id => document.getElementById(id)?.value ?? ''; Object.assign(S.remForm, { date: v('rm-date'), time: v('rm-time'), title: v('rm-title'), memo: v('rm-memo') }); };
+const openCalAt = date => { S.myTab = 'cal'; S.calDay = date; const d = pDate(date); if (d) S.calMonth = `${d.getFullYear()}-${d.getMonth()}`; };
+// 카톡·문자로 보낼 특약 요청 글
+function brokerText(c) {
+  const L = [`[전세 계약 특약사항 요청]`, c.address ? `주택: ${c.address}` : c.name ? `계약: ${c.name}` : '', c.deposit ? `보증금: ${won(man(c.deposit))}` : '', c.contract ? `계약일: ${fmt(pDate(c.contract))}` : '', c.balance ? `잔금일: ${fmt(pDate(c.balance))}` : '', '', '계약서 특약사항에 아래 내용을 넣어 주세요.'];
+  onClauses(c).forEach((cl, i) => L.push(`${i + 1}. ${clauseText(c, cl)}`));
+  return L.filter((x, i) => x !== '' || i > 4).join('\n');
+}
+// 폰 캘린더용 .ics (하루 전 9시 + 당일 알림)
+function icsFor(c, which) {
+  const evs = buildEvents(c).filter(e => which === 'all' || e.custom);
+  const esc2 = s => String(s || '').replace(/[\\;,]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//jeonse-jikimi//planner//KO', 'CALSCALE:GREGORIAN', 'X-WR-CALNAME:전세지킴이 일정'];
+  evs.forEach(e => {
+    const d = ymd(e.date).replace(/-/g, '');
+    lines.push('BEGIN:VEVENT', `UID:${c.id}-${e.id.replace(/[^\w-]/g, '_')}@jeonse-jikimi`, `DTSTAMP:${stamp}`);
+    if (e.time) { const [h, m] = e.time.split(':'); lines.push(`DTSTART:${d}T${h}${m}00`, `DURATION:PT1H`); }
+    else { const n = ymd(addDays(e.date, 1)).replace(/-/g, ''); lines.push(`DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${n}`); }
+    lines.push(`SUMMARY:${esc2('[전세] ' + e.title)}`);
+    if (e.note) lines.push(`DESCRIPTION:${esc2(e.note)}`);
+    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(e.title)}`, e.time ? 'TRIGGER:-P1D' : 'TRIGGER:-PT15H', 'END:VALARM');
+    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(e.title)}`, e.time ? 'TRIGGER:-PT1H' : 'TRIGGER:PT9H', 'END:VALARM');
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return { text: lines.join('\r\n'), n: evs.length };
+}
+function download(name, text, type) {
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+const fileDate = () => ymd(today()).replace(/-/g, '');
+const safeName = s => (String(s || '').replace(/[^0-9A-Za-z가-힣-]+/g, '_').replace(/^_+|_+$/g, '') || '계약').slice(0, 30);
+
+/* ---------- 저장(파일) · PDF 내보내기 ---------- */
+function vBackup(c) {
   const data = JSON.stringify({ contracts: store.contracts, checks: store.checks, clauseSel: store.clauseSel }, null, 0);
-  return `<div class="card stack"><h2>백업하기</h2><p class="muted small">플래너 내용은 이 기기 브라우저에만 저장돼요. 아래 글을 복사해 메모앱 등에 보관하면 다른 기기에서 불러올 수 있어요.</p>
-    <textarea id="bkOut" readonly>${esc(data)}</textarea><div><button class="btn" data-act="copyBk">복사하기</button></div></div>
-  <div class="card stack"><h2>불러오기</h2><textarea id="bkIn" placeholder="백업한 글을 붙여넣으세요"></textarea><div class="row"><button class="btn primary" data-act="importBk">불러오기</button>${S.importMsg ? `<span class="small">${esc(S.importMsg)}</span>` : ''}</div></div>`;
+  return `<div class="card stack"><h2>PDF로 내보내기</h2><p class="muted small">인쇄 창이 열리면 '프린터'를 <b>PDF로 저장</b>으로 고르세요. 휴대폰은 공유 메뉴에서 PDF로 저장할 수 있어요.</p>
+    <div class="row"><button class="btn primary" data-act="printDoc" data-k="report">내 계약 정리 PDF</button><button class="btn" data-act="printDoc" data-k="broker">중개사 전달용 특약 요청서 PDF</button></div>
+    <p class="small muted">계약 정리: 계약 정보 · 위험 진단 · 일정(내 일정 포함) · 체크리스트 · 특약 문구를 한 문서로 담아요.</p></div>
+  <div class="card stack"><h2>파일로 저장·불러오기</h2><p class="muted small">플래너 내용은 이 기기 브라우저에만 저장돼요. 파일로 저장해 두면 다른 기기나 브라우저에서 불러올 수 있어요. 카카오톡 '나와의 채팅'에 보내 두면 편해요.</p>
+    <div class="row"><button class="btn primary" data-act="saveFile">내 계약 파일로 저장</button><label class="btn" for="bkFile" style="cursor:pointer">파일 불러오기</label><input id="bkFile" type="file" accept=".json,application/json" data-act="loadFile" hidden></div>
+    ${S.importMsg ? `<p class="small">${esc(S.importMsg)}</p>` : ''}
+    <p class="small muted">불러오면 같은 계약은 파일 내용으로 바뀌고, 없던 계약은 추가돼요. 지금 있는 다른 계약은 지워지지 않아요.</p></div>
+  <details class="more"><summary>글로 복사해서 옮기기 (파일이 안 될 때)</summary><div class="stack" style="padding:0 16px 16px">
+    <textarea id="bkOut" readonly>${esc(data)}</textarea><div><button class="btn" data-act="copyBk">복사하기</button></div>
+    <textarea id="bkIn" placeholder="복사해 둔 글을 붙여넣으세요"></textarea><div><button class="btn" data-act="importBk">글로 불러오기</button></div></div></details>`;
+}
+function mergeBackup(d) {
+  if (!d || !Array.isArray(d.contracts)) throw new Error('형식');
+  d.contracts.forEach(nc => { const i = store.contracts.findIndex(x => x.id === nc.id); if (i >= 0) store.contracts[i] = nc; else store.contracts.push(nc); });
+  Object.assign(store.checks, d.checks || {}); Object.assign(store.clauseSel, d.clauseSel || {});
+  store.active = store.active && store.contracts.some(x => x.id === store.active) ? store.active : store.contracts[0]?.id || null; save();
+  return d.contracts.length;
+}
+
+/* ---------- 인쇄용 문서 (PDF) ---------- */
+const PRINT_SIGN = '전세지킴이 · 교육용 정리 자료이며 법률 자문이 아니에요.';
+function printDoc(kind) {
+  const c = activeContract(); if (!c) return;
+  const host = document.getElementById('print');
+  host.innerHTML = kind === 'broker' ? brokerDoc(c) : reportDoc(c);
+  const old = document.title;
+  document.title = `전세지킴이_${kind === 'broker' ? '특약요청서' : '계약정리'}_${safeName(c.name)}_${fileDate()}`;
+  let restored = false;
+  const done = () => { if (restored) return; restored = true; document.title = old; host.innerHTML = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  setTimeout(done, 120000); // 인쇄 창 종료 신호가 안 오는 브라우저 대비
+  setTimeout(() => window.print(), 50);
+}
+const pRow = (k, v) => v ? `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>` : '';
+const manWon = v => man(v) ? won(man(v)) : '';
+function contractRows(c) {
+  return pRow('계약 이름', c.name) + pRow('주소', c.address) + pRow('주택 유형', HOUSE[c.house]) + pRow('계약 형태', c.lease === 'MONTHLY' ? '보증금 있는 월세' : '전세')
+    + pRow('보증금', manWon(c.deposit)) + (c.lease === 'MONTHLY' ? pRow('월세', manWon(c.rent)) : '')
+    + pRow('계약일', c.contract && fmt(pDate(c.contract))) + pRow('잔금·입주일', c.balance && fmt(pDate(c.balance))) + pRow('만기일', c.end && fmt(pDate(c.end)));
+}
+function onClauses(c) { return clauseList(c).filter(cl => clauseOn(c, cl)); }
+function reportDoc(c) {
+  const d = diagnose(c), evs = buildEvents(c), ch = store.checks[c.id] || {};
+  const box = on => on ? '☑' : '☐';
+  return `<article class="pdoc">
+    <header><div class="pdoc-seal">전</div><div><h1>내 전세 계약 정리</h1><p>${esc(c.name || '')} · 작성일 ${fmt(today())}</p></div></header>
+    <h2>1. 계약 정보</h2><table>${contractRows(c)}${pRow('매매 시세', manWon(c.market))}${pRow('공시가격', manWon(c.official))}${pRow('근저당 채권최고액 합계', manWon(c.debt))}${pRow('선순위 보증금 합계', manWon(c.seniorDep))}</table>
+    <h2>2. 위험 진단 (교육용 참고)</h2><table>
+      ${d.ratio != null ? pRow('보증금 + 앞선 빚 ÷ 시세', `${d.ratio.toFixed(1)}% (${d.ratio <= 70 ? '비교적 안전' : d.ratio <= 80 ? '주의' : '위험'})`) : ''}
+      ${d.hugLimit ? pRow(`HUG 가격 기준 (${d.hugBasis})`, `${won(d.hugLimit)} — ${d.hugPass ? '이내' : '초과'}`) : ''}
+      ${d.smallTh ? pRow('소액임차인 최우선변제', d.small ? `해당 가능 (최대 ${won(d.smallAmt)})` : '해당 없음') : ''}</table>
+      ${d.items.length ? `<ul>${d.items.map(([, t]) => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+    <h2>3. 일정</h2>${evs.length ? `<table class="pdoc-sched"><thead><tr><th>날짜</th><th>할 일</th><th>완료</th></tr></thead><tbody>${evs.map(e => `<tr><td class="nowrap">${fmt(e.date)}${e.time ? ' ' + esc(e.time) : ''}<br><small>${ddayLabel(ddays(e.date))}</small></td><td><b>${esc(e.title)}</b>${e.custom ? ' <small>(내 일정)</small>' : ''}${e.note ? `<br><small>${esc(e.note)}</small>` : ''}</td><td class="c">${box(evDone(c, e))}</td></tr>`).join('')}</tbody></table>` : '<p>날짜를 넣으면 일정이 생겨요.</p>'}
+    <h2>4. 체크리스트</h2>${evs.filter(e => e.ck).map(e => `<h3>${esc(e.title)} <small>${fmt(e.date)}</small></h3><ul class="pdoc-ck">${ckItems(c, e.ck).map(it => `<li>${box(ch[it.id])} ${esc(it.text)}${it.required ? '' : ' <small>(권장)</small>'}</li>`).join('')}</ul>`).join('') || '<p>날짜를 넣으면 체크리스트가 생겨요.</p>'}
+    <h2>5. 특약 문구</h2><ol class="pdoc-cl">${onClauses(c).map(cl => `<li>${esc(clauseText(c, cl))}</li>`).join('')}</ol>
+    <footer>${esc(PRINT_SIGN)} 법령·보증기관 기준은 바뀔 수 있으니 계약 전 공식 기관에서 확인하세요.</footer></article>`;
+}
+function brokerDoc(c) {
+  const docs = ['등기사항전부증명서(계약 당일 발급본)', '건축물대장', '임대인 국세·지방세 납세증명서', '확정일자 부여현황(선순위 임차 정보)', '중개대상물 확인·설명서'];
+  if (c.flags.isTrust) docs.push('신탁원부 및 수탁자(신탁사)의 임대 동의서');
+  if (c.flags.isMultiFamily) docs.push('전입세대 열람 내역 및 선순위 임차보증금 합계');
+  if (c.flags.isAgent) docs.push('위임장 및 소유자 본인 발급 인감증명서');
+  return `<article class="pdoc broker">
+    <header><div class="pdoc-seal">전</div><div><h1>전세 계약 특약사항 요청서</h1><p>공인중개사님께 · ${fmt(today())}</p></div></header>
+    <p class="pdoc-lead">안녕하세요. 아래 주택의 임대차 계약과 관련하여, 계약서 특약사항에 다음 내용을 넣어 주시기를 요청드립니다. 계약 전에 문구를 함께 확인할 수 있으면 좋겠습니다.</p>
+    <h2>대상 주택과 계약 조건</h2><table>${contractRows(c)}</table>
+    <h2>요청 특약사항</h2><ol class="pdoc-cl">${onClauses(c).map(cl => `<li>${esc(clauseText(c, cl))}</li>`).join('')}</ol>
+    <h2>계약 전에 보여 주시길 요청하는 서류</h2><ul class="pdoc-ck">${docs.map(x => `<li>☐ ${esc(x)}</li>`).join('')}</ul>
+    <p class="small-note">계약금·잔금은 등기사항전부증명서상 소유자 명의 계좌로 송금하겠습니다.</p>
+    <table class="pdoc-sign"><tr><th>요청인</th><td>(서명)</td><th>연락처</th><td></td></tr></table>
+    <footer>${esc(PRINT_SIGN)}</footer></article>`;
 }
 
 /* ---------- insurance ---------- */
@@ -862,7 +1045,7 @@ function closeSheet() {
 
 /* ================= render ================= */
 const VIEWS = { intro: vIntro, terms: vTerms, home: vHome, learn: vLearn, glossary: vGlossary, docs: vDocs, contract: vContract, my: vMy, insurance: vInsurance, exam: vExam, news: vNews };
-let lastRoute = null, lastKey = null, lastQ = null;
+let lastRoute = null, lastKey = null, lastQ = null, lastPage = null;
 // 화면이 '바뀌었을 때'만 등장 애니메이션 — 체크·입력으로 다시 그릴 때는 움직이지 않게
 const viewKey = () => [S.route, S.stageId, S.lessonId, S.docId, S.docTab, S.docSample, S.sampleId, S.cmode, S.trap?.id, S.myTab, store.active, S.session ? 'exam' : '', S.result ? 'result' : ''].join('|');
 function render(keepScroll) {
@@ -874,10 +1057,19 @@ function render(keepScroll) {
   const main = document.getElementById('main');
   const key = viewKey(), q = S.session ? S.session.i : null;
   const anim = key !== lastKey ? 'enter' : q != null && q !== lastQ ? 'enter-q' : '';
+  // 다른 '페이지'(카드·단계·서류·계약서·시험)로 넘어가면 맨 위로 — 같은 페이지 안 탭 전환은 제자리
+  const pk = [S.route, S.stageId, S.lessonId, S.docId, S.sampleId, !!S.session, !!S.result].join('|');
+  const newPage = pk !== lastPage; lastPage = pk;
   lastKey = key; lastQ = q;
-  main.classList.remove('enter', 'enter-q');
+  main.classList.remove('enter', 'enter-q', 'dir-next', 'dir-prev');
   main.innerHTML = VIEWS[S.route]();
-  if (anim && !reduceMotion()) { void main.offsetWidth; main.classList.add(anim); if (anim === 'enter') countUp(main); }
+  if (anim && !reduceMotion()) { void main.offsetWidth; main.classList.add(anim); if (anim === 'enter') { countUp(main); if (S.navDir) main.classList.add('dir-' + S.navDir); } }
+  S.navDir = null;
+  if (newPage && keepScroll && !S.calFocus && !S.tour && scrollY > 0) {
+    const y0 = scrollY;
+    window.scrollTo({ top: 0, behavior: reduceMotion() || y0 > 3000 ? 'auto' : 'smooth' });
+    setTimeout(() => { if (scrollY >= y0 - 1) window.scrollTo(0, 0); }, 450); // 부드러운 스크롤을 지원하지 않는 앱 안 브라우저 대비
+  }
   document.querySelectorAll('[data-act="nav"][data-r]').forEach(b => { if (b.closest('.nav, .tabbar')) b.setAttribute('aria-current', b.dataset.r === S.route ? 'page' : 'false'); });
   renderSheet();
   if (S.route !== lastRoute && !keepScroll) window.scrollTo(0, 0);
@@ -929,10 +1121,32 @@ const A = {
   nav: el => go(el.dataset.r, el.dataset.r === 'learn' ? { stageId: null, lessonId: null } : el.dataset.r === 'docs' ? { docId: null } : el.dataset.r === 'exam' ? { result: S.session ? null : S.result } : {}),
   stage: el => go('learn', { stageId: el.dataset.id, lessonId: null }),
   learnHome: () => go('learn', { stageId: null, lessonId: null }),
-  lesson: el => go('learn', { lessonId: el.dataset.id, stageId: lessonById[el.dataset.id].stageId, sheet: null }),
+  lesson: el => go('learn', { lessonId: el.dataset.id, stageId: lessonById[el.dataset.id].stageId, sheet: null, navDir: el.dataset.dir || null }),
   term: el => { S.sheet = { type: 'term', id: el.dataset.id }; renderSheet(); },
   cksheet: el => { S.sheet = { type: 'ck', id: el.dataset.id }; renderSheet(); },
   sheetClose: () => closeSheet(),
+  // 달력·내 일정
+  calDay: el => { S.calDay = el.dataset.d; S.remForm = null; S.remMsg = ''; render(true); },
+  calMove: el => { const [y, m] = S.calMonth.split('-').map(Number); const d = new Date(y, m + +el.dataset.d, 1); S.calMonth = `${d.getFullYear()}-${d.getMonth()}`; render(true); },
+  calToday: () => { openCalAt(ymd(today())); S.remForm = null; render(true); },
+  remNew: el => { const date = el.dataset.d || S.calDay || ymd(today()); openCalAt(date); S.remForm = { id: null, date, time: '', type: 'bank', title: REMIND.bank.label, memo: '' }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
+  remEdit: el => { const c = activeContract(); const r = (c.reminders || []).find(x => x.id === el.dataset.id); if (!r) return; openCalAt(r.date); S.remForm = { ...r }; S.remMsg = ''; render(true); document.getElementById('remForm')?.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' }); },
+  remCancel: () => { S.remForm = null; S.remMsg = ''; render(true); },
+  remSave: () => {
+    const c = activeContract(); readRemForm(); const f = S.remForm;
+    if (!pDate(f.date)) { S.remMsg = '날짜를 골라 주세요.'; render(true); return; }
+    const title = f.title.trim() || (f.type !== 'custom' ? REMIND[f.type].label : '');
+    if (!title) { S.remMsg = '제목을 적어 주세요.'; render(true); return; }
+    const r = { id: f.id || 'r' + Date.now().toString(36), date: f.date, time: f.time, type: f.type, title, memo: f.memo.trim() };
+    const list = (c.reminders ||= []); const i = list.findIndex(x => x.id === r.id); if (i >= 0) list[i] = r; else list.push(r);
+    save(); S.remForm = null; S.remMsg = ''; openCalAt(r.date); render(true); toast(i >= 0 ? '일정을 고쳤어요' : '일정을 추가했어요');
+  },
+  remDel: () => { const f = S.remForm; if (!f.askDel) { readRemForm(); f.askDel = true; render(true); return; } const c = activeContract(); c.reminders = (c.reminders || []).filter(x => x.id !== f.id); delete (store.checks[c.id] || {})['ev:u:' + f.id]; save(); S.remForm = null; render(true); toast('일정을 지웠어요'); },
+  icsExport: el => { const c = activeContract(); const { text, n } = icsFor(c, el.dataset.w); if (!n) { toast(el.dataset.w === 'mine' ? '내 일정이 아직 없어요' : '일정이 없어요'); return; } download(`전세지킴이_일정_${safeName(c.name)}.ics`, text, 'text/calendar;charset=utf-8'); toast(`일정 ${n}개를 파일로 받았어요. 열어서 캘린더에 추가하세요`); },
+  // 저장·불러오기·PDF
+  saveFile: () => { const data = JSON.stringify({ app: 'jeonse-jikimi', v: 1, savedAt: new Date().toISOString(), contracts: store.contracts, checks: store.checks, clauseSel: store.clauseSel }, null, 1); download(`전세지킴이_내계약_${fileDate()}.json`, data, 'application/json'); toast('파일로 저장했어요'); },
+  printDoc: el => printDoc(el.dataset.k),
+  shareBroker: () => { const c = activeContract(); const text = brokerText(c); if (navigator.share) navigator.share({ title: '특약사항 요청', text }).catch(() => {}); else copyText(text); },
   paperMode: el => { S.paperMode = el.dataset.m; render(true); },
   introStart: () => go(termsOk ? 'home' : 'terms'),
   termsAgree: () => {
@@ -968,7 +1182,7 @@ const A = {
   trapReset: () => { S.trap = { id: S.trap.id, found: [], wrong: 0, revealed: false }; render(true); },
   calc: el => go('insurance', { calcFocus: el.dataset.id, sheet: null }),
   clauses: () => go('my', { myTab: activeContract() ? 'clauses' : 'library' }),
-  myTab: el => { S.myTab = el.dataset.t; S.confirmDel = false; render(true); },
+  myTab: el => { S.myTab = el.dataset.t; S.confirmDel = false; S.remForm = null; S.remMsg = ''; render(true); },
   cNew: () => { const c = newContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'info'; S.confirmDel = false; render(true); },
   cExample: () => { const c = exampleContract(); store.contracts.push(c); store.active = c.id; save(); S.myTab = 'plan'; render(true); },
   cDel: () => { S.confirmDel = true; render(true); },
@@ -979,7 +1193,7 @@ const A = {
   copyBk: () => { const t = document.getElementById('bkOut'); copyText(t.value, '#bkOut'); },
   importBk: () => {
     const raw = document.getElementById('bkIn').value.trim();
-    try { const d = JSON.parse(raw); if (!Array.isArray(d.contracts)) throw new Error('형식'); store.contracts = d.contracts; store.checks = d.checks || {}; store.clauseSel = d.clauseSel || {}; store.active = store.contracts[0]?.id || null; save(); S.importMsg = `계약 ${d.contracts.length}건을 불러왔어요.`; }
+    try { const n = mergeBackup(JSON.parse(raw)); S.importMsg = `계약 ${n}건을 불러왔어요.`; }
     catch (e) { S.importMsg = '불러오지 못했어요. 백업에서 복사한 글 전체를 그대로 붙여넣었는지 확인하세요.'; }
     render(true);
   },
@@ -994,6 +1208,13 @@ const A = {
   examHome: () => { S.result = null; render(true); },
 };
 const CHANGE = {
+  remType: el => { const f = S.remForm; const prev = f.type; readRemForm(); f.type = el.value; if (!f.title.trim() || f.title === REMIND[prev]?.label) f.title = el.value === 'custom' ? '' : REMIND[el.value].label; render(true); if (el.value === 'custom') document.getElementById('rm-title')?.focus(); },
+  loadFile: el => {
+    const file = el.files?.[0]; if (!file) return;
+    const rd = new FileReader();
+    rd.onload = () => { try { const n = mergeBackup(JSON.parse(rd.result)); S.importMsg = `계약 ${n}건을 불러왔어요.`; toast(S.importMsg); } catch (e) { S.importMsg = '불러오지 못했어요. 전세지킴이에서 저장한 파일(.json)인지 확인하세요.'; } render(true); };
+    rd.readAsText(file);
+  },
   ckItem: el => {
     const c = activeContract(); (store.checks[c.id] ||= {})[el.dataset.id] = el.checked; save();
     if (el.checked) S.fx = { sel: `[data-act="ckItem"][data-id="${el.dataset.id}"]`, cls: 'pop' };
