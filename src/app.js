@@ -970,7 +970,7 @@ function vIntro() {
     <p class="in-sub">평생 모은 돈이 들어가는 계약이에요.<br>하루의 틈, 서류 한 장이 결과를 바꿔요.</p>
     <div class="in-hero-cta"><button class="btn in-go" data-act="introStart">바로 시작하기</button><button class="in-tour" data-act="introJump" data-to="2">5장면 둘러보기 <span aria-hidden="true">↓</span></button></div>
     <div class="in-stamp" data-at="0.3" aria-hidden="true">확인<br>필요</div>
-    <button class="in-cue" data-act="introJump" data-to="2" aria-label="다음 장면으로 내려가기"><span class="mouse" aria-hidden="true"><i></i></span><span>아래로 내려보세요</span><span class="chev" aria-hidden="true"><i></i><i></i></span></button>
+    <button class="in-cue" data-act="introJump" data-to="2" aria-label="다음 장면으로 내려가기"><span>아래로 내려보세요</span><span class="chev" aria-hidden="true"><i></i><i></i></span></button>
   </div></section>
 
   <section class="fr fr2" data-fr="2"><div class="fr-stick">
