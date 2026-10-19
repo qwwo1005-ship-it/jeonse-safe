@@ -5,12 +5,13 @@
 ## 구조
 - `content/*.json` — 모든 교육 콘텐츠(진짜 데이터). 화면 문구 대부분이 여기 있음.
   - lessons(9단계 학습카드·계산기), glossary, checklists(플래너 일정 연동), clauses(특약), insurance,
-    policy_updates(최신 제도, 상태 태그), documents(서류 읽는 법 10종), contract_sample(계약서 예시 4종·위험찾기), quiz(223문항·시험 설정), meta,
+    policy_updates(최신 제도, 상태 태그), documents(서류 읽는 법 10종), contract_sample(계약서 예시 4종·위험찾기), quiz(338문항·모의고사 10회: 입문2·기초3·실전3·심화2, 회차끼리 문항 안 겹침), meta,
     scams(알려진 사기 수법 13가지), onboarding(약관 다음 수준 확인 9문항·결과별 추천·기초 단어 10개)
 - `src/index.template.html`, `src/style.css`, `src/app.js` — 앱 본체(해시 라우팅 SPA, 상태는 localStorage)
 - `tools/build.py` — content + src를 하나로 묶어 `dist/standalone.html`(배포용), `dist/index.html`(Claude 아티팩트용) 생성
 - `tools/validate.py` — JSON 간 ID 연결(lessonId, hotspotId, clauseId 등) 검사
 - `tools/gen_contracts.py`, `tools/gen_quiz.py` — 계약서 예시·문항 생성기(실행하면 해당 JSON 덮어씀)
+- `tools/upgrade_quiz.py` — gen_quiz.py 다음에 실행. 오답을 그럴듯하게 교체, 어려운 문항(q_301~) 추가, 모의고사 10회 배분(재실행해도 결과 같음)
 
 ## 디자인 (확정)
 - 확정안 = A(솜사탕) 그대로: `html[data-design="a"]`가 기본. 핑크·라일락 파스텔, 둥근 카드, 알약 모양 버튼, 주아 제목. (A 톤에 C 버튼만 섞는 안은 어색해서 취소)
@@ -31,7 +32,8 @@ python3 tools/validate.py && python3 tools/build.py
 
 ## 규칙
 - 콘텐츠를 고치면 validate → build 순서로 실행.
-- 문항 정답 위치는 고르게 유지(gen_quiz.py가 시드로 섞음). OX는 섞지 않음.
+- 문항 정답 위치는 고르게 유지(upgrade_quiz.py가 가장 적게 쓰인 자리에 배치). OX는 섞지 않음.
+- 오답은 헷갈릴 만한 것으로(터무니없는 보기 금지), 정답만 유독 길지 않게 보기 길이를 맞추기.
 - 법·제도 수치는 기준일(baseDate)과 상태 태그(IN_FORCE / PASSED_PENDING / PROPOSED / PLANNED_SERVICE)를 함께 관리. '추진 중'을 시행된 것처럼 쓰지 않기.
 - 현행법상 대항력은 전입신고 다음 날 0시(즉시 발생 개정안은 추진 중, 2026-10 기준).
 - 문구는 쉬운 존댓말("~해요"), 경고에는 항상 지금 할 행동을 붙임.

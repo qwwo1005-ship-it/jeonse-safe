@@ -49,8 +49,15 @@ for q in Q["questions"]:
     chk([q["stageId"]], stages, q["id"])
     for k, pool in [("lessonId", lessons), ("contractHotspotId", hs), ("documentId", docs), ("documentHotspotId", dhs), ("clauseId", cl)]:
         if k in q: chk([q[k]], pool, q["id"])
+    if q["type"] != "OX" and len(set(q["options"])) != len(q["options"]): err.append("duplicate options " + q["id"])
+in_exam = []
+for e in Q["exams"]:
+    if "questionIds" not in e: continue
+    chk(e["questionIds"], qs, e["id"]); in_exam += e["questionIds"]
+    if len(e["questionIds"]) != e["questionCount"]: err.append(f"{e['id']}: questionCount mismatch")
+if len(in_exam) != len(set(in_exam)): err.append("mock exams share questions")
 for s in S["samples"]:
-    sh = {h["id"] for h in s["hotspots"]}
+    sh ={h["id"] for h in s["hotspots"]}
     keys = {f["key"] for p in s["pages"] for sec in p["sections"] for f in sec["fields"]}
     for p in s["pages"]:
         for sec in p["sections"]:

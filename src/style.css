@@ -1092,3 +1092,25 @@ html.print-open { overflow: hidden; }
   .fr .tl-pt, .fr .h-line { opacity: 1 !important; }
   mark.hl { background-size: 100% 100%; }
 }
+
+/* ===== 모의고사 · 짧은 퀴즈 ===== */
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.quick { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 16px; border: 1px solid var(--line-strong); border-radius: 18px; background: var(--surface); transition: transform .18s ease, box-shadow .18s ease, border-color .18s; }
+.quick b { font-size: 1.05rem; }
+.quick .small { color: var(--muted); }
+.quick:hover:not([disabled]) { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
+.quick:focus-visible, .mock:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.quick[disabled] { opacity: .5; cursor: default; }
+.quick.main { background: var(--accent-soft); border-color: var(--accent); }
+.unit-quiz summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+.unit-quiz .where { margin-top: 8px; }
+.tier h3 { display: inline; }
+.tier .stars { color: var(--warn); font-size: .85rem; letter-spacing: 1px; }
+.mock-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.mock { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface); transition: transform .18s ease, border-color .18s; }
+.mock:hover { transform: translateY(-2px); border-color: var(--accent); }
+.mock .small { color: var(--muted); }
+.mock.rec { border: 2px solid var(--accent); background: var(--accent-soft); }
+.mock.rec .mock-score { color: var(--accent-ink); font-weight: 700; }
+.mock.done { border-color: var(--ok); }
+.mock.done .mock-score { color: var(--ok); font-weight: 700; }

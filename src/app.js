@@ -26,7 +26,7 @@ samples.forEach(s => s.hotspots.forEach(h => { if (!allHotspots[h.id]) allHotspo
 
 /* ================= storage ================= */
 const KEY = 'jeonse-guard-v1';
-const blank = () => ({ v: 1, read: {}, contracts: [], active: null, checks: {}, clauseSel: {}, wrong: {}, results: [], hl: {}, trash: [] });
+const blank = () => ({ v: 1, read: {}, contracts: [], active: null, checks: {}, clauseSel: {}, wrong: {}, results: [], hl: {}, trash: [], seen: {} });
 let store = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) store = Object.assign(blank(), JSON.parse(raw)); } catch (e) { /* storage unavailable */ }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* ignore */ } };
@@ -964,18 +964,30 @@ function vInsurance() {
 
 /* ---------- exam ---------- */
 const CAT = { BASIC: '기초', DOCS: '서류·권리분석', CLAUSE: '특약', INSURANCE: '보증보험', RESPONSE: '대응' };
+const TIER = [['intro', '입문', '용어와 기본 순서를 확인해요', 1], ['basic', '기초', '서류·특약의 기본을 다져요', 2], ['real', '실전', '계산·상황 판단이 섞여요', 3], ['adv', '심화', '헷갈리는 함정만 모았어요', 4]];
+const MOCKS = C.quiz.exams.filter(e => e.questionIds);
+const recTier = () => ({ starter: 'intro', basic: 'basic', ready: 'real' })[store.level?.id] || 'intro';
+// 안 푼 문제부터, 그다음 오래전에 본 문제 순으로 n개
+function freshPick(list, n) {
+  const seen = store.seen || {};
+  return shuffle(list).sort((a, b) => (seen[a.id] || 0) - (seen[b.id] || 0)).slice(0, n);
+}
+const QUICK = {
+  quick: () => ['오늘의 5문제', freshPick(qs, 5)],
+  cat: o => [`${CAT[o.cat]} 5문제`, freshPick(qs.filter(q => q.category === o.cat), 5)],
+  calc: () => ['계산·상황 5문제', freshPick(qs.filter(q => q.type === 'CALC' || q.type === 'SCENARIO'), 5)],
+  docs: () => ['서류 읽기 10문제', freshPick(qs.filter(q => q.documentId || q.contractHotspotId || q.category === 'DOCS'), 10)],
+  unit: o => { const st = stageById[o.stage]; return [`${st.order}단계 단원 퀴즈`, freshPick(qs.filter(q => q.stageId === st.id), 5)]; },
+};
 function startExam(kind, opt = {}) {
-  let pool = [], title = '', limit = null, mode = 'after', examId = kind;
-  if (kind === 'exam_full_01' || kind === 'exam_full_02') {
-    const ex = examById[kind]; title = ex.title; limit = ex.timeLimitMin;
-    Object.entries(ex.distribution).forEach(([cat, n]) => { pool.push(...shuffle(qs.filter(q => q.category === cat)).slice(0, n)); });
-    pool.sort((a, b) => a.stageId.localeCompare(b.stageId));
-  } else if (kind === 'exam_docs') {
-    const ex = examById[kind]; title = ex.title; limit = ex.timeLimitMin;
-    pool = shuffle(qs.filter(q => q.documentId || q.contractHotspotId)).slice(0, ex.questionCount);
-  } else if (kind === 'unit') {
-    const st = stageById[opt.stage]; title = `${st.order}단계 단원 퀴즈`; mode = 'now'; examId = 'unit:' + st.id;
-    pool = shuffle(qs.filter(q => q.stageId === st.id)).slice(0, 5);
+  let pool = [], title = '', limit = null, mode = 'after', examId = kind, again = null;
+  const ex = examById[kind];
+  if (ex?.questionIds) {
+    title = ex.title; limit = ex.timeLimitMin;
+    pool = ex.questionIds.map(id => qById[id]).filter(Boolean);
+  } else if (QUICK[kind]) {
+    [title, pool] = QUICK[kind](opt); mode = 'now'; again = { kind, opt };
+    examId = kind === 'unit' ? 'unit:' + opt.stage : kind === 'cat' ? 'cat:' + opt.cat : kind;
   } else if (kind === 'wrong') {
     title = '오답노트 다시 풀기'; mode = 'now';
     pool = shuffle(Object.keys(store.wrong).map(id => qById[id]).filter(Boolean)).slice(0, 20);
@@ -985,22 +997,42 @@ function startExam(kind, opt = {}) {
   }
   if (!pool.length) { toast('풀 문제가 없어요'); return; }
   const perm = {}; pool.forEach(q => { const o = q.options.map((_, i) => i); perm[q.id] = q.type === 'OX' ? o : shuffle(o); });
-  S.session = { examId, title, ids: pool.map(q => q.id), i: 0, ans: {}, perm, mode, limit, start: Date.now() };
+  S.session = { examId, title, ids: pool.map(q => q.id), i: 0, ans: {}, perm, mode, limit, again, start: Date.now() };
   S.result = null; S.submitWarn = false;
   go('exam');
+}
+const bestOf = id => store.results.filter(r => r.examId === id).reduce((m, r) => Math.max(m, r.score), -1);
+function mockCard(e, rec) {
+  const best = bestOf(e.id), passed = best >= e.passScore;
+  return `<button class="mock${passed ? ' done' : ''}${rec ? ' rec' : ''}" data-act="examStart" data-id="${e.id}">
+    <b>${esc(e.title.replace(/^.+ 모의고사 /, ''))}</b><span class="small">${e.questionCount}문항 · ${e.timeLimitMin}분</span>
+    <span class="small mock-score">${best < 0 ? (rec ? '여기부터 추천' : '아직 안 풀었어요') : `최고 ${best}점${passed ? ' · 합격' : ''}`}</span></button>`;
 }
 function vExam() {
   if (S.session) return vSession();
   if (S.result) return vResult();
   const last = store.results.slice(-5).reverse();
   const wrongN = Object.keys(store.wrong).length;
-  return `<div class="page"><div class="head"><div class="eyebrow">모의고사</div><h1>${qs.length}문항 문제은행</h1><p>실전 모의고사는 30분에 30문항, 80점 이상이면 수료 배지를 받아요. 틀린 문제는 오답노트에 모여요.</p></div>
-  <div class="grid">
-    ${['exam_full_01', 'exam_full_02', 'exam_docs'].map(id => { const e = examById[id]; return `<div class="card stack"><h3>${esc(e.title)}</h3><p class="small muted">${e.questionCount}문항 · ${e.timeLimitMin}분 · 합격 ${e.passScore}점</p>${e.distribution ? `<p class="small">${Object.entries(e.distribution).map(([k, v]) => `${CAT[k]} ${v}`).join(' · ')}</p>` : '<p class="small">등기부·건축물대장·확인설명서·계약서 칸 읽기</p>'}<div><button class="btn primary" data-act="examStart" data-id="${id}">시작하기</button></div></div>`; }).join('')}
-    <div class="card stack"><h3>오답노트</h3><p class="small muted">${wrongN}문항 · 맞히면 노트에서 빠져요</p><div><button class="btn" data-act="examStart" data-id="wrong" ${wrongN ? '' : 'disabled'}>다시 풀기</button></div></div></div>
-  <section class="stack"><h2>단원 퀴즈 (5문항, 바로 해설)</h2><div class="where">${STAGES.map(s => `<button data-act="examStart" data-id="unit" data-stage="${s.id}">${s.order}. ${esc(s.title)}</button>`).join('')}</div></section>
+  const seenN = Object.keys(store.seen || {}).filter(id => qById[id]).length;
+  const rt = recTier();
+  const recId = (MOCKS.find(e => e.tier === rt && bestOf(e.id) < e.passScore) || MOCKS.find(e => bestOf(e.id) < e.passScore) || {}).id;
+  return `<div class="page"><div class="head"><div class="eyebrow">모의고사 · 짧은 퀴즈</div><h1>${qs.length}문항 문제은행</h1><p>모의고사 ${MOCKS.length}회는 회차마다 문제가 겹치지 않아요. 짧은 퀴즈는 안 푼 문제부터 나와요. 지금까지 ${seenN}문항을 풀었어요.</p>
+    <div class="bar" style="margin-top:10px"><i style="width:${Math.round(seenN / qs.length * 100)}%"></i></div></div>
+  <section class="stack"><h2>짧은 퀴즈 <span class="small muted">5문제 · 바로 해설</span></h2>
+    <div class="quick-grid">
+      <button class="quick main glow" data-act="examStart" data-id="quick"><b>오늘의 5문제</b><span class="small">안 푼 문제부터 골고루</span></button>
+      <button class="quick" data-act="examStart" data-id="calc"><b>계산·상황</b><span class="small">숫자와 판단 연습</span></button>
+      <button class="quick" data-act="examStart" data-id="docs"><b>서류 읽기</b><span class="small">10문제</span></button>
+      <button class="quick" data-act="examStart" data-id="wrong" ${wrongN ? '' : 'disabled'}><b>오답노트</b><span class="small">${wrongN}문항 · 맞히면 빠져요</span></button>
+    </div>
+    <div class="where">${Object.entries(CAT).map(([k, v]) => `<button data-act="examStart" data-id="cat" data-cat="${k}">${v}</button>`).join('')}</div>
+    <details class="unit-quiz"><summary>단계별 단원 퀴즈</summary><div class="where">${STAGES.map(s => `<button data-act="examStart" data-id="unit" data-stage="${s.id}">${s.order}. ${esc(s.title)}</button>`).join('')}</div></details></section>
+  <section class="stack"><h2>모의고사 ${MOCKS.length}회 <span class="small muted">입문 → 심화</span></h2>
+    ${TIER.map(([t, name, desc, stars]) => { const list = MOCKS.filter(e => e.tier === t); if (!list.length) return ''; const e0 = list[0];
+      return `<div class="card stack tier tier-${t}"><div class="row" style="justify-content:space-between"><div><h3>${name} <span class="stars">${'★'.repeat(stars)}</span>${t === rt ? ' <span class="chip plan-chip">내 수준</span>' : ''}</h3><p class="small muted">${desc} · 합격 ${e0.passScore}점${e0.certificate ? ' · 수료 배지' : ''}</p></div></div>
+        <div class="mock-row">${list.map(e => mockCard(e, e.id === recId)).join('')}</div></div>`; }).join('')}</section>
   ${last.length ? `<section class="stack"><h2>최근 기록</h2><div class="table-wrap"><table class="data"><thead><tr><th>날짜</th><th>시험</th><th>점수</th></tr></thead><tbody>${last.map(r => `<tr><td class="num">${esc(r.date)}</td><td>${esc(r.title)}</td><td class="num">${r.score}점 (${r.correct}/${r.total})</td></tr>`).join('')}</tbody></table></div></section>` : ''}
-  ${store.results.some(r => r.cert) ? `<div class="cert"><div class="eyebrow">수료</div><h2>전세 안전 수료</h2><p class="small">실전 모의고사 80점 이상 달성</p></div>` : ''}</div>`;
+  ${store.results.some(r => r.cert) ? `<div class="cert"><div class="eyebrow">수료</div><h2>전세 안전 수료</h2><p class="small">실전·심화 모의고사 80점 이상 달성</p></div>` : ''}</div>`;
 }
 function remain() { const s = S.session; if (!s?.limit) return null; return Math.max(0, s.limit * 60 - Math.floor((Date.now() - s.start) / 1000)); }
 const mmss = t => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
@@ -1024,13 +1056,13 @@ function vSession() {
 function submitExam() {
   const s = S.session; const items = s.ids.map(id => ({ q: qById[id], a: s.ans[id] }));
   const correct = items.filter(x => x.a === x.q.answer).length; const score = Math.round(correct / items.length * 100);
-  items.forEach(x => { if (x.a === x.q.answer) delete store.wrong[x.q.id]; else store.wrong[x.q.id] = (store.wrong[x.q.id] || 0) + 1; });
+  store.seen ||= {}; items.forEach(x => { if (x.a != null) store.seen[x.q.id] = Date.now(); if (x.a === x.q.answer) delete store.wrong[x.q.id]; else store.wrong[x.q.id] = (store.wrong[x.q.id] || 0) + 1; });
   const ex = examById[s.examId]; const pass = ex?.passScore ? score >= ex.passScore : null;
   const cert = !!(ex?.certificate && score >= ex.certificate.minScore);
   const d = new Date(); const date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   if (!s.examId.startsWith('ids')) store.results.push({ examId: s.examId, title: s.title, score, correct, total: items.length, date, cert });
   store.results = store.results.slice(-50); save();
-  S.result = { title: s.title, examId: s.examId, items, score, correct, pass, cert, mode: s.mode }; S.session = null; S.submitWarn = false;
+  S.result = { title: s.title, examId: s.examId, items, score, correct, pass, cert, badge: ex?.certificate?.badge, mode: s.mode, again: s.again }; S.session = null; S.submitWarn = false;
 }
 function vResult() {
   const r = S.result; const cats = {};
@@ -1040,9 +1072,11 @@ function vResult() {
   return `<div class="page"><div class="head"><div class="eyebrow">${esc(r.title)} 결과</div><h1>${r.correct} / ${r.items.length} 정답</h1></div>
   <div class="row" style="gap:20px"><div class="score-ring" style="--c:${color};--p:${r.score}" role="img" aria-label="${r.score}점"><span data-count="${r.score}">${r.score}</span></div>
     <div class="stack">${r.pass != null ? `<span class="chip ${r.pass ? 'green' : 'red'}">${r.pass ? '합격' : '불합격'}</span>` : ''}<div class="table-wrap"><table class="data"><tbody>${Object.entries(cats).map(([k, [a, b]]) => `<tr><th>${CAT[k]}</th><td class="num">${a}/${b}</td></tr>`).join('')}</tbody></table></div></div></div>
-  ${r.cert ? `<div class="cert"><div class="eyebrow">전세지킴이</div><h2>전세 안전 수료</h2><p>${esc(r.title)} ${r.score}점으로 수료 기준을 넘었어요.</p></div>` : ''}
+  ${r.cert ? `<div class="cert"><div class="eyebrow">전세지킴이</div><h2>${esc(r.badge || '전세 안전 수료')}</h2><p>${esc(r.title)} ${r.score}점으로 수료 기준을 넘었어요.</p></div>` : ''}
   ${wrong.length ? `<section class="stack"><h2>틀린 문제 다시 보기</h2>${wrong.map(x => `<div class="card stack"><p><b>${esc(x.q.prompt)}</b></p><p class="small">내 답: ${x.a == null ? '(빈칸)' : esc(x.q.options[x.a])} · 정답: <b>${esc(x.q.options[x.q.answer])}</b></p><p class="small muted">${esc(x.q.explanation)}</p>${x.q.lessonId ? `<div><button class="btn ghost" data-act="lessonSheet" data-id="${x.q.lessonId}">학습카드</button></div>` : ''}</div>`).join('')}</section>` : '<div class="callout green">모두 맞혔어요!</div>'}
-  <div class="row"><button class="btn primary" data-act="examStart" data-id="wrong" ${Object.keys(store.wrong).length ? '' : 'disabled'}>오답노트 풀기</button><button class="btn" data-act="examHome">시험 목록</button></div></div>`;
+  <div class="row">${r.again ? `<button class="btn primary glow" data-act="examAgain">이어서 ${r.items.length}문제 더</button>` : ''}${nextMock(r.examId) ? `<button class="btn${r.again ? '' : ' primary'}" data-act="examStart" data-id="${nextMock(r.examId).id}">다음: ${esc(nextMock(r.examId).title)}</button>` : ''}<button class="btn" data-act="examStart" data-id="wrong" ${Object.keys(store.wrong).length ? '' : 'disabled'}>오답노트 풀기</button><button class="btn ghost" data-act="examHome">시험 목록</button></div></div>`;
+}
+function nextMock(id) { const i = MOCKS.findIndex(e => e.id === id); return i >= 0 ? MOCKS[i + 1] : null;
 }
 
 // 상태별 보기: 시행 중 / 시행 예정·대기 / 추진 중(미확정)
@@ -1502,7 +1536,7 @@ const A = {
   termsWithdraw: () => { try { localStorage.removeItem(TERMS_KEY); } catch (e) { /* ignore */ } termsOk = false; go('intro'); toast('동의를 철회했어요'); },
   theme: () => { const order = ['', 'light', 'dark']; theme = order[(order.indexOf(theme) + 1) % 3]; try { localStorage.setItem('jeonse-theme', theme); } catch (e) { /* ignore */ } applyTheme(true); },
   hl: el => { const id = S.lessonId, i = +el.dataset.i; const arr = (store.hl[id] ||= []); const k = arr.indexOf(i); if (k >= 0) arr.splice(k, 1); else arr.push(i); if (!arr.length) delete store.hl[id]; save(); el.classList.toggle('mine', k < 0); el.setAttribute('aria-pressed', String(k < 0)); if (k < 0) toast('밑줄 노트에 담았어요'); },
-  lqAnswer: el => { S.lq.a = +el.dataset.i; const q = qById[S.lq.id]; if (S.lq.a !== q.answer) store.wrong[q.id] = (store.wrong[q.id] || 0) + 1; save(); render(true); },
+  lqAnswer: el => { S.lq.a = +el.dataset.i; const q = qById[S.lq.id]; (store.seen ||= {})[q.id] = Date.now(); if (S.lq.a !== q.answer) store.wrong[q.id] = (store.wrong[q.id] || 0) + 1; save(); render(true); },
   lqNext: () => { S.lq = pickLessonQ(S.lessonId, S.lq?.id); render(true); },
   doc: el => go('docs', { docId: el.dataset.id, docTab: el.dataset.t || 'guide', docSample: 0, hsId: null, tour: null, sheet: null }),
   docsHome: () => go('docs', { docId: null, hsId: null, tour: null }),
@@ -1538,7 +1572,8 @@ const A = {
     catch (e) { S.importMsg = '불러오지 못했어요. 백업에서 복사한 글 전체를 그대로 붙여넣었는지 확인하세요.'; }
     render(true);
   },
-  examStart: el => { const id = el.dataset.id; startExam(id, { stage: el.dataset.stage }); },
+  examStart: el => { const id = el.dataset.id; startExam(id, { stage: el.dataset.stage, cat: el.dataset.cat }); },
+  examAgain: () => { const a = S.result?.again; if (a) startExam(a.kind, a.opt); },
   quizIds: el => { S.sheet = null; startExam('ids', { ids: el.dataset.ids.split(','), title: '관련 문제' }); },
   quizDoc: el => startExam('ids', { ids: qs.filter(q => q.documentId === el.dataset.id).map(q => q.id), title: `${docById[el.dataset.id].name} 문제` }),
   answer: el => { const s = S.session; const q = s.ids[s.i]; if (s.mode === 'now' && s.ans[q] != null) return; s.ans[q] = +el.dataset.i; S.submitWarn = false; render(true); },
